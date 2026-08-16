@@ -300,6 +300,26 @@
   .freq-item .desc { color: var(--text-dim); margin-top: 1px; }
   .freq-item.hot { border-color: var(--danger); }
 
+  .gauge-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .gauge-unit { display: flex; flex-direction: column; align-items: center; }
+  .gauge-unit canvas { width: 220px; height: 150px; background: transparent; border-radius: 0; }
+  .gauge-caption {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    margin-top: 2px;
+  }
+
   #lufsTimelineCanvas { height: 160px; }
   .timeline-legend { display: flex; gap: 16px; font-size: 10.5px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.02em; color: var(--text-dim); margin-top: 8px; }
   .timeline-legend span { display: flex; align-items: center; gap: 5px; }
@@ -322,6 +342,57 @@
   .hidden { display: none !important; }
 
   #playhead-controls { display: flex; align-items: center; gap: 10px; }
+
+  /* Accessibility: visible keyboard focus */
+  button:focus-visible, .upload-zone:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; }
+  }
+
+  /* Mobile / narrow viewport */
+  @media (max-width: 720px) {
+    header { padding: 12px 14px; }
+    header h1 { font-size: 14px; }
+    header .eyebrow { display: none; }
+    .theme-toggle { padding: 5px 9px; font-size: 10px; }
+    main { padding: 14px 14px 32px; }
+    .panel { padding: 14px 14px 16px; margin-top: 12px; }
+    .panel h2 { font-size: 10px; margin-bottom: 12px; }
+
+    .gauge-row { gap: 4px; padding-bottom: 12px; margin-bottom: 12px; }
+    .gauge-unit canvas { width: 165px; height: 115px; }
+
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .metric-box .value { font-size: 19px; }
+    .metric-box .label { font-size: 9px; }
+
+    .platform-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+    .freq-guide { grid-template-columns: repeat(2, 1fr); }
+
+    .vectorscope-row { flex-direction: column; align-items: center; }
+    #vectorscopeCanvas { width: 100%; max-width: 260px; height: auto; aspect-ratio: 1; }
+    .corr-readout { width: 100%; min-width: 0; }
+
+    #waveformCanvas { height: 130px; }
+    #sampleCanvas { height: 120px; }
+    #spectrumCanvas { height: 140px; }
+    #eqCanvas { height: 200px; }
+    #lufsTimelineCanvas { height: 130px; }
+
+    .upload-compact .fname { max-width: 150px; }
+    .controls-row { gap: 6px; }
+    button.tool-btn { padding: 6px 10px; font-size: 10.5px; }
+    .zoom-label { font-size: 10.5px; }
+    .eq-hint { display: block; margin-top: 4px; }
+  }
+
+  @media (max-width: 420px) {
+    .metrics-grid { grid-template-columns: 1fr 1fr; }
+    .gauge-row { flex-direction: column; align-items: center; }
+  }
 </style>
 </head>
 <body data-theme="dark">
@@ -362,6 +433,16 @@
 
     <div class="panel">
       <h2>Loudness &amp; Dynamics</h2>
+      <div class="gauge-row" id="gaugeRow">
+        <div class="gauge-unit">
+          <canvas id="lufsGaugeCanvas" width="220" height="150"></canvas>
+          <div class="gauge-caption">Integrated Loudness</div>
+        </div>
+        <div class="gauge-unit">
+          <canvas id="tpGaugeCanvas" width="220" height="150"></canvas>
+          <div class="gauge-caption">True Peak</div>
+        </div>
+      </div>
       <div class="metrics-grid" id="loudnessGrid"></div>
       <p class="info-text">Integrated loudness is measured per ITU-R BS.1770-4: K-weighting filters, 400ms gated blocks with 75% overlap, absolute gate at −70 LUFS and relative gate at −10 LU below the absolute-gated mean. Commercial masters typically target around −14 to −9 integrated LUFS with true peak below −1 dBTP. True peak here uses 4x linear-interpolation oversampling as an approximation of the standard's polyphase filter — close, but a dedicated meter may read slightly differently on inter-sample peaks.</p>
     </div>
@@ -463,7 +544,11 @@
     const isDark = html.getAttribute('data-theme') === 'dark';
     html.setAttribute('data-theme', isDark ? 'light' : 'dark');
     themeToggle.textContent = isDark ? '🌙 Dark Mode' : '☀ Light Mode';
-    if (audioBuffer) { drawWaveform(); drawSampleView(); drawEqCurve(); drawLufsTimeline(); }
+    if (audioBuffer) {
+      drawWaveform(); drawSampleView(); drawEqCurve(); drawLufsTimeline();
+      if (integratedLufs !== null) drawArcGauge('lufsGaugeCanvas', integratedLufs, -30, 0, -14, 'LUFS', 1);
+      if (lastTruePeakDb !== null) drawArcGauge('tpGaugeCanvas', lastTruePeakDb, -12, 1, -1, 'dBTP', 1);
+    }
   });
 
   const uploadZone = document.getElementById('uploadZone');
@@ -493,6 +578,7 @@
   let selection = null; // {start, end} in samples, channel 0
   let animFrame;
   let integratedLufs = null;
+  let lastTruePeakDb = null;
   let enhancedMakeupLinear = 1.0; // calibrated so Enhanced mode actually lands at -14 LUFS
   let enhancedCalibrationStatus = 'idle'; // idle | calculating | done
   let currentFileName = 'master';
@@ -550,6 +636,7 @@
     document.querySelector('.ab-btn[data-mode="original"]').classList.add('active');
     abMode = 'original';
     loudnessTimelineBlocks = null;
+    lastTruePeakDb = null;
   }
 
   function renderFileInfo(file) {
@@ -887,6 +974,96 @@
     return p95 - p10;
   }
 
+  // ---- Analog-style arc gauge (VU/LUFS meter aesthetic) ----
+  function drawArcGauge(canvasId, value, min, max, targetValue, unit, decimals) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const cssW = canvas.clientWidth || 220, cssH = canvas.clientHeight || 150;
+    canvas.width = cssW * dpr; canvas.height = cssH * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    const cx = cssW / 2, cy = cssH - 18, r = Math.min(cssW / 2 - 18, cssH - 34);
+    const startAngle = Math.PI * 1.0, endAngle = Math.PI * 2.0; // semicircle, left to right
+    const clamped = Math.max(min, Math.min(max, value));
+    const t = (clamped - min) / (max - min);
+    const valueAngle = startAngle + t * (endAngle - startAngle);
+
+    // background track
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, startAngle, endAngle);
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = css('--bg-panel-2');
+    ctx.lineCap = 'butt';
+    ctx.stroke();
+
+    // colored fill arc, color reflects zone (danger near max, warn approaching, accent2 healthy)
+    let arcColor = css('--accent2');
+    if (isFinite(value)) {
+      if (t > 0.92) arcColor = css('--danger');
+      else if (t > 0.78) arcColor = css('--warn');
+    }
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, startAngle, valueAngle);
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = arcColor;
+    ctx.stroke();
+
+    // tick marks
+    ctx.strokeStyle = css('--border-bright');
+    ctx.lineWidth = 1;
+    const tickCount = 6;
+    for (let i = 0; i <= tickCount; i++) {
+      const a = startAngle + (i / tickCount) * (endAngle - startAngle);
+      const x1 = cx + Math.cos(a) * (r + 8), y1 = cy + Math.sin(a) * (r + 8);
+      const x2 = cx + Math.cos(a) * (r + 14), y2 = cy + Math.sin(a) * (r + 14);
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    }
+
+    // target marker (e.g. -14 LUFS or -1 dBTP)
+    if (targetValue !== null && targetValue >= min && targetValue <= max) {
+      const tt = (targetValue - min) / (max - min);
+      const ta = startAngle + tt * (endAngle - startAngle);
+      const x1 = cx + Math.cos(ta) * (r - 7), y1 = cy + Math.sin(ta) * (r - 7);
+      const x2 = cx + Math.cos(ta) * (r + 7), y2 = cy + Math.sin(ta) * (r + 7);
+      ctx.strokeStyle = css('--accent');
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    }
+
+    // needle
+    if (isFinite(value)) {
+      const nx = cx + Math.cos(valueAngle) * (r - 4);
+      const ny = cy + Math.sin(valueAngle) * (r - 4);
+      ctx.strokeStyle = css('--text');
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(nx, ny); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fillStyle = css('--text'); ctx.fill();
+    }
+
+    // digital readout
+    ctx.textAlign = 'center';
+    ctx.fillStyle = css('--text');
+    ctx.font = '600 20px "JetBrains Mono", monospace';
+    const displayVal = isFinite(value) ? value.toFixed(decimals) : '—';
+    ctx.fillText(`${displayVal}`, cx, cy - r * 0.32);
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.fillStyle = css('--text-faint');
+    ctx.fillText(unit, cx, cy - r * 0.32 + 14);
+    ctx.textAlign = 'left';
+
+    // min/max end labels
+    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.fillStyle = css('--text-faint');
+    ctx.textAlign = 'left';
+    ctx.fillText(String(min), cx - r - 12, cy + 12);
+    ctx.textAlign = 'right';
+    ctx.fillText(String(max), cx + r + 12, cy + 12);
+    ctx.textAlign = 'left';
+  }
+
   function renderLoudness() {
     const ch0 = audioBuffer.getChannelData(0);
     let sumSquares = 0, peak = 0;
@@ -929,6 +1106,9 @@
       `;
 
       renderPlatformPreview(lufs, truePeakDb);
+      lastTruePeakDb = truePeakDb;
+      drawArcGauge('lufsGaugeCanvas', lufs, -30, 0, -14, 'LUFS', 1);
+      drawArcGauge('tpGaugeCanvas', truePeakDb, -12, 1, -1, 'dBTP', 1);
       applyAbMode(abMode);
       enhancedCalibrationStatus = 'idle';
       enhancedMakeupLinear = 1.0;
@@ -1692,6 +1872,8 @@
       fitCanvas(eqCanvas, true);
       fitCanvas(lufsTimelineCanvas, true);
       drawWaveform(); drawSampleView(); drawEqCurve(); drawLufsTimeline();
+      if (integratedLufs !== null) drawArcGauge('lufsGaugeCanvas', integratedLufs, -30, 0, -14, 'LUFS', 1);
+      if (lastTruePeakDb !== null) drawArcGauge('tpGaugeCanvas', lastTruePeakDb, -12, 1, -1, 'dBTP', 1);
     }
   });
 })();
