@@ -188,7 +188,7 @@
     <div class="panel">
       <h2>Loudness &amp; Dynamics</h2>
       <div class="metrics-grid" id="loudnessGrid"></div>
-      <p class="info-text">Commercial masters typically target around −14 to −9 integrated LUFS with true peak below −1 dBTP. If your integrated LUFS is much lower (quieter) than that, your master may need more gain or compression to compete in loudness with commercial releases.</p>
+      <p class="info-text">Integrated loudness is measured per ITU-R BS.1770-4: K-weighting filters, 400ms gated blocks with 75% overlap, absolute gate at −70 LUFS and relative gate at −10 LU below the absolute-gated mean. Commercial masters typically target around −14 to −9 integrated LUFS with true peak below −1 dBTP. True peak here uses 4x linear-interpolation oversampling as an approximation of the standard's polyphase filter — close, but a dedicated meter may read slightly differently on inter-sample peaks.</p>
     </div>
 
     <div class="panel">
@@ -304,11 +304,144 @@
     `;
   }
 
-  // ---- Loudness estimation (simplified, not full ITU-R BS.1770) ----
+  // ---- ITU-R BS.1770-4 K-weighted gated loudness ----
+
+  // RBJ biquad coefficient design, used to build the two K-weighting stages
+  function designHighShelf(fs, f0, gainDb, Q) {
+    const A = Math.pow(10, gainDb / 40);
+    const w0 = 2 * Math.PI * f0 / fs;
+    const cosW0 = Math.cos(w0), sinW0 = Math.sin(w0);
+    const alpha = sinW0 / (2 * Q);
+    const twoSqrtAAlpha = 2 * Math.sqrt(A) * alpha;
+
+    const b0 = A * ((A + 1) + (A - 1) * cosW0 + twoSqrtAAlpha);
+    const b1 = -2 * A * ((A - 1) + (A + 1) * cosW0);
+    const b2 = A * ((A + 1) + (A - 1) * cosW0 - twoSqrtAAlpha);
+    const a0 = (A + 1) - (A - 1) * cosW0 + twoSqrtAAlpha;
+    const a1 = 2 * ((A - 1) - (A + 1) * cosW0);
+    const a2 = (A + 1) - (A - 1) * cosW0 - twoSqrtAAlpha;
+
+    return { b0: b0/a0, b1: b1/a0, b2: b2/a0, a1: a1/a0, a2: a2/a0 };
+  }
+
+  function designHighPass(fs, f0, Q) {
+    const w0 = 2 * Math.PI * f0 / fs;
+    const cosW0 = Math.cos(w0), sinW0 = Math.sin(w0);
+    const alpha = sinW0 / (2 * Q);
+
+    const b0 = (1 + cosW0) / 2;
+    const b1 = -(1 + cosW0);
+    const b2 = (1 + cosW0) / 2;
+    const a0 = 1 + alpha;
+    const a1 = -2 * cosW0;
+    const a2 = 1 - alpha;
+
+    return { b0: b0/a0, b1: b1/a0, b2: b2/a0, a1: a1/a0, a2: a2/a0 };
+  }
+
+  function applyBiquad(data, coef) {
+    const out = new Float32Array(data.length);
+    let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+    for (let i = 0; i < data.length; i++) {
+      const x0 = data[i];
+      const y0 = coef.b0*x0 + coef.b1*x1 + coef.b2*x2 - coef.a1*y1 - coef.a2*y2;
+      out[i] = y0;
+      x2 = x1; x1 = x0;
+      y2 = y1; y1 = y0;
+    }
+    return out;
+  }
+
+  // K-weight a single channel: stage 1 high shelf, stage 2 high-pass (RLB)
+  function kWeightChannel(data, fs) {
+    const stage1 = designHighShelf(fs, 1681.9744509555319, 3.99984385397, 0.7071752369554193);
+    const stage2 = designHighPass(fs, 38.13547087613982, 0.5003270373238773);
+    const afterStage1 = applyBiquad(data, stage1);
+    return applyBiquad(afterStage1, stage2);
+  }
+
+  function calculateIntegratedLoudness() {
+    const fs = audioBuffer.sampleRate;
+    const numChannels = audioBuffer.numberOfChannels;
+    const channelWeights = []; // 1.0 for L/R/C, per BS.1770 (no surround handling here)
+    const kWeighted = [];
+    for (let c = 0; c < numChannels; c++) {
+      kWeighted.push(kWeightChannel(audioBuffer.getChannelData(c), fs));
+      channelWeights.push(1.0);
+    }
+
+    const blockSize = Math.round(0.4 * fs);   // 400ms
+    const hopSize = Math.round(0.1 * fs);     // 100ms -> 75% overlap
+    const len = audioBuffer.length;
+    const blockLoudnesses = []; // { z: weighted mean square sum }
+
+    for (let start = 0; start + blockSize <= len; start += hopSize) {
+      let weightedSum = 0;
+      for (let c = 0; c < numChannels; c++) {
+        const ch = kWeighted[c];
+        let sumSq = 0;
+        for (let i = start; i < start + blockSize; i++) {
+          sumSq += ch[i] * ch[i];
+        }
+        const meanSq = sumSq / blockSize;
+        weightedSum += channelWeights[c] * meanSq;
+      }
+      blockLoudnesses.push(weightedSum);
+    }
+
+    // absolute gate at -70 LUFS
+    const absThreshLinear = Math.pow(10, (-70 + 0.691) / 10);
+    const gatedAbs = blockLoudnesses.filter(z => z > absThreshLinear);
+
+    if (gatedAbs.length === 0) return { lufs: -Infinity, blocks: blockLoudnesses };
+
+    const meanAbs = gatedAbs.reduce((a,b) => a+b, 0) / gatedAbs.length;
+    const relativeThreshLUFS = -0.691 + 10 * Math.log10(meanAbs) - 10;
+    const relativeThreshLinear = Math.pow(10, (relativeThreshLUFS + 0.691) / 10);
+
+    const gatedRel = gatedAbs.filter(z => z > relativeThreshLinear);
+    if (gatedRel.length === 0) return { lufs: -Infinity, blocks: blockLoudnesses };
+
+    const meanRel = gatedRel.reduce((a,b) => a+b, 0) / gatedRel.length;
+    const integratedLUFS = -0.691 + 10 * Math.log10(meanRel);
+
+    return { lufs: integratedLUFS, blocks: blockLoudnesses };
+  }
+
+  // Approximate true peak via 4x oversampling (linear interpolation, not full ITU polyphase filter)
+  function estimateTruePeakDb() {
+    const oversample = 4;
+    let maxPeak = 0;
+    for (let c = 0; c < audioBuffer.numberOfChannels; c++) {
+      const data = audioBuffer.getChannelData(c);
+      for (let i = 0; i < data.length - 1; i++) {
+        const a = data[i], b = data[i+1];
+        for (let k = 0; k < oversample; k++) {
+          const interp = a + (b - a) * (k / oversample);
+          const av = Math.abs(interp);
+          if (av > maxPeak) maxPeak = av;
+        }
+      }
+      const av = Math.abs(data[data.length - 1]);
+      if (av > maxPeak) maxPeak = av;
+    }
+    return 20 * Math.log10(maxPeak || 1e-10);
+  }
+
+  function loudnessRangeEstimate(blocks) {
+    // Rough LRA per EBU R128 idea: 95th minus 10th percentile of gated block loudness
+    const absThreshLinear = Math.pow(10, (-70 + 0.691) / 10);
+    const gated = blocks.filter(z => z > absThreshLinear).map(z => -0.691 + 10 * Math.log10(z));
+    if (gated.length < 2) return 0;
+    gated.sort((a,b) => a-b);
+    const p10 = gated[Math.floor(gated.length * 0.10)];
+    const p95 = gated[Math.floor(gated.length * 0.95)];
+    return p95 - p10;
+  }
+
   function renderLoudness() {
     const ch0 = audioBuffer.getChannelData(0);
-    let sumSquares = 0;
-    let peak = 0;
+    let sumSquares = 0, peak = 0;
     for (let i = 0; i < ch0.length; i++) {
       const v = ch0[i];
       sumSquares += v * v;
@@ -317,28 +450,35 @@
     }
     const rms = Math.sqrt(sumSquares / ch0.length);
     const rmsDb = 20 * Math.log10(rms || 1e-10);
-    const peakDb = 20 * Math.log10(peak || 1e-10);
-    // rough LUFS approximation: RMS dBFS - 3dB K-weighting offset approximation
-    const approxLUFS = rmsDb + 3.0;
-
-    // crest factor / dynamic range estimate
-    const crest = peakDb - rmsDb;
-
-    let lufsClass = 'ok';
-    if (approxLUFS < -20) lufsClass = 'warn';
-    if (approxLUFS < -25) lufsClass = 'danger';
-
-    let peakClass = 'ok';
-    if (peakDb > -1) peakClass = 'warn';
-    if (peakDb > -0.1) peakClass = 'danger';
+    const samplePeakDb = 20 * Math.log10(peak || 1e-10);
 
     const grid = document.getElementById('loudnessGrid');
-    grid.innerHTML = `
-      <div class="metric-box"><div class="label">Approx. Integrated Loudness</div><div class="value ${lufsClass}">${approxLUFS.toFixed(1)} LUFS</div></div>
-      <div class="metric-box"><div class="label">True Peak (approx)</div><div class="value ${peakClass}">${peakDb.toFixed(1)} dBTP</div></div>
-      <div class="metric-box"><div class="label">RMS Level</div><div class="value">${rmsDb.toFixed(1)} dBFS</div></div>
-      <div class="metric-box"><div class="label">Crest Factor</div><div class="value">${crest.toFixed(1)} dB</div></div>
-    `;
+    grid.innerHTML = `<div class="metric-box"><div class="label">Integrated Loudness</div><div class="value">Calculating…</div></div>`;
+
+    // Run the K-weighted analysis async so the UI doesn't lock up on long files
+    setTimeout(() => {
+      const { lufs, blocks } = calculateIntegratedLoudness();
+      const truePeakDb = estimateTruePeakDb();
+      const lra = loudnessRangeEstimate(blocks);
+      const crest = samplePeakDb - rmsDb;
+
+      let lufsClass = 'ok';
+      if (lufs < -20 || lufs > -6) lufsClass = 'warn';
+      if (lufs < -25) lufsClass = 'danger';
+
+      let peakClass = 'ok';
+      if (truePeakDb > -1) peakClass = 'warn';
+      if (truePeakDb > -0.1) peakClass = 'danger';
+
+      grid.innerHTML = `
+        <div class="metric-box"><div class="label">Integrated Loudness (K-weighted)</div><div class="value ${lufsClass}">${lufs.toFixed(1)} LUFS</div></div>
+        <div class="metric-box"><div class="label">True Peak (est., 4x oversample)</div><div class="value ${peakClass}">${truePeakDb.toFixed(1)} dBTP</div></div>
+        <div class="metric-box"><div class="label">Sample Peak</div><div class="value">${samplePeakDb.toFixed(1)} dBFS</div></div>
+        <div class="metric-box"><div class="label">Loudness Range (LRA est.)</div><div class="value">${lra.toFixed(1)} LU</div></div>
+        <div class="metric-box"><div class="label">RMS Level</div><div class="value">${rmsDb.toFixed(1)} dBFS</div></div>
+        <div class="metric-box"><div class="label">Crest Factor</div><div class="value">${crest.toFixed(1)} dB</div></div>
+      `;
+    }, 30);
   }
 
   // ---- Full waveform ----
