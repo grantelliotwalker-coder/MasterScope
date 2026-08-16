@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Master Scope — Audio Analysis Tool</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d0e12'/%3E%3Cpath d='M8 34 L16 34 L20 20 L26 46 L32 12 L38 50 L44 26 L48 34 L56 34' fill='none' stroke='%233ddc97' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
   :root {
     --bg: #0d0e12;
@@ -62,10 +63,12 @@
     font-size: 13px;
   }
   main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 100%;
+    margin: 0;
+    padding: 20px 28px 40px;
   }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand svg { display: block; flex-shrink: 0; }
   .upload-zone {
     border: 2px dashed var(--border);
     border-radius: 12px;
@@ -81,6 +84,35 @@
   .upload-zone p { color: var(--text-dim); margin: 6px 0; }
   .upload-zone strong { color: var(--text); }
   #fileInput { display: none; }
+
+  .upload-compact {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .upload-compact .fname {
+    font-size: 13px;
+    color: var(--text-dim);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 320px;
+  }
+  .upload-compact button {
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .upload-compact button:hover { border-color: var(--accent); }
 
   .panel {
     background: var(--bg-panel);
@@ -166,7 +198,13 @@
 <body data-theme="dark">
 
 <header>
-  <h1>Master<span>Scope</span></h1>
+  <div class="brand">
+    <svg width="30" height="30" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="14" fill="var(--bg-panel-2)" stroke="var(--border)"/>
+      <path d="M8 34 L16 34 L20 20 L26 46 L32 12 L38 50 L44 26 L48 34 L56 34" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h1>Master<span>Scope</span></h1>
+  </div>
   <button class="theme-toggle" id="themeToggle">☀ Light mode</button>
 </header>
 
@@ -176,6 +214,11 @@
     <p><strong>Click to upload</strong> or drag an audio file here</p>
     <p>WAV, MP3, FLAC, AIFF — analyzed entirely in your browser, nothing is uploaded anywhere</p>
     <input type="file" id="fileInput" accept="audio/*">
+  </div>
+
+  <div class="upload-compact hidden" id="uploadCompact">
+    <span class="fname" id="uploadedFileName"></span>
+    <button id="uploadAnotherBtn">Upload different file</button>
   </div>
 
   <div id="analysisSection" class="hidden">
@@ -192,11 +235,17 @@
     </div>
 
     <div class="panel">
-      <h2>Waveform — full track</h2>
+      <h2>Frequency Spectrum (live playback analysis)</h2>
       <div class="controls-row">
         <button class="tool-btn" id="playBtn">▶ Play</button>
         <span class="zoom-label" id="playTime">0:00 / 0:00</span>
       </div>
+      <canvas id="spectrumCanvas"></canvas>
+      <div class="freq-guide" id="freqGuide"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Waveform — full track</h2>
       <canvas id="waveformCanvas"></canvas>
       <p class="info-text">Click or drag on the waveform to select a region to zoom into below.</p>
     </div>
@@ -211,12 +260,6 @@
       </div>
       <canvas id="sampleCanvas"></canvas>
       <div id="sampleInfo">Hover over the sample view to inspect individual sample values.</div>
-    </div>
-
-    <div class="panel">
-      <h2>Frequency Spectrum (live playback analysis)</h2>
-      <canvas id="spectrumCanvas"></canvas>
-      <div class="freq-guide" id="freqGuide"></div>
     </div>
 
   </div>
@@ -236,6 +279,11 @@
   const uploadZone = document.getElementById('uploadZone');
   const fileInput = document.getElementById('fileInput');
   const analysisSection = document.getElementById('analysisSection');
+  const uploadCompact = document.getElementById('uploadCompact');
+  const uploadedFileName = document.getElementById('uploadedFileName');
+  const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
+
+  uploadAnotherBtn.addEventListener('click', () => fileInput.click());
 
   uploadZone.addEventListener('click', () => fileInput.click());
   uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
@@ -281,6 +329,9 @@
       return;
     }
     analysisSection.classList.remove('hidden');
+    uploadZone.classList.add('hidden');
+    uploadCompact.classList.remove('hidden');
+    uploadedFileName.textContent = file.name;
     renderFileInfo(file);
     renderLoudness();
     drawWaveform();
