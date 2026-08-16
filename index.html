@@ -212,6 +212,23 @@
   .freq-item .desc { color: var(--text-dim); margin-top: 1px; }
   .freq-item.hot { border-color: var(--danger); }
 
+  #lufsTimelineCanvas { height: 160px; }
+  .timeline-legend { display: flex; gap: 16px; font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+  .timeline-legend span { display: flex; align-items: center; gap: 5px; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+  .vectorscope-row { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  #vectorscopeCanvas { width: 260px; height: 260px; flex-shrink: 0; background: var(--bg-panel-2); border-radius: 8px; }
+  .corr-readout { flex: 1; min-width: 200px; }
+  .corr-bar-track { height: 14px; background: var(--bg-panel-2); border: 1px solid var(--border); border-radius: 7px; position: relative; overflow: hidden; margin: 8px 0; }
+  .corr-bar-fill { position: absolute; top:0; bottom:0; width: 4px; background: var(--accent); border-radius: 2px; }
+  .corr-value { font-size: 20px; font-weight: 600; }
+  .corr-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); }
+
+  #eqCanvas { height: 260px; cursor: pointer; }
+  .eq-controls-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .eq-hint { font-size: 11px; color: var(--text-dim); }
+
   .info-text { font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-top: 8px; }
   #sampleInfo { font-size: 12px; color: var(--text-dim); margin-top: 6px; font-family: monospace; }
   .hidden { display: none !important; }
@@ -259,6 +276,28 @@
     </div>
 
     <div class="panel">
+      <h2>Loudness History Timeline</h2>
+      <canvas id="lufsTimelineCanvas"></canvas>
+      <div class="timeline-legend">
+        <span><span class="legend-swatch" style="background:var(--accent2)"></span>Momentary (400ms)</span>
+        <span><span class="legend-swatch" style="background:var(--accent)"></span>Short-term (3s)</span>
+        <span><span class="legend-swatch" style="background:var(--warn)"></span>Integrated</span>
+      </div>
+      <p class="info-text">Shows how loudness moves across the track. A momentary line that swings wildly against a flat short-term line usually means transient-heavy material; a short-term line that drifts far from the integrated average across sections can flag inconsistent balance between verses/choruses or intro/outro.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Parametric EQ</h2>
+      <p class="info-text" style="margin-top:0">Drag any node to change its frequency and gain live during playback. Scroll on a node to adjust its Q (bandwidth). This EQ sits permanently in the playback chain — it's separate from the A/B modes below, so you can shape the sound directly and hear the analyzer and A/B modes respond to it.</p>
+      <canvas id="eqCanvas"></canvas>
+      <div class="eq-controls-row">
+        <button class="tool-btn" id="eqFlatBtn">Reset Flat</button>
+        <button class="tool-btn" id="eqLoadEnhancedBtn">Load "Enhanced" Curve</button>
+        <span class="eq-hint" id="eqHint">6 bands · drag = freq/gain · scroll = Q</span>
+      </div>
+    </div>
+
+    <div class="panel">
       <h2>A/B Compare — Reveal the Gap</h2>
       <p class="info-text" style="margin-top:0">Play the same file three ways: as-is, gain-matched to Spotify's −14 LUFS target, and an "Enhanced" pass that trims 250–500 Hz mud, lifts 2–5 kHz presence, and adds gentle glue compression — all landed at the <em>same</em> −14 LUFS. If Enhanced sounds noticeably punchier than Normalized at equal loudness, that gap is exactly what's separating you from a commercial-feeling master. Switch modes below, then hit Play in the panel underneath.</p>
       <div class="controls-row" id="abModeRow">
@@ -281,6 +320,20 @@
       </div>
       <canvas id="spectrumCanvas"></canvas>
       <div class="freq-guide" id="freqGuide"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Vectorscope &amp; Phase Correlation</h2>
+      <div class="vectorscope-row">
+        <canvas id="vectorscopeCanvas" width="260" height="260"></canvas>
+        <div class="corr-readout">
+          <div class="eq-hint">Phase Correlation</div>
+          <div class="corr-value" id="corrValue">—</div>
+          <div class="corr-bar-track"><div class="corr-bar-fill" id="corrBarFill" style="left:50%"></div></div>
+          <div class="corr-labels"><span>−1 (out of phase)</span><span>0</span><span>+1 (mono)</span></div>
+          <p class="info-text">The scope shows L/R as a Lissajous pattern: a vertical line means perfectly mono/correlated, a wide circle means very wide or phase-incoherent stereo. Correlation near −1 is a real problem, it means content will cancel out in mono playback (phones, clubs, some Bluetooth speakers).</p>
+        </div>
+      </div>
     </div>
 
     <div class="panel">
@@ -319,6 +372,7 @@
     const isDark = html.getAttribute('data-theme') === 'dark';
     html.setAttribute('data-theme', isDark ? 'light' : 'dark');
     themeToggle.textContent = isDark ? '🌙 Dark mode' : '☀ Light mode';
+    if (audioBuffer) { drawWaveform(); drawSampleView(); drawEqCurve(); drawLufsTimeline(); }
   });
 
   const uploadZone = document.getElementById('uploadZone');
@@ -352,7 +406,7 @@
   let enhancedCalibrationStatus = 'idle'; // idle | calculating | done
   let currentFileName = 'master';
   let abMode = 'original';
-  let chainNodes = null; // { normGain, lowMidFilter, presenceFilter, compressor, makeupGain }
+  let chainNodes = null; // { normGain, eqBands, compressor, makeupGain, splitter, analyserL, analyserR }
 
   const waveformCanvas = document.getElementById('waveformCanvas');
   const sampleCanvas = document.getElementById('sampleCanvas');
@@ -404,6 +458,7 @@
     document.querySelectorAll('.ab-btn').forEach(b => b.classList.remove('active'));
     document.querySelector('.ab-btn[data-mode="original"]').classList.add('active');
     abMode = 'original';
+    loudnessTimelineBlocks = null;
   }
 
   function renderFileInfo(file) {
@@ -528,6 +583,26 @@
   // Render the Enhanced chain (pre-gain-match + EQ + compression, no makeup gain)
   // through an OfflineAudioContext, measure its real LUFS, then compute exactly
   // how much makeup gain is needed to land it on -14 LUFS.
+  // Builds an offline EQ filter chain mirroring the current live eqBands state
+  function buildOfflineEqChain(offlineCtx) {
+    const source = EQ_BAND_DEFS.map((def, i) => {
+      const live = eqBands[i];
+      return {
+        freq: live ? live.node.frequency.value : def.freq,
+        gain: live ? live.node.gain.value : def.gain,
+        q: live ? live.node.Q.value : def.q,
+        type: def.type,
+      };
+    });
+    const nodes = source.map(b => {
+      const f = offlineCtx.createBiquadFilter();
+      f.type = b.type; f.frequency.value = b.freq; f.Q.value = b.q; f.gain.value = b.gain;
+      return f;
+    });
+    for (let i = 0; i < nodes.length - 1; i++) nodes[i].connect(nodes[i+1]);
+    return { input: nodes[0], output: nodes[nodes.length - 1] };
+  }
+
   async function calibrateEnhancedGain() {
     if (!audioBuffer || integratedLufs === null || !isFinite(integratedLufs)) {
       enhancedMakeupLinear = 1.0;
@@ -546,17 +621,7 @@
     const normGain = offlineCtx.createGain();
     normGain.gain.value = Math.pow(10, normAdjustDb / 20);
 
-    const lowMidFilter = offlineCtx.createBiquadFilter();
-    lowMidFilter.type = 'peaking';
-    lowMidFilter.frequency.value = 380;
-    lowMidFilter.Q.value = 1.1;
-    lowMidFilter.gain.value = -3.5;
-
-    const presenceFilter = offlineCtx.createBiquadFilter();
-    presenceFilter.type = 'peaking';
-    presenceFilter.frequency.value = 3200;
-    presenceFilter.Q.value = 0.9;
-    presenceFilter.gain.value = 3;
+    const eq = buildOfflineEqChain(offlineCtx);
 
     const compressor = offlineCtx.createDynamicsCompressor();
     compressor.threshold.value = -18;
@@ -566,9 +631,8 @@
     compressor.release.value = 0.15;
 
     src.connect(normGain);
-    normGain.connect(lowMidFilter);
-    lowMidFilter.connect(presenceFilter);
-    presenceFilter.connect(compressor);
+    normGain.connect(eq.input);
+    eq.output.connect(compressor);
     compressor.connect(offlineCtx.destination);
     src.start(0);
 
@@ -607,17 +671,7 @@
     const normGain = offlineCtx.createGain();
     normGain.gain.value = Math.pow(10, normAdjustDb / 20);
 
-    const lowMidFilter = offlineCtx.createBiquadFilter();
-    lowMidFilter.type = 'peaking';
-    lowMidFilter.frequency.value = 380;
-    lowMidFilter.Q.value = 1.1;
-    lowMidFilter.gain.value = -3.5;
-
-    const presenceFilter = offlineCtx.createBiquadFilter();
-    presenceFilter.type = 'peaking';
-    presenceFilter.frequency.value = 3200;
-    presenceFilter.Q.value = 0.9;
-    presenceFilter.gain.value = 3;
+    const eq = buildOfflineEqChain(offlineCtx);
 
     const compressor = offlineCtx.createDynamicsCompressor();
     compressor.threshold.value = -18;
@@ -630,9 +684,8 @@
     makeupGain.gain.value = enhancedMakeupLinear;
 
     src.connect(normGain);
-    normGain.connect(lowMidFilter);
-    lowMidFilter.connect(presenceFilter);
-    presenceFilter.connect(compressor);
+    normGain.connect(eq.input);
+    eq.output.connect(compressor);
     compressor.connect(makeupGain);
     makeupGain.connect(offlineCtx.destination);
     src.start(0);
@@ -789,6 +842,9 @@
       enhancedCalibrationStatus = 'idle';
       enhancedMakeupLinear = 1.0;
       calibrateEnhancedGain();
+
+      loudnessTimelineBlocks = blocks;
+      drawLufsTimeline();
     }, 30);
   }
 
@@ -1052,22 +1108,31 @@
   });
 
   // ---- Playback + live spectrum ----
+  const EQ_BAND_DEFS = [
+    { id: 0, freq: 90,   gain: 0, q: 1.0,  type: 'lowshelf' },
+    { id: 1, freq: 380,  gain: 0, q: 1.1,  type: 'peaking'  },
+    { id: 2, freq: 1000, gain: 0, q: 1.0,  type: 'peaking'  },
+    { id: 3, freq: 3200, gain: 0, q: 0.9,  type: 'peaking'  },
+    { id: 4, freq: 6500, gain: 0, q: 1.0,  type: 'peaking'  },
+    { id: 5, freq: 13000,gain: 0, q: 0.8,  type: 'highshelf'},
+  ];
+  const ENHANCED_EQ_PRESET = { 0: 0, 1: -3.5, 2: 0, 3: 3, 4: 0.5, 5: 0.5 };
+  let eqBands = []; // live state: [{freq,gain,q,type,node}]
+
   function setupSpectrum() {
     analyserNode = audioCtx.createAnalyser();
     analyserNode.fftSize = 4096;
 
     const normGain = audioCtx.createGain();
-    const lowMidFilter = audioCtx.createBiquadFilter();
-    lowMidFilter.type = 'peaking';
-    lowMidFilter.frequency.value = 380;
-    lowMidFilter.Q.value = 1.1;
-    lowMidFilter.gain.value = 0;
 
-    const presenceFilter = audioCtx.createBiquadFilter();
-    presenceFilter.type = 'peaking';
-    presenceFilter.frequency.value = 3200;
-    presenceFilter.Q.value = 0.9;
-    presenceFilter.gain.value = 0;
+    eqBands = EQ_BAND_DEFS.map(def => {
+      const node = audioCtx.createBiquadFilter();
+      node.type = def.type;
+      node.frequency.value = def.freq;
+      node.Q.value = def.q;
+      node.gain.value = def.gain;
+      return { ...def, node };
+    });
 
     const compressor = audioCtx.createDynamicsCompressor();
     compressor.threshold.value = 0;
@@ -1079,25 +1144,35 @@
     const makeupGain = audioCtx.createGain();
     makeupGain.gain.value = 1;
 
-    chainNodes = { normGain, lowMidFilter, presenceFilter, compressor, makeupGain };
+    const splitter = audioCtx.createChannelSplitter(2);
+    const analyserL = audioCtx.createAnalyser();
+    const analyserR = audioCtx.createAnalyser();
+    analyserL.fftSize = 2048;
+    analyserR.fftSize = 2048;
+
+    chainNodes = { normGain, eqBands, compressor, makeupGain, splitter, analyserL, analyserR };
     applyAbMode('original');
+    drawEqCurve();
   }
 
   function buildChain(source) {
-    const { normGain, lowMidFilter, presenceFilter, compressor, makeupGain } = chainNodes;
+    const { normGain, eqBands, compressor, makeupGain, splitter, analyserL, analyserR } = chainNodes;
     source.connect(normGain);
-    normGain.connect(lowMidFilter);
-    lowMidFilter.connect(presenceFilter);
-    presenceFilter.connect(compressor);
+    let node = normGain;
+    for (const band of eqBands) { node.connect(band.node); node = band.node; }
+    node.connect(compressor);
     compressor.connect(makeupGain);
     makeupGain.connect(analyserNode);
     analyserNode.connect(audioCtx.destination);
+    makeupGain.connect(splitter);
+    splitter.connect(analyserL, 0);
+    splitter.connect(analyserR, audioBuffer.numberOfChannels > 1 ? 1 : 0);
   }
 
   function applyAbMode(mode) {
     abMode = mode;
     if (!chainNodes) return;
-    const { normGain, lowMidFilter, presenceFilter, compressor, makeupGain } = chainNodes;
+    const { normGain, compressor, makeupGain } = chainNodes;
     const now = audioCtx ? audioCtx.currentTime : 0;
     const rampTime = 0.05;
 
@@ -1106,31 +1181,25 @@
 
     if (mode === 'original') {
       normGain.gain.setTargetAtTime(1, now, rampTime);
-      lowMidFilter.gain.setTargetAtTime(0, now, rampTime);
-      presenceFilter.gain.setTargetAtTime(0, now, rampTime);
       compressor.threshold.setTargetAtTime(0, now, rampTime);
       compressor.ratio.setTargetAtTime(1, now, rampTime);
       makeupGain.gain.setTargetAtTime(1, now, rampTime);
-      document.getElementById('abGainInfo').textContent = 'Playing as uploaded, no processing applied.';
+      document.getElementById('abGainInfo').textContent = 'Playing as uploaded, no gain-matching or compression applied. (Parametric EQ above still applies if you\'ve moved any bands.)';
     } else if (mode === 'normalized') {
       normGain.gain.setTargetAtTime(normAdjustLinear, now, rampTime);
-      lowMidFilter.gain.setTargetAtTime(0, now, rampTime);
-      presenceFilter.gain.setTargetAtTime(0, now, rampTime);
       compressor.threshold.setTargetAtTime(0, now, rampTime);
       compressor.ratio.setTargetAtTime(1, now, rampTime);
       makeupGain.gain.setTargetAtTime(1, now, rampTime);
       document.getElementById('abGainInfo').textContent =
-        `Gain-matched to −14 LUFS: ${normAdjustDb >= 0 ? '+' : ''}${normAdjustDb.toFixed(1)} dB, no EQ or compression change.`;
+        `Gain-matched to −14 LUFS: ${normAdjustDb >= 0 ? '+' : ''}${normAdjustDb.toFixed(1)} dB, no compression change. (Parametric EQ above still applies if you've moved any bands.)`;
     } else if (mode === 'enhanced') {
       normGain.gain.setTargetAtTime(normAdjustLinear, now, rampTime);
-      lowMidFilter.gain.setTargetAtTime(-3.5, now, rampTime);
-      presenceFilter.gain.setTargetAtTime(3, now, rampTime);
       compressor.threshold.setTargetAtTime(-18, now, rampTime);
       compressor.ratio.setTargetAtTime(3, now, rampTime);
       makeupGain.gain.setTargetAtTime(enhancedMakeupLinear, now, rampTime);
       if (enhancedCalibrationStatus === 'done') {
         document.getElementById('abGainInfo').textContent =
-          `Calibrated to measure exactly −14 LUFS after EQ + compression (makeup ${(20*Math.log10(enhancedMakeupLinear)).toFixed(1)} dB) — −3.5 dB at 380 Hz, +3 dB at 3.2 kHz, 3:1 glue compression.`;
+          `Calibrated to measure exactly −14 LUFS after your current EQ curve + compression (makeup ${(20*Math.log10(enhancedMakeupLinear)).toFixed(1)} dB), 3:1 glue compression. Uses whatever EQ curve is set above — try "Load Enhanced Curve" if you haven't.`;
       } else {
         document.getElementById('abGainInfo').textContent = 'Calibrating Enhanced gain to land exactly on −14 LUFS…';
       }
@@ -1201,6 +1270,7 @@
     playOffset = elapsed;
     updatePlayTime(elapsed);
     compositeWaveform();
+    drawVectorscope();
 
     animFrame = requestAnimationFrame(drawSpectrumLoop);
   }
@@ -1230,12 +1300,307 @@
     `).join('');
   }
 
+  // ---- Parametric EQ: draggable curve editor ----
+  const eqCanvas = document.getElementById('eqCanvas');
+  const EQ_FREQ_MIN = 20, EQ_FREQ_MAX = 20000, EQ_GAIN_MAX = 12;
+
+  function eqFreqToX(freq, w) {
+    const t = Math.log10(freq / EQ_FREQ_MIN) / Math.log10(EQ_FREQ_MAX / EQ_FREQ_MIN);
+    return t * w;
+  }
+  function eqXToFreq(x, w) {
+    const t = Math.max(0, Math.min(1, x / w));
+    return EQ_FREQ_MIN * Math.pow(EQ_FREQ_MAX / EQ_FREQ_MIN, t);
+  }
+  function eqGainToY(gain, h) {
+    return h / 2 - (gain / EQ_GAIN_MAX) * (h / 2 - 14);
+  }
+  function eqYToGain(y, h) {
+    const g = -((y - h / 2) / (h / 2 - 14)) * EQ_GAIN_MAX;
+    return Math.max(-EQ_GAIN_MAX, Math.min(EQ_GAIN_MAX, g));
+  }
+
+  // Magnitude response (dB) of a single biquad at a given frequency, mirrors Web Audio's own math
+  function biquadMagnitudeDb(type, freq, gainDb, q, fs, atFreq) {
+    const A = Math.pow(10, gainDb / 40);
+    const w0 = 2 * Math.PI * freq / fs;
+    const cosW0 = Math.cos(w0), sinW0 = Math.sin(w0);
+    const alpha = sinW0 / (2 * q);
+    let b0,b1,b2,a0,a1,a2;
+    if (type === 'peaking') {
+      b0 = 1 + alpha*A; b1 = -2*cosW0; b2 = 1 - alpha*A;
+      a0 = 1 + alpha/A; a1 = -2*cosW0; a2 = 1 - alpha/A;
+    } else if (type === 'lowshelf') {
+      const twoSqrtAAlpha = 2*Math.sqrt(A)*alpha;
+      b0 = A*((A+1)-(A-1)*cosW0+twoSqrtAAlpha);
+      b1 = 2*A*((A-1)-(A+1)*cosW0);
+      b2 = A*((A+1)-(A-1)*cosW0-twoSqrtAAlpha);
+      a0 = (A+1)+(A-1)*cosW0+twoSqrtAAlpha;
+      a1 = -2*((A-1)+(A+1)*cosW0);
+      a2 = (A+1)+(A-1)*cosW0-twoSqrtAAlpha;
+    } else { // highshelf
+      const twoSqrtAAlpha = 2*Math.sqrt(A)*alpha;
+      b0 = A*((A+1)+(A-1)*cosW0+twoSqrtAAlpha);
+      b1 = -2*A*((A-1)+(A+1)*cosW0);
+      b2 = A*((A+1)+(A-1)*cosW0-twoSqrtAAlpha);
+      a0 = (A+1)-(A-1)*cosW0+twoSqrtAAlpha;
+      a1 = 2*((A-1)-(A+1)*cosW0);
+      a2 = (A+1)-(A-1)*cosW0-twoSqrtAAlpha;
+    }
+    b0/=a0; b1/=a0; b2/=a0; a1/=a0; a2/=a0;
+    const w = 2 * Math.PI * atFreq / fs;
+    const cosw = Math.cos(w), sinw = Math.sin(w);
+    const cos2w = Math.cos(2*w), sin2w = Math.sin(2*w);
+    const numRe = b0 + b1*cosw + b2*cos2w;
+    const numIm = -b1*sinw - b2*sin2w;
+    const denRe = 1 + a1*cosw + a2*cos2w;
+    const denIm = -a1*sinw - a2*sin2w;
+    const numMag = Math.sqrt(numRe*numRe + numIm*numIm);
+    const denMag = Math.sqrt(denRe*denRe + denIm*denIm);
+    return 20 * Math.log10((numMag / denMag) || 1e-9);
+  }
+
+  function drawEqCurve() {
+    if (!eqCanvas) return;
+    const { ctx, w, h } = fitCanvas(eqCanvas);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = css('--bg-panel-2');
+    ctx.fillRect(0, 0, w, h);
+
+    // grid lines
+    ctx.strokeStyle = css('--border');
+    ctx.lineWidth = 1;
+    [100, 1000, 10000].forEach(f => {
+      const x = eqFreqToX(f, w);
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+    });
+    [-6, 0, 6].forEach(g => {
+      const y = eqGainToY(g, h);
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+    });
+    ctx.fillStyle = css('--text-dim');
+    ctx.font = '10px sans-serif';
+    ctx.fillText('100Hz', eqFreqToX(100,w)+3, h-4);
+    ctx.fillText('1kHz', eqFreqToX(1000,w)+3, h-4);
+    ctx.fillText('10kHz', eqFreqToX(10000,w)+3, h-4);
+    ctx.fillText('+6dB', 3, eqGainToY(6,h)-3);
+    ctx.fillText('0dB', 3, eqGainToY(0,h)-3);
+    ctx.fillText('-6dB', 3, eqGainToY(-6,h)-3);
+
+    if (!eqBands || eqBands.length === 0) return;
+    const fs = audioCtx ? audioCtx.sampleRate : 44100;
+
+    // combined response curve
+    ctx.beginPath();
+    ctx.strokeStyle = css('--accent');
+    ctx.lineWidth = 2;
+    for (let x = 0; x <= w; x += 2) {
+      const freq = eqXToFreq(x, w);
+      let totalDb = 0;
+      for (const b of eqBands) {
+        totalDb += biquadMagnitudeDb(b.type, b.node.frequency.value, b.node.gain.value, b.node.Q.value, fs, freq);
+      }
+      const y = eqGainToY(totalDb, h);
+      if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // band nodes
+    eqBands.forEach((b, i) => {
+      const x = eqFreqToX(b.node.frequency.value, w);
+      const y = eqGainToY(b.node.gain.value, h);
+      ctx.beginPath();
+      ctx.arc(x, y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = css('--accent2');
+      ctx.fill();
+      ctx.strokeStyle = css('--bg-panel-2');
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = css('--text');
+      ctx.font = '10px sans-serif';
+      ctx.fillText(String(i+1), x - 3, y - 11);
+    });
+  }
+
+  let eqDraggingIdx = null;
+  eqCanvas.addEventListener('mousedown', e => {
+    if (!eqBands.length) return;
+    const rect = eqCanvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    let closest = -1, closestDist = 22;
+    eqBands.forEach((b, i) => {
+      const x = eqFreqToX(b.node.frequency.value, rect.width);
+      const y = eqGainToY(b.node.gain.value, rect.height);
+      const d = Math.hypot(mx - x, my - y);
+      if (d < closestDist) { closestDist = d; closest = i; }
+    });
+    eqDraggingIdx = closest;
+  });
+  window.addEventListener('mousemove', e => {
+    if (eqDraggingIdx === null || eqDraggingIdx < 0) return;
+    const rect = eqCanvas.getBoundingClientRect();
+    const mx = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+    const my = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+    const band = eqBands[eqDraggingIdx];
+    const freq = eqXToFreq(mx, rect.width);
+    const gain = eqYToGain(my, rect.height);
+    band.node.frequency.setTargetAtTime(freq, audioCtx ? audioCtx.currentTime : 0, 0.01);
+    band.node.gain.setTargetAtTime(gain, audioCtx ? audioCtx.currentTime : 0, 0.01);
+    drawEqCurve();
+  });
+  window.addEventListener('mouseup', () => { eqDraggingIdx = null; });
+
+  eqCanvas.addEventListener('wheel', e => {
+    if (!eqBands.length) return;
+    const rect = eqCanvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    let closest = -1, closestDist = 22;
+    eqBands.forEach((b, i) => {
+      const x = eqFreqToX(b.node.frequency.value, rect.width);
+      const y = eqGainToY(b.node.gain.value, rect.height);
+      const d = Math.hypot(mx - x, my - y);
+      if (d < closestDist) { closestDist = d; closest = i; }
+    });
+    if (closest >= 0) {
+      e.preventDefault();
+      const band = eqBands[closest];
+      const newQ = Math.max(0.2, Math.min(8, band.node.Q.value * (e.deltaY < 0 ? 1.1 : 0.9)));
+      band.node.Q.setTargetAtTime(newQ, audioCtx ? audioCtx.currentTime : 0, 0.01);
+      document.getElementById('eqHint').textContent = `Band ${closest+1}: Q = ${newQ.toFixed(2)}`;
+      drawEqCurve();
+    }
+  }, { passive: false });
+
+  document.getElementById('eqFlatBtn').addEventListener('click', () => {
+    if (!eqBands.length) return;
+    eqBands.forEach((b, i) => {
+      b.node.frequency.setTargetAtTime(EQ_BAND_DEFS[i].freq, audioCtx.currentTime, 0.02);
+      b.node.gain.setTargetAtTime(0, audioCtx.currentTime, 0.02);
+      b.node.Q.setTargetAtTime(EQ_BAND_DEFS[i].q, audioCtx.currentTime, 0.02);
+    });
+    setTimeout(drawEqCurve, 50);
+  });
+  document.getElementById('eqLoadEnhancedBtn').addEventListener('click', () => {
+    if (!eqBands.length) return;
+    eqBands.forEach((b, i) => {
+      const g = ENHANCED_EQ_PRESET[i] ?? 0;
+      b.node.gain.setTargetAtTime(g, audioCtx.currentTime, 0.02);
+    });
+    setTimeout(drawEqCurve, 50);
+    if (enhancedCalibrationStatus !== 'idle') calibrateEnhancedGain();
+  });
+
+  // ---- Vectorscope + phase correlation ----
+  const vectorscopeCanvas = document.getElementById('vectorscopeCanvas');
+  function drawVectorscope() {
+    if (!chainNodes || !chainNodes.analyserL || !isPlaying) return;
+    const { analyserL, analyserR } = chainNodes;
+    const N = analyserL.fftSize;
+    const bufL = new Float32Array(N);
+    const bufR = new Float32Array(N);
+    analyserL.getFloatTimeDomainData(bufL);
+    analyserR.getFloatTimeDomainData(bufR);
+
+    const { ctx, w, h } = fitCanvas(vectorscopeCanvas);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = css('--bg-panel-2');
+    ctx.fillRect(0, 0, w, h);
+
+    const cx = w / 2, cy = h / 2, scale = Math.min(w, h) / 2.4;
+    ctx.strokeStyle = css('--border');
+    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, h); ctx.moveTo(0, cy); ctx.lineTo(w, cy); ctx.stroke();
+
+    ctx.fillStyle = css('--accent2');
+    let sumLR = 0, sumL2 = 0, sumR2 = 0;
+    const step = Math.max(1, Math.floor(N / 800));
+    for (let i = 0; i < N; i += step) {
+      const l = bufL[i], r = bufR[i];
+      sumLR += l * r; sumL2 += l * l; sumR2 += r * r;
+      // classic vectorscope rotation: x = (L-R), y = (L+R)
+      const x = cx + ((l - r) / Math.SQRT2) * scale;
+      const y = cy - ((l + r) / Math.SQRT2) * scale;
+      ctx.fillRect(x, y, 1.5, 1.5);
+    }
+
+    const denom = Math.sqrt(sumL2 * sumR2) + 1e-12;
+    const corr = Math.max(-1, Math.min(1, sumLR / denom));
+    document.getElementById('corrValue').textContent = corr.toFixed(2);
+    document.getElementById('corrBarFill').style.left = `${((corr + 1) / 2) * 100}%`;
+    const fillEl = document.getElementById('corrBarFill');
+    if (corr < -0.2) fillEl.style.background = 'var(--danger)';
+    else if (corr < 0.3) fillEl.style.background = 'var(--warn)';
+    else fillEl.style.background = 'var(--accent)';
+  }
+
+  // ---- Loudness History Timeline ----
+  let loudnessTimelineBlocks = null; // linear mean-square values, 100ms hop, 400ms window
+  const lufsTimelineCanvas = document.getElementById('lufsTimelineCanvas');
+
+  function drawLufsTimeline() {
+    if (!lufsTimelineCanvas || !loudnessTimelineBlocks || loudnessTimelineBlocks.length === 0) return;
+    const { ctx, w, h } = fitCanvas(lufsTimelineCanvas);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = css('--bg-panel-2');
+    ctx.fillRect(0, 0, w, h);
+
+    const toLUFS = z => z > 1e-12 ? -0.691 + 10 * Math.log10(z) : -70;
+    const momentary = loudnessTimelineBlocks.map(toLUFS);
+
+    // short-term: rolling mean of ~30 blocks (3s at 100ms hop)
+    const stWindow = 30;
+    const shortTerm = [];
+    let rollSum = 0;
+    for (let i = 0; i < loudnessTimelineBlocks.length; i++) {
+      rollSum += loudnessTimelineBlocks[i];
+      if (i >= stWindow) rollSum -= loudnessTimelineBlocks[i - stWindow];
+      const count = Math.min(i + 1, stWindow);
+      shortTerm.push(toLUFS(rollSum / count));
+    }
+
+    const minLUFS = -40, maxLUFS = 0;
+    const yFor = v => h - ((Math.max(minLUFS, v) - minLUFS) / (maxLUFS - minLUFS)) * h;
+    const xFor = i => (i / (loudnessTimelineBlocks.length - 1)) * w;
+
+    // gridlines
+    ctx.strokeStyle = css('--border');
+    ctx.fillStyle = css('--text-dim');
+    ctx.font = '10px sans-serif';
+    [-30, -20, -14, -10].forEach(v => {
+      const y = yFor(v);
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      ctx.fillText(`${v}`, 3, y - 2);
+    });
+
+    function plot(arr, color) {
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      arr.forEach((v, i) => {
+        const x = xFor(i), y = yFor(v);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+    }
+    plot(momentary, css('--accent2') + 'aa');
+    plot(shortTerm, css('--accent'));
+
+    if (integratedLufs !== null && isFinite(integratedLufs)) {
+      const y = yFor(integratedLufs);
+      ctx.strokeStyle = css('--warn');
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
   window.addEventListener('resize', () => {
     if (audioBuffer) {
       fitCanvas(waveformCanvas, true);
       fitCanvas(sampleCanvas, true);
       fitCanvas(spectrumCanvas, true);
-      drawWaveform(); drawSampleView();
+      fitCanvas(eqCanvas, true);
+      fitCanvas(lufsTimelineCanvas, true);
+      drawWaveform(); drawSampleView(); drawEqCurve(); drawLufsTimeline();
     }
   });
 })();
