@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Scope — Audio Analysis Tool</title>
+<style>
+  :root {
+    --bg: #0d0e12;
+    --bg-panel: #16181f;
+    --bg-panel-2: #1d2029;
+    --border: #2a2e3a;
+    --text: #e8e9ed;
+    --text-dim: #8b8f9c;
+    --accent: #3ddc97;
+    --accent2: #4fa8ff;
+    --warn: #ffb648;
+    --danger: #ff5f5f;
+  }
+  [data-theme="light"] {
+    --bg: #f4f5f7;
+    --bg-panel: #ffffff;
+    --bg-panel-2: #edeef2;
+    --border: #d8dae0;
+    --text: #1a1c22;
+    --text-dim: #6b6f7b;
+    --accent: #0f9d68;
+    --accent2: #1c6fd6;
+    --warn: #b8791f;
+    --danger: #d43f3f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: background 0.2s, color 0.2s;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-panel);
+  }
+  header h1 {
+    font-size: 17px;
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  header h1 span { color: var(--accent); }
+  .theme-toggle {
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    background: var(--bg-panel);
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--accent);
+  }
+  .upload-zone p { color: var(--text-dim); margin: 6px 0; }
+  .upload-zone strong { color: var(--text); }
+  #fileInput { display: none; }
+
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 16px;
+  }
+  .panel h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-dim);
+    margin: 0 0 12px 0;
+  }
+  .controls-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  button.tool-btn {
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  button.tool-btn:hover { border-color: var(--accent); }
+  button.tool-btn.active { border-color: var(--accent); color: var(--accent); }
+  input[type=range] { accent-color: var(--accent); }
+  .zoom-label { font-size: 12px; color: var(--text-dim); min-width: 90px; }
+
+  canvas { width: 100%; display: block; border-radius: 6px; background: var(--bg-panel-2); }
+  #waveformCanvas { height: 180px; cursor: crosshair; }
+  #sampleCanvas { height: 160px; cursor: crosshair; }
+  #spectrumCanvas { height: 220px; }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .metric-box {
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .metric-box .label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .metric-box .value { font-size: 22px; font-weight: 600; margin-top: 4px; }
+  .metric-box .value.ok { color: var(--accent); }
+  .metric-box .value.warn { color: var(--warn); }
+  .metric-box .value.danger { color: var(--danger); }
+
+  .freq-guide {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .freq-item {
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .freq-item .range { color: var(--accent2); font-weight: 600; }
+  .freq-item .desc { color: var(--text-dim); margin-top: 2px; }
+  .freq-item.hot { border-color: var(--danger); }
+
+  .info-text { font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-top: 8px; }
+  #sampleInfo { font-size: 12px; color: var(--text-dim); margin-top: 6px; font-family: monospace; }
+  .hidden { display: none !important; }
+
+  #playhead-controls { display: flex; align-items: center; gap: 10px; }
+</style>
+</head>
+<body data-theme="dark">
+
+<header>
+  <h1>Master<span>Scope</span></h1>
+  <button class="theme-toggle" id="themeToggle">☀ Light mode</button>
+</header>
+
+<main>
+
+  <div class="upload-zone" id="uploadZone">
+    <p><strong>Click to upload</strong> or drag an audio file here</p>
+    <p>WAV, MP3, FLAC, AIFF — analyzed entirely in your browser, nothing is uploaded anywhere</p>
+    <input type="file" id="fileInput" accept="audio/*">
+  </div>
+
+  <div id="analysisSection" class="hidden">
+
+    <div class="panel">
+      <h2>File Info</h2>
+      <div class="metrics-grid" id="fileInfoGrid"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Loudness &amp; Dynamics</h2>
+      <div class="metrics-grid" id="loudnessGrid"></div>
+      <p class="info-text">Commercial masters typically target around −14 to −9 integrated LUFS with true peak below −1 dBTP. If your integrated LUFS is much lower (quieter) than that, your master may need more gain or compression to compete in loudness with commercial releases.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Waveform — full track</h2>
+      <div class="controls-row">
+        <button class="tool-btn" id="playBtn">▶ Play</button>
+        <span class="zoom-label" id="playTime">0:00 / 0:00</span>
+      </div>
+      <canvas id="waveformCanvas"></canvas>
+      <p class="info-text">Click or drag on the waveform to select a region to zoom into below.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Sample-level Zoom</h2>
+      <div class="controls-row">
+        <button class="tool-btn" id="zoomInBtn">＋ Zoom in</button>
+        <button class="tool-btn" id="zoomOutBtn">－ Zoom out</button>
+        <button class="tool-btn" id="zoomResetBtn">Reset</button>
+        <span class="zoom-label" id="zoomLabel">Select a region above</span>
+      </div>
+      <canvas id="sampleCanvas"></canvas>
+      <div id="sampleInfo">Hover over the sample view to inspect individual sample values.</div>
+    </div>
+
+    <div class="panel">
+      <h2>Frequency Spectrum (live playback analysis)</h2>
+      <canvas id="spectrumCanvas"></canvas>
+      <div class="freq-guide" id="freqGuide"></div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+(function() {
+  const themeToggle = document.getElementById('themeToggle');
+  themeToggle.addEventListener('click', () => {
+    const html = document.body;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    themeToggle.textContent = isDark ? '🌙 Dark mode' : '☀ Light mode';
+  });
+
+  const uploadZone = document.getElementById('uploadZone');
+  const fileInput = document.getElementById('fileInput');
+  const analysisSection = document.getElementById('analysisSection');
+
+  uploadZone.addEventListener('click', () => fileInput.click());
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', e => {
+    if (e.target.files.length) handleFile(e.target.files[0]);
+  });
+
+  let audioCtx, audioBuffer, sourceNode, analyserNode;
+  let isPlaying = false;
+  let playStartTime = 0, playOffset = 0;
+  let selection = null; // {start, end} in samples, channel 0
+  let animFrame;
+
+  const waveformCanvas = document.getElementById('waveformCanvas');
+  const sampleCanvas = document.getElementById('sampleCanvas');
+  const spectrumCanvas = document.getElementById('spectrumCanvas');
+
+  function css(v) { return getComputedStyle(document.body).getPropertyValue(v).trim(); }
+
+  function fitCanvas(canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, w: rect.width, h: rect.height };
+  }
+
+  async function handleFile(file) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const arrayBuffer = await file.arrayBuffer();
+    try {
+      audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+    } catch (err) {
+      alert('Could not decode this audio file: ' + err.message);
+      return;
+    }
+    analysisSection.classList.remove('hidden');
+    renderFileInfo(file);
+    renderLoudness();
+    drawWaveform();
+    selection = null;
+    drawSampleView();
+    setupSpectrum();
+    renderFreqGuide();
+  }
+
+  function renderFileInfo(file) {
+    const grid = document.getElementById('fileInfoGrid');
+    const dur = audioBuffer.duration;
+    const mins = Math.floor(dur / 60);
+    const secs = Math.floor(dur % 60).toString().padStart(2, '0');
+    grid.innerHTML = `
+      <div class="metric-box"><div class="label">File name</div><div class="value" style="font-size:14px">${file.name}</div></div>
+      <div class="metric-box"><div class="label">Sample rate</div><div class="value">${audioBuffer.sampleRate.toLocaleString()} Hz</div></div>
+      <div class="metric-box"><div class="label">Channels</div><div class="value">${audioBuffer.numberOfChannels}</div></div>
+      <div class="metric-box"><div class="label">Duration</div><div class="value">${mins}:${secs}</div></div>
+      <div class="metric-box"><div class="label">Total samples</div><div class="value" style="font-size:16px">${audioBuffer.length.toLocaleString()}</div></div>
+    `;
+  }
+
+  // ---- Loudness estimation (simplified, not full ITU-R BS.1770) ----
+  function renderLoudness() {
+    const ch0 = audioBuffer.getChannelData(0);
+    let sumSquares = 0;
+    let peak = 0;
+    for (let i = 0; i < ch0.length; i++) {
+      const v = ch0[i];
+      sumSquares += v * v;
+      const av = Math.abs(v);
+      if (av > peak) peak = av;
+    }
+    const rms = Math.sqrt(sumSquares / ch0.length);
+    const rmsDb = 20 * Math.log10(rms || 1e-10);
+    const peakDb = 20 * Math.log10(peak || 1e-10);
+    // rough LUFS approximation: RMS dBFS - 3dB K-weighting offset approximation
+    const approxLUFS = rmsDb + 3.0;
+
+    // crest factor / dynamic range estimate
+    const crest = peakDb - rmsDb;
+
+    let lufsClass = 'ok';
+    if (approxLUFS < -20) lufsClass = 'warn';
+    if (approxLUFS < -25) lufsClass = 'danger';
+
+    let peakClass = 'ok';
+    if (peakDb > -1) peakClass = 'warn';
+    if (peakDb > -0.1) peakClass = 'danger';
+
+    const grid = document.getElementById('loudnessGrid');
+    grid.innerHTML = `
+      <div class="metric-box"><div class="label">Approx. Integrated Loudness</div><div class="value ${lufsClass}">${approxLUFS.toFixed(1)} LUFS</div></div>
+      <div class="metric-box"><div class="label">True Peak (approx)</div><div class="value ${peakClass}">${peakDb.toFixed(1)} dBTP</div></div>
+      <div class="metric-box"><div class="label">RMS Level</div><div class="value">${rmsDb.toFixed(1)} dBFS</div></div>
+      <div class="metric-box"><div class="label">Crest Factor</div><div class="value">${crest.toFixed(1)} dB</div></div>
+    `;
+  }
+
+  // ---- Full waveform ----
+  function drawWaveform() {
+    const { ctx, w, h } = fitCanvas(waveformCanvas);
+    const data = audioBuffer.getChannelData(0);
+    const step = Math.ceil(data.length / w);
+    const mid = h / 2;
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = css('--bg-panel-2');
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.beginPath();
+    ctx.strokeStyle = css('--accent2');
+    ctx.lineWidth = 1;
+    for (let x = 0; x < w; x++) {
+      let min = 1.0, max = -1.0;
+      const start = x * step;
+      for (let j = 0; j < step; j++) {
+        const v = data[start + j];
+        if (v === undefined) continue;
+        if (v < min) min = v;
+        if (v > max) max = v;
+      }
+      ctx.moveTo(x, mid + min * mid);
+      ctx.lineTo(x, mid + max * mid);
+    }
+    ctx.stroke();
+
+    if (selection) {
+      const x1 = (selection.start / data.length) * w;
+      const x2 = (selection.end / data.length) * w;
+      ctx.fillStyle = css('--accent') + '33';
+      ctx.fillRect(x1, 0, x2 - x1, h);
+      ctx.strokeStyle = css('--accent');
+      ctx.strokeRect(x1, 0, x2 - x1, h);
+    }
+  }
+
+  let dragStart = null;
+  waveformCanvas.addEventListener('mousedown', e => {
+    const rect = waveformCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const frac = x / rect.width;
+    dragStart = Math.floor(frac * audioBuffer.length);
+  });
+  waveformCanvas.addEventListener('mousemove', e => {
+    if (dragStart === null) return;
+    const rect = waveformCanvas.getBoundingClientRect();
+    const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+    const frac = x / rect.width;
+    const cur = Math.floor(frac * audioBuffer.length);
+    selection = { start: Math.min(dragStart, cur), end: Math.max(dragStart, cur) };
+    if (selection.end - selection.start < 100) selection.end = selection.start + 100;
+    drawWaveform();
+  });
+  window.addEventListener('mouseup', () => {
+    if (dragStart !== null) {
+      dragStart = null;
+      drawSampleView();
+    }
+  });
+
+  // ---- Sample-level zoom view ----
+  function drawSampleView() {
+    const { ctx, w, h } = fitCanvas(sampleCanvas);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = css('--bg-panel-2');
+    ctx.fillRect(0, 0, w, h);
+
+    const label = document.getElementById('zoomLabel');
+    if (!selection) {
+      label.textContent = 'Select a region on the waveform above';
+      return;
+    }
+
+    const data = audioBuffer.getChannelData(0);
+    const start = selection.start, end = Math.min(selection.end, data.length);
+    const n = end - start;
+    const durationMs = (n / audioBuffer.sampleRate) * 1000;
+    label.textContent = `${n.toLocaleString()} samples (${durationMs.toFixed(1)} ms)`;
+
+    const mid = h / 2;
+    ctx.strokeStyle = css('--border');
+    ctx.beginPath();
+    ctx.moveTo(0, mid); ctx.lineTo(w, mid);
+    ctx.stroke();
+
+    if (n <= w) {
+      // draw individual sample points connected, dots visible if zoomed enough
+      const xStep = w / n;
+      ctx.beginPath();
+      ctx.strokeStyle = css('--accent');
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < n; i++) {
+        const v = data[start + i];
+        const x = i * xStep;
+        const y = mid - v * mid * 0.9;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      if (xStep > 4) {
+        ctx.fillStyle = css('--accent2');
+        for (let i = 0; i < n; i++) {
+          const v = data[start + i];
+          const x = i * xStep;
+          const y = mid - v * mid * 0.9;
+          ctx.beginPath();
+          ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    } else {
+      // min/max per pixel like the full waveform
+      const step = n / w;
+      ctx.beginPath();
+      ctx.strokeStyle = css('--accent');
+      for (let x = 0; x < w; x++) {
+        let mn = 1, mx = -1;
+        const s = start + Math.floor(x * step);
+        const e2 = start + Math.floor((x + 1) * step);
+        for (let j = s; j < e2; j++) {
+          const v = data[j];
+          if (v < mn) mn = v;
+          if (v > mx) mx = v;
+        }
+        ctx.moveTo(x, mid + mn * mid * 0.9);
+        ctx.lineTo(x, mid + mx * mid * 0.9);
+      }
+      ctx.stroke();
+    }
+
+    sampleCanvas.onmousemove = (e) => {
+      const rect = sampleCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const idx = start + Math.floor((x / rect.width) * n);
+      if (idx >= 0 && idx < data.length) {
+        const v = data[idx];
+        const timeSec = idx / audioBuffer.sampleRate;
+        document.getElementById('sampleInfo').textContent =
+          `Sample #${idx.toLocaleString()} · t=${timeSec.toFixed(6)}s · amplitude=${v.toFixed(5)} (${(v*100).toFixed(2)}% of full scale)`;
+      }
+    };
+  }
+
+  document.getElementById('zoomInBtn').addEventListener('click', () => {
+    if (!selection) return;
+    const mid = (selection.start + selection.end) / 2;
+    const half = Math.max(50, (selection.end - selection.start) / 4);
+    selection = { start: Math.floor(mid - half), end: Math.floor(mid + half) };
+    drawWaveform(); drawSampleView();
+  });
+  document.getElementById('zoomOutBtn').addEventListener('click', () => {
+    if (!selection) return;
+    const mid = (selection.start + selection.end) / 2;
+    const half = (selection.end - selection.start);
+    selection = { start: Math.max(0, Math.floor(mid - half)), end: Math.min(audioBuffer.length, Math.floor(mid + half)) };
+    drawWaveform(); drawSampleView();
+  });
+  document.getElementById('zoomResetBtn').addEventListener('click', () => {
+    selection = null;
+    drawWaveform(); drawSampleView();
+  });
+
+  // ---- Playback + live spectrum ----
+  function setupSpectrum() {
+    analyserNode = audioCtx.createAnalyser();
+    analyserNode.fftSize = 4096;
+  }
+
+  document.getElementById('playBtn').addEventListener('click', togglePlay);
+
+  function togglePlay() {
+    const btn = document.getElementById('playBtn');
+    if (isPlaying) {
+      sourceNode.stop();
+      isPlaying = false;
+      btn.textContent = '▶ Play';
+      cancelAnimationFrame(animFrame);
+      return;
+    }
+    sourceNode = audioCtx.createBufferSource();
+    sourceNode.buffer = audioBuffer;
+    sourceNode.connect(analyserNode);
+    analyserNode.connect(audioCtx.destination);
+    sourceNode.start(0, playOffset);
+    playStartTime = audioCtx.currentTime - playOffset;
+    isPlaying = true;
+    btn.textContent = '⏸ Pause';
+    sourceNode.onended = () => {
+      isPlaying = false;
+      btn.textContent = '▶ Play';
+      playOffset = 0;
+    };
+    drawSpectrumLoop();
+  }
+
+  function drawSpectrumLoop() {
+    if (!isPlaying) return;
+    const { ctx, w, h } = fitCanvas(spectrumCanvas);
+    const bufferLength = analyserNode.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    analyserNode.getByteFrequencyData(dataArray);
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = css('--bg-panel-2');
+    ctx.fillRect(0, 0, w, h);
+
+    const barCount = 128;
+    const barWidth = w / barCount;
+    const nyquist = audioCtx.sampleRate / 2;
+
+    for (let i = 0; i < barCount; i++) {
+      // log scale mapping
+      const freq = 20 * Math.pow(nyquist / 20, i / barCount);
+      const bin = Math.min(bufferLength - 1, Math.floor((freq / nyquist) * bufferLength));
+      const val = dataArray[bin] / 255;
+      const barH = val * h;
+      const hue = 140 - val * 140; // green -> red
+      ctx.fillStyle = `hsl(${hue}, 80%, 55%)`;
+      ctx.fillRect(i * barWidth, h - barH, barWidth - 1, barH);
+    }
+
+    const elapsed = audioCtx.currentTime - playStartTime;
+    playOffset = elapsed;
+    updatePlayTime(elapsed);
+
+    animFrame = requestAnimationFrame(drawSpectrumLoop);
+  }
+
+  function updatePlayTime(elapsed) {
+    const dur = audioBuffer.duration;
+    const fmt = t => `${Math.floor(t/60)}:${Math.floor(t%60).toString().padStart(2,'0')}`;
+    document.getElementById('playTime').textContent = `${fmt(Math.min(elapsed,dur))} / ${fmt(dur)}`;
+  }
+
+  function renderFreqGuide() {
+    const guide = document.getElementById('freqGuide');
+    const bands = [
+      { range: '20–60 Hz', desc: 'Sub bass — felt more than heard, kick/bass fundamentals' },
+      { range: '60–250 Hz', desc: 'Bass — warmth lives here, too much = boomy' },
+      { range: '200–500 Hz', desc: 'Low mids — muddiness and boxiness territory' },
+      { range: '500–2k Hz', desc: 'Mids — vocal body, can sound "honky" if excessive' },
+      { range: '2k–4k Hz', desc: 'Upper mids — presence, but harsh/fatiguing if too hot' },
+      { range: '4k–6k Hz', desc: 'Presence — clarity and attack, sibilance risk' },
+      { range: '6k–20k Hz', desc: 'Air/brilliance — sparkle, too much = harsh or hissy' },
+    ];
+    guide.innerHTML = bands.map(b => `
+      <div class="freq-item">
+        <div class="range">${b.range}</div>
+        <div class="desc">${b.desc}</div>
+      </div>
+    `).join('');
+  }
+
+  window.addEventListener('resize', () => {
+    if (audioBuffer) { drawWaveform(); drawSampleView(); }
+  });
+})();
+</script>
+
+</body>
+</html>
