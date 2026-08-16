@@ -139,6 +139,89 @@
   .diagnosis-item.status-danger .diagnosis-icon { color: var(--danger); }
   .diagnosis-title { font-size: 12.5px; font-weight: 600; font-family: var(--font-mono); letter-spacing: 0.01em; }
   .diagnosis-body { font-size: 12px; color: var(--text-dim); margin-top: 3px; line-height: 1.5; }
+
+  .landing { margin-bottom: 26px; }
+  .hero {
+    text-align: center;
+    padding: 48px 20px 36px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .hero-title {
+    font-size: 38px;
+    font-weight: 600;
+    line-height: 1.15;
+    margin: 0 0 16px 0;
+    letter-spacing: -0.01em;
+  }
+  .hero-sub {
+    font-size: 14.5px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin: 0 auto;
+    max-width: 560px;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .feature-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 18px 20px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s, background 0.15s;
+  }
+  .feature-card:hover { border-color: var(--accent); transform: translateY(-1px); background: var(--bg-panel-2); }
+  .feature-card:hover .feature-try { opacity: 1; }
+  .feature-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .feature-icon {
+    font-size: 20px;
+    color: var(--accent);
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    margin-bottom: 12px;
+  }
+  .feature-title {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+  }
+  .feature-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+  .feature-desc em { color: var(--text); font-style: normal; }
+  .feature-try {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--accent);
+    margin-top: 10px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .landing-hint {
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    margin: 18px 0 0;
+  }
   header {
     display: flex;
     align-items: center;
@@ -440,6 +523,12 @@
 
   /* Mobile / narrow viewport */
   @media (max-width: 720px) {
+    .hero { padding: 30px 12px 26px; }
+    .hero-title { font-size: 26px; }
+    .hero-sub { font-size: 13px; }
+    .feature-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .feature-card { padding: 14px; }
+
     header { padding: 12px 14px; }
     header h1 { font-size: 14px; }
     header .eyebrow { display: none; }
@@ -478,6 +567,8 @@
   @media (max-width: 420px) {
     .metrics-grid { grid-template-columns: 1fr 1fr; }
     .gauge-row { flex-direction: column; align-items: center; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .hero-title { font-size: 22px; }
   }
 </style>
 </head>
@@ -511,6 +602,66 @@
 </nav>
 
 <main>
+
+  <section class="landing" id="landingSection">
+    <div class="hero">
+      <div class="hero-eyebrow">Real ITU-R BS.1770-4 · Runs 100% in your browser</div>
+      <h2 class="hero-title">See exactly what's<br>in your master.</h2>
+      <p class="hero-sub">Upload a mix or master and get real loudness metering, frequency and phase analysis, a live parametric EQ, and specific, actionable fixes — all computed from your actual file, not generic advice.</p>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card" data-panel="panel-loudness">
+        <div class="feature-icon">◎</div>
+        <div class="feature-title">Loudness Gauges</div>
+        <div class="feature-desc">Real analog-style Integrated LUFS and True Peak meters, gated per the actual BS.1770-4 standard, not an approximation.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
+      <div class="feature-card" data-panel="panel-diagnosis">
+        <div class="feature-icon">⚑</div>
+        <div class="feature-title">Mix Diagnosis</div>
+        <div class="feature-desc">A real spectral + phase analysis engine that tells you exactly what to fix — mud, harshness, mono compatibility, peak headroom — and why.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
+      <div class="feature-card" data-panel="panel-sample">
+        <div class="feature-icon">∿</div>
+        <div class="feature-title">Sample-Accurate Zoom</div>
+        <div class="feature-desc">Drill from the full waveform down to individual 44.1kHz samples to see exactly what's happening at any instant.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
+      <div class="feature-card" data-panel="panel-eq">
+        <div class="feature-icon">▤</div>
+        <div class="feature-title">Live Parametric EQ</div>
+        <div class="feature-desc">6-band draggable EQ that sits right in the playback chain — shape the sound and hear it change in real time.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
+      <div class="feature-card" data-panel="panel-vectorscope">
+        <div class="feature-icon">◈</div>
+        <div class="feature-title">Vectorscope &amp; Phase</div>
+        <div class="feature-desc">A real Lissajous scope and correlation meter to catch mono-compatibility problems before they cost you on Bluetooth or club systems.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
+      <div class="feature-card" data-panel="panel-ab">
+        <div class="feature-icon">⇄</div>
+        <div class="feature-title">A/B Reveal &amp; Export</div>
+        <div class="feature-desc">Hear your master as-is, gain-matched to Spotify's target, and an Enhanced pass at the <em>same</em> loudness — then download the result.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
+      <div class="feature-card" data-panel="panel-timeline">
+        <div class="feature-icon">◷</div>
+        <div class="feature-title">Loudness History</div>
+        <div class="feature-desc">Momentary and short-term LUFS plotted across the whole track, so you can spot inconsistent sections at a glance.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
+      <div class="feature-card" data-panel="panel-platforms">
+        <div class="feature-icon">▥</div>
+        <div class="feature-title">Platform Preview</div>
+        <div class="feature-desc">See exactly how Spotify, Apple Music, and others will turn your master up or down — before you upload anywhere.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
+    </div>
+    <p class="landing-hint">Click any card above to load a synthesized demo track and jump straight to that panel — no upload needed.</p>
+  </section>
 
   <div class="upload-zone" id="uploadZone">
     <p><strong>Click to upload</strong> or drag an audio file here</p>
@@ -733,18 +884,25 @@
   async function handleFile(file) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const arrayBuffer = await file.arrayBuffer();
+    let decoded;
     try {
-      audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+      decoded = await audioCtx.decodeAudioData(arrayBuffer);
     } catch (err) {
       alert('Could not decode this audio file: ' + err.message);
       return;
     }
+    loadBuffer(decoded, file);
+  }
+
+  function loadBuffer(buffer, fileLike) {
+    audioBuffer = buffer;
     analysisSection.classList.remove('hidden');
     uploadZone.classList.add('hidden');
     uploadCompact.classList.remove('hidden');
-    uploadedFileName.textContent = file.name;
-    currentFileName = file.name;
-    renderFileInfo(file);
+    document.getElementById('landingSection').classList.add('hidden');
+    uploadedFileName.textContent = fileLike.name;
+    currentFileName = fileLike.name;
+    renderFileInfo(fileLike);
     renderLoudness();
     drawWaveform();
     selection = null;
@@ -760,6 +918,81 @@
     loudnessTimelineBlocks = null;
     lastTruePeakDb = null;
   }
+
+  // Synthesizes a demo stereo track with deliberate characteristics (some
+  // low-mid buildup, a hot section, mild stereo width) so the Mix Diagnosis
+  // and other panels have something real and interesting to show, with no upload needed.
+  function generateDemoBuffer() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const fs = 44100, duration = 20, len = fs * duration;
+    const buf = audioCtx.createBuffer(2, len, fs);
+    const L = buf.getChannelData(0), R = buf.getChannelData(1);
+
+    function noteFreq(midi) { return 440 * Math.pow(2, (midi - 69) / 12); }
+    const chords = [
+      [40, 47, 52, 59], // low, warm
+      [43, 50, 55, 62],
+      [38, 45, 50, 57],
+      [41, 48, 53, 60],
+    ];
+
+    for (let i = 0; i < len; i++) {
+      const t = i / fs;
+      const barIdx = Math.floor(t / 2.5) % chords.length;
+      const chord = chords[barIdx];
+      let sample = 0;
+
+      // bass fundamental + some 300-400hz body (deliberate mud for the demo)
+      sample += 0.20 * Math.sin(2*Math.PI*noteFreq(chord[0]-12)*t);
+      sample += 0.14 * Math.sin(2*Math.PI*noteFreq(chord[0])*t);
+      sample += 0.10 * Math.sin(2*Math.PI*350*t) * (0.6 + 0.4*Math.sin(2*Math.PI*0.3*t));
+
+      // chord pad in the mids
+      chord.forEach((n, idx) => {
+        sample += (0.05 / (idx+1)) * Math.sin(2*Math.PI*noteFreq(n)*t + idx);
+      });
+
+      // sparse "hats" for presence/air content
+      const hatPhase = (t * 4) % 1;
+      if (hatPhase < 0.04) sample += 0.06 * (Math.random()*2-1);
+
+      // kick-ish transient every beat, occasionally hot to demonstrate a peak/limiting moment
+      const beatPhase = (t * 2) % 1;
+      if (beatPhase < 0.02) {
+        const kickEnv = Math.exp(-beatPhase * 140);
+        const hot = (Math.floor(t/2.5) % 4 === 2) ? 1.35 : 1.0;
+        sample += 0.5 * kickEnv * Math.sin(2*Math.PI*60*t) * hot;
+      }
+
+      // gentle overall envelope + soft-knee limiting so it doesn't clip
+      let s = sample * 0.9;
+      s = Math.tanh(s * 1.15) * 0.92;
+
+      // mild, deliberately imperfect stereo width via a short mid/side offset + slight decorrelated air
+      const width = 0.15 * Math.sin(2*Math.PI*noteFreq(chord[1])*t + 0.7);
+      L[i] = Math.max(-1, Math.min(1, s + width));
+      R[i] = Math.max(-1, Math.min(1, s - width));
+    }
+    return buf;
+  }
+
+  function loadDemoAndJumpTo(panelId) {
+    const demoBuffer = generateDemoBuffer();
+    loadBuffer(demoBuffer, { name: 'Demo Track (synthesized, no upload needed)' });
+    setTimeout(() => {
+      const el = document.getElementById(panelId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+  }
+
+  document.querySelectorAll('.feature-card[data-panel]').forEach(card => {
+    card.addEventListener('click', () => loadDemoAndJumpTo(card.dataset.panel));
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); loadDemoAndJumpTo(card.dataset.panel); }
+    });
+  });
 
   function renderFileInfo(file) {
     const grid = document.getElementById('fileInfoGrid');
