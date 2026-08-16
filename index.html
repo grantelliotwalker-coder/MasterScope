@@ -257,6 +257,17 @@
     </div>
 
     <div class="panel">
+      <h2>A/B Compare — Reveal the Gap</h2>
+      <p class="info-text" style="margin-top:0">Play the same file three ways: as-is, gain-matched to Spotify's −14 LUFS target, and an "Enhanced" pass that trims 250–500 Hz mud, lifts 2–5 kHz presence, and adds gentle glue compression — all landed at the <em>same</em> −14 LUFS. If Enhanced sounds noticeably punchier than Normalized at equal loudness, that gap is exactly what's separating you from a commercial-feeling master. Switch modes below, then hit Play in the panel underneath.</p>
+      <div class="controls-row" id="abModeRow">
+        <button class="tool-btn ab-btn active" data-mode="original">Original</button>
+        <button class="tool-btn ab-btn" data-mode="normalized">Normalized (−14 LUFS)</button>
+        <button class="tool-btn ab-btn" data-mode="enhanced">Enhanced (−14 LUFS)</button>
+      </div>
+      <div class="zoom-label" id="abGainInfo"></div>
+    </div>
+
+    <div class="panel">
       <h2>Frequency Spectrum (live playback analysis)</h2>
       <div class="controls-row">
         <button class="tool-btn" id="playBtn">▶ Play</button>
@@ -330,6 +341,9 @@
   let playStartTime = 0, playOffset = 0;
   let selection = null; // {start, end} in samples, channel 0
   let animFrame;
+  let integratedLufs = null;
+  let abMode = 'original';
+  let chainNodes = null; // { normGain, lowMidFilter, presenceFilter, compressor, makeupGain }
 
   const waveformCanvas = document.getElementById('waveformCanvas');
   const sampleCanvas = document.getElementById('sampleCanvas');
@@ -367,6 +381,10 @@
     drawSampleView();
     setupSpectrum();
     renderFreqGuide();
+    integratedLufs = null;
+    document.querySelectorAll('.ab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.ab-btn[data-mode="original"]').classList.add('active');
+    abMode = 'original';
   }
 
   function renderFileInfo(file) {
@@ -537,6 +555,7 @@
     // Run the K-weighted analysis async so the UI doesn't lock up on long files
     setTimeout(() => {
       const { lufs, blocks } = calculateIntegratedLoudness();
+      integratedLufs = lufs;
       const truePeakDb = estimateTruePeakDb();
       const lra = loudnessRangeEstimate(blocks);
       const crest = samplePeakDb - rmsDb;
@@ -559,6 +578,7 @@
       `;
 
       renderPlatformPreview(lufs, truePeakDb);
+      applyAbMode(abMode);
     }, 30);
   }
 
@@ -807,7 +827,91 @@
   function setupSpectrum() {
     analyserNode = audioCtx.createAnalyser();
     analyserNode.fftSize = 4096;
+
+    const normGain = audioCtx.createGain();
+    const lowMidFilter = audioCtx.createBiquadFilter();
+    lowMidFilter.type = 'peaking';
+    lowMidFilter.frequency.value = 380;
+    lowMidFilter.Q.value = 1.1;
+    lowMidFilter.gain.value = 0;
+
+    const presenceFilter = audioCtx.createBiquadFilter();
+    presenceFilter.type = 'peaking';
+    presenceFilter.frequency.value = 3200;
+    presenceFilter.Q.value = 0.9;
+    presenceFilter.gain.value = 0;
+
+    const compressor = audioCtx.createDynamicsCompressor();
+    compressor.threshold.value = 0;
+    compressor.knee.value = 6;
+    compressor.ratio.value = 1;
+    compressor.attack.value = 0.003;
+    compressor.release.value = 0.15;
+
+    const makeupGain = audioCtx.createGain();
+    makeupGain.gain.value = 1;
+
+    chainNodes = { normGain, lowMidFilter, presenceFilter, compressor, makeupGain };
+    applyAbMode('original');
   }
+
+  function buildChain(source) {
+    const { normGain, lowMidFilter, presenceFilter, compressor, makeupGain } = chainNodes;
+    source.connect(normGain);
+    normGain.connect(lowMidFilter);
+    lowMidFilter.connect(presenceFilter);
+    presenceFilter.connect(compressor);
+    compressor.connect(makeupGain);
+    makeupGain.connect(analyserNode);
+    analyserNode.connect(audioCtx.destination);
+  }
+
+  function applyAbMode(mode) {
+    abMode = mode;
+    if (!chainNodes) return;
+    const { normGain, lowMidFilter, presenceFilter, compressor, makeupGain } = chainNodes;
+    const now = audioCtx ? audioCtx.currentTime : 0;
+    const rampTime = 0.05;
+
+    const normAdjustDb = (integratedLufs !== null && isFinite(integratedLufs)) ? (-14 - integratedLufs) : 0;
+    const normAdjustLinear = Math.pow(10, normAdjustDb / 20);
+
+    if (mode === 'original') {
+      normGain.gain.setTargetAtTime(1, now, rampTime);
+      lowMidFilter.gain.setTargetAtTime(0, now, rampTime);
+      presenceFilter.gain.setTargetAtTime(0, now, rampTime);
+      compressor.threshold.setTargetAtTime(0, now, rampTime);
+      compressor.ratio.setTargetAtTime(1, now, rampTime);
+      makeupGain.gain.setTargetAtTime(1, now, rampTime);
+      document.getElementById('abGainInfo').textContent = 'Playing as uploaded, no processing applied.';
+    } else if (mode === 'normalized') {
+      normGain.gain.setTargetAtTime(normAdjustLinear, now, rampTime);
+      lowMidFilter.gain.setTargetAtTime(0, now, rampTime);
+      presenceFilter.gain.setTargetAtTime(0, now, rampTime);
+      compressor.threshold.setTargetAtTime(0, now, rampTime);
+      compressor.ratio.setTargetAtTime(1, now, rampTime);
+      makeupGain.gain.setTargetAtTime(1, now, rampTime);
+      document.getElementById('abGainInfo').textContent =
+        `Gain-matched to −14 LUFS: ${normAdjustDb >= 0 ? '+' : ''}${normAdjustDb.toFixed(1)} dB, no EQ or compression change.`;
+    } else if (mode === 'enhanced') {
+      normGain.gain.setTargetAtTime(normAdjustLinear, now, rampTime);
+      lowMidFilter.gain.setTargetAtTime(-3.5, now, rampTime);
+      presenceFilter.gain.setTargetAtTime(3, now, rampTime);
+      compressor.threshold.setTargetAtTime(-18, now, rampTime);
+      compressor.ratio.setTargetAtTime(3, now, rampTime);
+      makeupGain.gain.setTargetAtTime(1.4, now, rampTime);
+      document.getElementById('abGainInfo').textContent =
+        `Same −14 LUFS target, plus −3.5 dB at 380 Hz, +3 dB at 3.2 kHz, and gentle 3:1 glue compression.`;
+    }
+  }
+
+  document.querySelectorAll('.ab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyAbMode(btn.dataset.mode);
+    });
+  });
 
   document.getElementById('playBtn').addEventListener('click', togglePlay);
 
@@ -822,8 +926,7 @@
     }
     sourceNode = audioCtx.createBufferSource();
     sourceNode.buffer = audioBuffer;
-    sourceNode.connect(analyserNode);
-    analyserNode.connect(audioCtx.destination);
+    buildChain(sourceNode);
     sourceNode.start(0, playOffset);
     playStartTime = audioCtx.currentTime - playOffset;
     isPlaying = true;
