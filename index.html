@@ -46,13 +46,99 @@
     margin: 0;
     background: var(--bg);
     background-image:
-      radial-gradient(ellipse 900px 500px at 15% -10%, color-mix(in srgb, var(--accent) 5%, transparent), transparent);
+      radial-gradient(ellipse 1000px 560px at 12% -8%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, color-mix(in srgb, var(--accent2) 4%, transparent), transparent 60%),
+      radial-gradient(ellipse 900px 700px at 50% 120%, color-mix(in srgb, var(--accent) 3%, transparent), transparent 60%);
+    background-attachment: fixed;
     color: var(--text);
     font-family: var(--font-display);
     transition: background 0.2s, color 0.2s;
     letter-spacing: 0.01em;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
+  main { flex: 1; }
   .mono { font-family: var(--font-mono); }
+
+  .navtabs {
+    display: flex;
+    gap: 2px;
+    padding: 0 20px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .navtabs::-webkit-scrollbar { display: none; }
+  .navtabs a {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    text-decoration: none;
+    padding: 10px 12px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .navtabs a:hover { color: var(--text); }
+  .navtabs a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .site-footer {
+    border-top: 1px solid var(--border);
+    background: var(--bg-panel);
+    padding: 22px 20px;
+    margin-top: 20px;
+  }
+  .footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+  }
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--text-dim);
+  }
+  .footer-brand b { color: var(--accent); font-weight: 600; }
+  .footer-note { font-size: 11px; color: var(--text-faint); }
+  .footer-links {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    display: flex;
+    gap: 8px;
+  }
+
+  .diagnosis-list { display: flex; flex-direction: column; gap: 8px; }
+  .diagnosis-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border-bright);
+    border-radius: 4px;
+    padding: 11px 14px;
+  }
+  .diagnosis-item.status-ok { border-left-color: var(--accent2); }
+  .diagnosis-item.status-warn { border-left-color: var(--warn); }
+  .diagnosis-item.status-danger { border-left-color: var(--danger); }
+  .diagnosis-icon { font-family: var(--font-mono); font-size: 13px; margin-top: 1px; flex-shrink: 0; width: 16px; text-align: center; }
+  .diagnosis-item.status-ok .diagnosis-icon { color: var(--accent2); }
+  .diagnosis-item.status-warn .diagnosis-icon { color: var(--warn); }
+  .diagnosis-item.status-danger .diagnosis-icon { color: var(--danger); }
+  .diagnosis-title { font-size: 12.5px; font-weight: 600; font-family: var(--font-mono); letter-spacing: 0.01em; }
+  .diagnosis-body { font-size: 12px; color: var(--text-dim); margin-top: 3px; line-height: 1.5; }
   header {
     display: flex;
     align-items: center;
@@ -411,6 +497,19 @@
   <button class="theme-toggle" id="themeToggle">☀ Light Mode</button>
 </header>
 
+<nav class="navtabs" id="navTabs">
+  <a href="#panel-overview">Overview</a>
+  <a href="#panel-loudness">Loudness</a>
+  <a href="#panel-diagnosis">Mix Diagnosis</a>
+  <a href="#panel-timeline">History</a>
+  <a href="#panel-eq">EQ</a>
+  <a href="#panel-ab">A/B Compare</a>
+  <a href="#panel-spectrum">Spectrum</a>
+  <a href="#panel-vectorscope">Vectorscope</a>
+  <a href="#panel-waveform">Waveform</a>
+  <a href="#panel-platforms">Platforms</a>
+</nav>
+
 <main>
 
   <div class="upload-zone" id="uploadZone">
@@ -426,12 +525,12 @@
 
   <div id="analysisSection" class="hidden">
 
-    <div class="panel">
+    <div class="panel" id="panel-overview">
       <h2>File Info</h2>
       <div class="metrics-grid" id="fileInfoGrid"></div>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="panel-loudness">
       <h2>Loudness &amp; Dynamics</h2>
       <div class="gauge-row" id="gaugeRow">
         <div class="gauge-unit">
@@ -447,7 +546,13 @@
       <p class="info-text">Integrated loudness is measured per ITU-R BS.1770-4: K-weighting filters, 400ms gated blocks with 75% overlap, absolute gate at −70 LUFS and relative gate at −10 LU below the absolute-gated mean. Commercial masters typically target around −14 to −9 integrated LUFS with true peak below −1 dBTP. True peak here uses 4x linear-interpolation oversampling as an approximation of the standard's polyphase filter — close, but a dedicated meter may read slightly differently on inter-sample peaks.</p>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="panel-diagnosis">
+      <h2>Mix Diagnosis — What To Fix</h2>
+      <p class="info-text" style="margin-top:0">Computed directly from this file's frequency balance, phase correlation, peak headroom and loudness — not generic advice. Green checks are healthy, amber/red flag things worth addressing before your next master pass.</p>
+      <div id="diagnosisList" class="diagnosis-list"></div>
+    </div>
+
+    <div class="panel" id="panel-timeline">
       <h2>Loudness History Timeline</h2>
       <canvas id="lufsTimelineCanvas"></canvas>
       <div class="timeline-legend">
@@ -458,7 +563,7 @@
       <p class="info-text">Shows how loudness moves across the track. A momentary line that swings wildly against a flat short-term line usually means transient-heavy material; a short-term line that drifts far from the integrated average across sections can flag inconsistent balance between verses/choruses or intro/outro.</p>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="panel-eq">
       <h2>Parametric EQ</h2>
       <p class="info-text" style="margin-top:0">Drag any node to change its frequency and gain live during playback. Scroll on a node to adjust its Q (bandwidth). This EQ sits permanently in the playback chain — it's separate from the A/B modes below, so you can shape the sound directly and hear the analyzer and A/B modes respond to it.</p>
       <canvas id="eqCanvas"></canvas>
@@ -469,7 +574,7 @@
       </div>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="panel-ab">
       <h2>A/B Compare — Reveal the Gap</h2>
       <p class="info-text" style="margin-top:0">Play the same file three ways: as-is, gain-matched to Spotify's −14 LUFS target, and an "Enhanced" pass that trims 250–500 Hz mud, lifts 2–5 kHz presence, and adds gentle glue compression — all landed at the <em>same</em> −14 LUFS. If Enhanced sounds noticeably punchier than Normalized at equal loudness, that gap is exactly what's separating you from a commercial-feeling master. Switch modes below, then hit Play in the panel underneath.</p>
       <div class="controls-row" id="abModeRow">
@@ -484,7 +589,7 @@
       </div>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="panel-spectrum">
       <h2>Frequency Spectrum (live playback analysis)</h2>
       <div class="controls-row">
         <button class="tool-btn" id="playBtn">▶ Play</button>
@@ -494,7 +599,7 @@
       <div class="freq-guide" id="freqGuide"></div>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="panel-vectorscope">
       <h2>Vectorscope &amp; Phase Correlation</h2>
       <div class="vectorscope-row">
         <canvas id="vectorscopeCanvas" width="260" height="260"></canvas>
@@ -508,19 +613,19 @@
       </div>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="panel-platforms">
       <h2>Streaming Platform Loudness Preview</h2>
       <div id="platformGrid" class="platform-grid"></div>
       <p class="info-text">Most streaming platforms normalize playback loudness to their own target. If your integrated loudness is louder than the platform's target, they'll turn your master <em>down</em> to match — so mastering hotter than a platform's target buys you nothing there, it just eats into your peak headroom for no benefit. If you're quieter than the target, most platforms turn you <em>up</em>, which can also raise your true peak above 0 dBTP if you had little headroom to begin with.</p>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="panel-waveform">
       <h2>Waveform — full track</h2>
       <canvas id="waveformCanvas"></canvas>
       <p class="info-text">Click the waveform to jump playback there, or drag to select a region to zoom into below.</p>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="panel-sample">
       <h2>Sample-level Zoom</h2>
       <div class="controls-row">
         <button class="tool-btn" id="zoomInBtn">＋ Zoom in</button>
@@ -534,7 +639,24 @@
 
   </div>
 
+
 </main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg width="18" height="18" viewBox="0 0 64 64">
+        <rect width="64" height="64" rx="10" fill="var(--bg-panel-2)" stroke="var(--border-bright)"/>
+        <path d="M8 34 L16 34 L20 20 L26 46 L32 12 L38 50 L44 26 L48 34 L56 34" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Master<b>Scope</b></span>
+    </div>
+    <div class="footer-note">Runs entirely in your browser. Nothing you upload ever leaves this tab.</div>
+    <div class="footer-links">
+      <span>ITU-R BS.1770-4</span><span>·</span><span>WebAudio API</span><span>·</span><span>No cloud, no upload</span>
+    </div>
+  </div>
+</footer>
 
 <script>
 (function() {
@@ -1064,6 +1186,185 @@
     ctx.textAlign = 'left';
   }
 
+  // ---- Mix Diagnosis engine ----
+
+  // Compact iterative radix-2 Cooley-Tukey FFT (in place, re/im arrays, power-of-2 length)
+  function fft(re, im) {
+    const n = re.length;
+    for (let i = 1, j = 0; i < n; i++) {
+      let bit = n >> 1;
+      for (; j & bit; bit >>= 1) j ^= bit;
+      j ^= bit;
+      if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; }
+    }
+    for (let len = 2; len <= n; len <<= 1) {
+      const ang = -2 * Math.PI / len;
+      const wr = Math.cos(ang), wi = Math.sin(ang);
+      for (let i = 0; i < n; i += len) {
+        let curWr = 1, curWi = 0;
+        for (let k = 0; k < len / 2; k++) {
+          const ur = re[i+k], ui = im[i+k];
+          const vr = re[i+k+len/2]*curWr - im[i+k+len/2]*curWi;
+          const vi = re[i+k+len/2]*curWi + im[i+k+len/2]*curWr;
+          re[i+k] = ur + vr; im[i+k] = ui + vi;
+          re[i+k+len/2] = ur - vr; im[i+k+len/2] = ui - vi;
+          const nWr = curWr*wr - curWi*wi, nWi = curWr*wi + curWi*wr;
+          curWr = nWr; curWi = nWi;
+        }
+      }
+    }
+  }
+
+  // Welch-averaged spectrum: average magnitude across evenly-spaced windowed chunks
+  function welchAverageSpectrum(mono, chunkSize, numChunks) {
+    const avg = new Float64Array(chunkSize / 2);
+    const hann = new Float64Array(chunkSize);
+    for (let i = 0; i < chunkSize; i++) hann[i] = 0.5 - 0.5 * Math.cos(2*Math.PI*i/(chunkSize-1));
+    const usable = mono.length - chunkSize;
+    const step = Math.max(1, Math.floor(usable / numChunks));
+    let count = 0;
+    for (let start = 0; start + chunkSize <= mono.length && count < numChunks; start += step) {
+      const re = new Float64Array(chunkSize), im = new Float64Array(chunkSize);
+      for (let i = 0; i < chunkSize; i++) re[i] = mono[start+i] * hann[i];
+      fft(re, im);
+      for (let k = 0; k < chunkSize/2; k++) avg[k] += Math.sqrt(re[k]*re[k] + im[k]*im[k]);
+      count++;
+    }
+    if (count > 0) for (let k = 0; k < avg.length; k++) avg[k] /= count;
+    return avg;
+  }
+
+  function bandAverageDb(spectrum, fs, chunkSize, fLo, fHi) {
+    const binHz = fs / chunkSize;
+    const kLo = Math.max(1, Math.floor(fLo / binHz));
+    const kHi = Math.min(spectrum.length - 1, Math.ceil(fHi / binHz));
+    let sum = 0, n = 0;
+    for (let k = kLo; k <= kHi; k++) { sum += spectrum[k]; n++; }
+    const mean = n > 0 ? sum / n : 1e-9;
+    return 20 * Math.log10(mean || 1e-9);
+  }
+
+  function wholeTrackCorrelation(buffer) {
+    if (buffer.numberOfChannels < 2) return 1;
+    const L = buffer.getChannelData(0), R = buffer.getChannelData(1);
+    let sumLR = 0, sumL2 = 0, sumR2 = 0;
+    const step = Math.max(1, Math.floor(L.length / 500000)); // sample down for speed on long files
+    for (let i = 0; i < L.length; i += step) {
+      sumLR += L[i]*R[i]; sumL2 += L[i]*L[i]; sumR2 += R[i]*R[i];
+    }
+    return sumLR / (Math.sqrt(sumL2*sumR2) + 1e-12);
+  }
+
+  function runMixDiagnosis(buffer, integratedLufsVal, truePeakDbVal, crestVal, lraVal) {
+    const list = document.getElementById('diagnosisList');
+    if (!list) return;
+    list.innerHTML = `<div class="info-text">Analyzing mix balance…</div>`;
+
+    setTimeout(() => {
+      const fs = buffer.sampleRate;
+      const mono = new Float32Array(buffer.length);
+      for (let c = 0; c < buffer.numberOfChannels; c++) {
+        const ch = buffer.getChannelData(c);
+        for (let i = 0; i < ch.length; i++) mono[i] += ch[i] / buffer.numberOfChannels;
+      }
+      const chunkSize = 4096;
+      const spectrum = welchAverageSpectrum(mono, chunkSize, 60);
+
+      const sub = bandAverageDb(spectrum, fs, chunkSize, 20, 60);
+      const bass = bandAverageDb(spectrum, fs, chunkSize, 60, 250);
+      const mud = bandAverageDb(spectrum, fs, chunkSize, 250, 500);
+      const mid = bandAverageDb(spectrum, fs, chunkSize, 500, 2000);
+      const presence = bandAverageDb(spectrum, fs, chunkSize, 2000, 5000);
+      const air = bandAverageDb(spectrum, fs, chunkSize, 6000, 16000);
+      const mudPresenceGap = presence - mud;
+      const subBassGap = sub - bass;
+
+      const corr = wholeTrackCorrelation(buffer);
+
+      const items = [];
+
+      // Frequency balance: mud vs presence
+      if (mudPresenceGap < -16) {
+        items.push({ status: 'danger', icon: '✕', title: 'Low-mid buildup is masking clarity',
+          body: `Presence (2–5 kHz) sits ${Math.abs(mudPresenceGap).toFixed(1)} dB below low-mid mud (250–500 Hz). This is the single biggest thing making the mix feel smaller/duller than commercial references. Try a broad cut around 300–400 Hz on the busiest elements (bass, guitars, vocal body), and make sure something clearly owns 2–5 kHz.` });
+      } else if (mudPresenceGap < -10) {
+        items.push({ status: 'warn', icon: '!', title: 'Some low-mid buildup vs presence',
+          body: `Presence is ${Math.abs(mudPresenceGap).toFixed(1)} dB below mud energy. Not severe, but a gentle cut around 300–400 Hz and a touch more clarity at 2–5 kHz would likely make this read louder/bigger at the same LUFS.` });
+      } else {
+        items.push({ status: 'ok', icon: '✓', title: 'Low-mid vs presence balance looks healthy',
+          body: `Presence and low-mid energy are reasonably balanced (${mudPresenceGap.toFixed(1)} dB gap). This isn't the thing holding the mix back.` });
+      }
+
+      // Sub vs bass balance
+      if (subBassGap > 6) {
+        items.push({ status: 'warn', icon: '!', title: 'Sub-bass may be overpowering the bass body',
+          body: `Sub (20–60 Hz) is ${subBassGap.toFixed(1)} dB hotter than bass (60–250 Hz). Can read as boomy or lacking punch on smaller speakers/phones. Consider a high-pass or gentle cut below ~50 Hz if this wasn't intentional.` });
+      } else if (subBassGap < -10) {
+        items.push({ status: 'warn', icon: '!', title: 'Low end may feel thin on full-range systems',
+          body: `Bass (60–250 Hz) is significantly hotter than sub (20–60 Hz). Fine on laptop speakers, but may feel like it's missing real weight on a proper system or club rig.` });
+      }
+
+      // Phase / mono compatibility
+      if (corr < -0.1) {
+        items.push({ status: 'danger', icon: '✕', title: 'Real mono compatibility risk',
+          body: `Whole-track phase correlation is ${corr.toFixed(2)}. Content is cancelling when summed to mono — this will noticeably thin out or drop out on phones, Bluetooth speakers, and club systems. Check any wide stereo widening or heavily panned/inverted elements.` });
+      } else if (corr < 0.25) {
+        items.push({ status: 'warn', icon: '!', title: 'Wide stereo field, worth a mono check',
+          body: `Correlation is ${corr.toFixed(2)}, on the wide side. Not necessarily wrong, but worth auditioning this in mono before finalizing, since some of that width may be lost or altered on mono playback systems.` });
+      } else {
+        items.push({ status: 'ok', icon: '✓', title: 'Good mono compatibility',
+          body: `Phase correlation is ${corr.toFixed(2)}, healthy stereo width without cancellation risk.` });
+      }
+
+      // True peak headroom
+      if (isFinite(truePeakDbVal)) {
+        if (truePeakDbVal > -0.1) {
+          items.push({ status: 'danger', icon: '✕', title: 'True peak margin is essentially zero',
+            body: `True peak is ${truePeakDbVal.toFixed(1)} dBTP. Almost no headroom left — lossy encoding on streaming platforms can easily push this into inter-sample clipping. Pull your ceiling down to at least −1 dBTP.` });
+        } else if (truePeakDbVal > -1.0) {
+          items.push({ status: 'warn', icon: '!', title: 'True peak margin is tight',
+            body: `True peak is ${truePeakDbVal.toFixed(1)} dBTP. Workable, but −1 dBTP or lower is the safer convention for surviving lossy encoding without overshoot.` });
+        } else {
+          items.push({ status: 'ok', icon: '✓', title: 'Healthy true peak headroom',
+            body: `True peak sits at ${truePeakDbVal.toFixed(1)} dBTP, safe margin for streaming encoding.` });
+        }
+      }
+
+      // Loudness vs streaming target
+      if (isFinite(integratedLufsVal)) {
+        const diff = integratedLufsVal - (-14);
+        if (Math.abs(diff) > 6) {
+          items.push({ status: 'warn', icon: '!', title: `${diff > 0 ? 'Well above' : 'Well below'} the −14 LUFS streaming target`,
+            body: `Integrated loudness is ${integratedLufsVal.toFixed(1)} LUFS, ${Math.abs(diff).toFixed(1)} dB ${diff > 0 ? 'louder' : 'quieter'} than Spotify's target. Remember platforms normalize anyway — the real goal is making the mix sound its biggest once it's turned to −14, not chasing extra loudness here.` });
+        } else {
+          items.push({ status: 'ok', icon: '✓', title: 'Loudness is close to the streaming target',
+            body: `At ${integratedLufsVal.toFixed(1)} LUFS, you're within a reasonable range of −14 LUFS, so normalization won't do much to this file either way.` });
+        }
+      }
+
+      // Dynamics / over-compression check
+      if (isFinite(crestVal)) {
+        if (crestVal < 6) {
+          items.push({ status: 'warn', icon: '!', title: 'Dynamics look heavily limited',
+            body: `Crest factor is ${crestVal.toFixed(1)} dB, on the squashed side. If this wasn't an intentional loud/aggressive style, easing off the limiter could bring back punch and reduce listener fatigue.` });
+        } else if (crestVal > 20) {
+          items.push({ status: 'warn', icon: '!', title: 'Dynamics are very wide for a commercial master',
+            body: `Crest factor is ${crestVal.toFixed(1)} dB. Could be intentional (acoustic/classical-leaning material), but if you're aiming for a competitive commercial master, there's room to bring the average level up without much perceived loss of punch.` });
+        }
+      }
+
+      list.innerHTML = items.map(it => `
+        <div class="diagnosis-item status-${it.status}">
+          <div class="diagnosis-icon">${it.icon}</div>
+          <div>
+            <div class="diagnosis-title">${it.title}</div>
+            <div class="diagnosis-body">${it.body}</div>
+          </div>
+        </div>
+      `).join('');
+    }, 30);
+  }
+
   function renderLoudness() {
     const ch0 = audioBuffer.getChannelData(0);
     let sumSquares = 0, peak = 0;
@@ -1116,6 +1417,8 @@
 
       loudnessTimelineBlocks = blocks;
       drawLufsTimeline();
+
+      runMixDiagnosis(audioBuffer, lufs, truePeakDb, crest, lra);
     }, 30);
   }
 
