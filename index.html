@@ -247,7 +247,7 @@
     <div class="panel">
       <h2>Waveform — full track</h2>
       <canvas id="waveformCanvas"></canvas>
-      <p class="info-text">Click or drag on the waveform to select a region to zoom into below.</p>
+      <p class="info-text">Click the waveform to jump playback there, or drag to select a region to zoom into below.</p>
     </div>
 
     <div class="panel">
@@ -568,17 +568,56 @@
       ctx.strokeStyle = css('--accent');
       ctx.strokeRect(x1, 0, x2 - x1, h);
     }
+
+    drawPlayhead(ctx, w, h);
+  }
+
+  function drawPlayhead(ctx, w, h) {
+    if (!audioBuffer) return;
+    const frac = Math.max(0, Math.min(1, playOffset / audioBuffer.duration));
+    const x = frac * w;
+    ctx.beginPath();
+    ctx.strokeStyle = css('--warn');
+    ctx.lineWidth = 2;
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+
+  waveformCanvas.addEventListener('click', e => {
+    if (dragMoved) { dragMoved = false; return; }
+    const rect = waveformCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const frac = x / rect.width;
+    seekTo(frac * audioBuffer.duration);
+  });
+
+  function seekTo(timeSec) {
+    const wasPlaying = isPlaying;
+    if (isPlaying) {
+      sourceNode.onended = null;
+      sourceNode.stop();
+      cancelAnimationFrame(animFrame);
+      isPlaying = false;
+    }
+    playOffset = Math.max(0, Math.min(audioBuffer.duration, timeSec));
+    updatePlayTime(playOffset);
+    drawWaveform();
+    if (wasPlaying) togglePlay();
   }
 
   let dragStart = null;
+  let dragMoved = false;
   waveformCanvas.addEventListener('mousedown', e => {
     const rect = waveformCanvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const frac = x / rect.width;
     dragStart = Math.floor(frac * audioBuffer.length);
+    dragMoved = false;
   });
   waveformCanvas.addEventListener('mousemove', e => {
     if (dragStart === null) return;
+    dragMoved = true;
     const rect = waveformCanvas.getBoundingClientRect();
     const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
     const frac = x / rect.width;
@@ -758,6 +797,7 @@
     const elapsed = audioCtx.currentTime - playStartTime;
     playOffset = elapsed;
     updatePlayTime(elapsed);
+    drawWaveform();
 
     animFrame = requestAnimationFrame(drawSpectrumLoop);
   }
