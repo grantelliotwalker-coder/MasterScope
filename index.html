@@ -171,7 +171,29 @@
   .metric-box .value.warn { color: var(--warn); }
   .metric-box .value.danger { color: var(--danger); }
 
-  .freq-guide {
+  .platform-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+  }
+  .platform-box {
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .platform-box .pname { font-size: 13px; font-weight: 600; }
+  .platform-box .ptarget { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .platform-box .padjust {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+  .platform-box .padjust.turn-down { color: var(--warn); }
+  .platform-box .padjust.turn-up { color: var(--accent2); }
+  .platform-box .padjust.unchanged { color: var(--accent); }
+  .platform-box .presult { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+  .platform-box .presult.danger { color: var(--danger); }
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 8px;
@@ -242,6 +264,12 @@
       </div>
       <canvas id="spectrumCanvas"></canvas>
       <div class="freq-guide" id="freqGuide"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Streaming Platform Loudness Preview</h2>
+      <div id="platformGrid" class="platform-grid"></div>
+      <p class="info-text">Most streaming platforms normalize playback loudness to their own target. If your integrated loudness is louder than the platform's target, they'll turn your master <em>down</em> to match — so mastering hotter than a platform's target buys you nothing there, it just eats into your peak headroom for no benefit. If you're quieter than the target, most platforms turn you <em>up</em>, which can also raise your true peak above 0 dBTP if you had little headroom to begin with.</p>
     </div>
 
     <div class="panel">
@@ -529,7 +557,47 @@
         <div class="metric-box"><div class="label">RMS Level</div><div class="value">${rmsDb.toFixed(1)} dBFS</div></div>
         <div class="metric-box"><div class="label">Crest Factor</div><div class="value">${crest.toFixed(1)} dB</div></div>
       `;
+
+      renderPlatformPreview(lufs, truePeakDb);
     }, 30);
+  }
+
+  const PLATFORM_TARGETS = [
+    { name: 'Spotify', target: -14, note: 'default streaming' },
+    { name: 'Apple Music', target: -16, note: 'Sound Check' },
+    { name: 'YouTube', target: -14, note: 'video/music' },
+    { name: 'Tidal', target: -14, note: 'default' },
+    { name: 'Amazon Music', target: -14, note: 'default' },
+    { name: 'Deezer', target: -15, note: 'default' },
+  ];
+
+  function renderPlatformPreview(lufs, truePeakDb) {
+    const grid = document.getElementById('platformGrid');
+    if (!isFinite(lufs)) {
+      grid.innerHTML = '<p class="info-text">Not enough signal above the gating threshold to estimate platform normalization.</p>';
+      return;
+    }
+    grid.innerHTML = PLATFORM_TARGETS.map(p => {
+      const adjust = p.target - lufs; // dB gain platform would apply
+      const resultPeak = truePeakDb + adjust;
+      let cls = 'unchanged';
+      let arrow = '→';
+      if (adjust < -0.15) { cls = 'turn-down'; arrow = '▼'; }
+      else if (adjust > 0.15) { cls = 'turn-up'; arrow = '▲'; }
+
+      let resultText = `Resulting peak ≈ ${resultPeak.toFixed(1)} dBTP`;
+      let resultClass = '';
+      if (resultPeak > -1) resultClass = 'danger';
+
+      return `
+        <div class="platform-box">
+          <div class="pname">${p.name}</div>
+          <div class="ptarget">Target ${p.target} LUFS · ${p.note}</div>
+          <div class="padjust ${cls}">${arrow} ${adjust >= 0 ? '+' : ''}${adjust.toFixed(1)} dB</div>
+          <div class="presult ${resultClass}">${resultText}</div>
+        </div>
+      `;
+    }).join('');
   }
 
   // ---- Full waveform ----
