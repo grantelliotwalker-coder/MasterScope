@@ -267,6 +267,10 @@
         <button class="tool-btn ab-btn" data-mode="enhanced">Enhanced (−14 LUFS)</button>
       </div>
       <div class="zoom-label" id="abGainInfo"></div>
+      <div class="controls-row" style="margin-top:10px">
+        <button class="tool-btn" id="downloadEnhancedBtn">⬇ Download Enhanced WAV</button>
+        <span class="zoom-label" id="downloadStatus"></span>
+      </div>
     </div>
 
     <div class="panel">
@@ -344,6 +348,9 @@
   let selection = null; // {start, end} in samples, channel 0
   let animFrame;
   let integratedLufs = null;
+  let enhancedMakeupLinear = 1.0; // calibrated so Enhanced mode actually lands at -14 LUFS
+  let enhancedCalibrationStatus = 'idle'; // idle | calculating | done
+  let currentFileName = 'master';
   let abMode = 'original';
   let chainNodes = null; // { normGain, lowMidFilter, presenceFilter, compressor, makeupGain }
 
@@ -383,6 +390,7 @@
     uploadZone.classList.add('hidden');
     uploadCompact.classList.remove('hidden');
     uploadedFileName.textContent = file.name;
+    currentFileName = file.name;
     renderFileInfo(file);
     renderLoudness();
     drawWaveform();
@@ -391,6 +399,8 @@
     setupSpectrum();
     renderFreqGuide();
     integratedLufs = null;
+    enhancedCalibrationStatus = 'idle';
+    enhancedMakeupLinear = 1.0;
     document.querySelectorAll('.ab-btn').forEach(b => b.classList.remove('active'));
     document.querySelector('.ab-btn[data-mode="original"]').classList.add('active');
     abMode = 'original';
@@ -466,19 +476,20 @@
     return applyBiquad(afterStage1, stage2);
   }
 
-  function calculateIntegratedLoudness() {
-    const fs = audioBuffer.sampleRate;
-    const numChannels = audioBuffer.numberOfChannels;
+  function calculateIntegratedLoudness(buffer) {
+    buffer = buffer || audioBuffer;
+    const fs = buffer.sampleRate;
+    const numChannels = buffer.numberOfChannels;
     const channelWeights = []; // 1.0 for L/R/C, per BS.1770 (no surround handling here)
     const kWeighted = [];
     for (let c = 0; c < numChannels; c++) {
-      kWeighted.push(kWeightChannel(audioBuffer.getChannelData(c), fs));
+      kWeighted.push(kWeightChannel(buffer.getChannelData(c), fs));
       channelWeights.push(1.0);
     }
 
     const blockSize = Math.round(0.4 * fs);   // 400ms
     const hopSize = Math.round(0.1 * fs);     // 100ms -> 75% overlap
-    const len = audioBuffer.length;
+    const len = buffer.length;
     const blockLoudnesses = []; // { z: weighted mean square sum }
 
     for (let start = 0; start + blockSize <= len; start += hopSize) {
@@ -513,6 +524,193 @@
 
     return { lufs: integratedLUFS, blocks: blockLoudnesses };
   }
+
+  // Render the Enhanced chain (pre-gain-match + EQ + compression, no makeup gain)
+  // through an OfflineAudioContext, measure its real LUFS, then compute exactly
+  // how much makeup gain is needed to land it on -14 LUFS.
+  async function calibrateEnhancedGain() {
+    if (!audioBuffer || integratedLufs === null || !isFinite(integratedLufs)) {
+      enhancedMakeupLinear = 1.0;
+      return;
+    }
+    enhancedCalibrationStatus = 'calculating';
+    refreshAbGainInfo();
+
+    const fs = audioBuffer.sampleRate;
+    const offlineCtx = new OfflineAudioContext(audioBuffer.numberOfChannels, audioBuffer.length, fs);
+
+    const src = offlineCtx.createBufferSource();
+    src.buffer = audioBuffer;
+
+    const normAdjustDb = -14 - integratedLufs;
+    const normGain = offlineCtx.createGain();
+    normGain.gain.value = Math.pow(10, normAdjustDb / 20);
+
+    const lowMidFilter = offlineCtx.createBiquadFilter();
+    lowMidFilter.type = 'peaking';
+    lowMidFilter.frequency.value = 380;
+    lowMidFilter.Q.value = 1.1;
+    lowMidFilter.gain.value = -3.5;
+
+    const presenceFilter = offlineCtx.createBiquadFilter();
+    presenceFilter.type = 'peaking';
+    presenceFilter.frequency.value = 3200;
+    presenceFilter.Q.value = 0.9;
+    presenceFilter.gain.value = 3;
+
+    const compressor = offlineCtx.createDynamicsCompressor();
+    compressor.threshold.value = -18;
+    compressor.knee.value = 6;
+    compressor.ratio.value = 3;
+    compressor.attack.value = 0.003;
+    compressor.release.value = 0.15;
+
+    src.connect(normGain);
+    normGain.connect(lowMidFilter);
+    lowMidFilter.connect(presenceFilter);
+    presenceFilter.connect(compressor);
+    compressor.connect(offlineCtx.destination);
+    src.start(0);
+
+    const rendered = await offlineCtx.startRendering();
+    const { lufs: measuredLufs } = calculateIntegratedLoudness(rendered);
+
+    if (isFinite(measuredLufs)) {
+      const makeupDb = -14 - measuredLufs;
+      enhancedMakeupLinear = Math.pow(10, makeupDb / 20);
+    } else {
+      enhancedMakeupLinear = 1.0;
+    }
+    enhancedCalibrationStatus = 'done';
+    if (chainNodes && abMode === 'enhanced') applyAbMode('enhanced');
+    refreshAbGainInfo();
+  }
+
+  function refreshAbGainInfo() {
+    const el = document.getElementById('abGainInfo');
+    if (!el) return;
+    if (abMode === 'enhanced' && enhancedCalibrationStatus === 'calculating') {
+      el.textContent = 'Calibrating Enhanced gain to land exactly on −14 LUFS…';
+    }
+  }
+
+  // Render the full Enhanced chain (gain-match + EQ + compression + calibrated makeup)
+  // offline at full quality, returning a rendered AudioBuffer.
+  async function renderEnhancedBuffer() {
+    const fs = audioBuffer.sampleRate;
+    const offlineCtx = new OfflineAudioContext(audioBuffer.numberOfChannels, audioBuffer.length, fs);
+
+    const src = offlineCtx.createBufferSource();
+    src.buffer = audioBuffer;
+
+    const normAdjustDb = (integratedLufs !== null && isFinite(integratedLufs)) ? (-14 - integratedLufs) : 0;
+    const normGain = offlineCtx.createGain();
+    normGain.gain.value = Math.pow(10, normAdjustDb / 20);
+
+    const lowMidFilter = offlineCtx.createBiquadFilter();
+    lowMidFilter.type = 'peaking';
+    lowMidFilter.frequency.value = 380;
+    lowMidFilter.Q.value = 1.1;
+    lowMidFilter.gain.value = -3.5;
+
+    const presenceFilter = offlineCtx.createBiquadFilter();
+    presenceFilter.type = 'peaking';
+    presenceFilter.frequency.value = 3200;
+    presenceFilter.Q.value = 0.9;
+    presenceFilter.gain.value = 3;
+
+    const compressor = offlineCtx.createDynamicsCompressor();
+    compressor.threshold.value = -18;
+    compressor.knee.value = 6;
+    compressor.ratio.value = 3;
+    compressor.attack.value = 0.003;
+    compressor.release.value = 0.15;
+
+    const makeupGain = offlineCtx.createGain();
+    makeupGain.gain.value = enhancedMakeupLinear;
+
+    src.connect(normGain);
+    normGain.connect(lowMidFilter);
+    lowMidFilter.connect(presenceFilter);
+    presenceFilter.connect(compressor);
+    compressor.connect(makeupGain);
+    makeupGain.connect(offlineCtx.destination);
+    src.start(0);
+
+    return offlineCtx.startRendering();
+  }
+
+  // Encode an AudioBuffer as a 16-bit PCM WAV Blob
+  function audioBufferToWavBlob(buffer) {
+    const numChannels = buffer.numberOfChannels;
+    const sampleRate = buffer.sampleRate;
+    const numFrames = buffer.length;
+    const bytesPerSample = 2;
+    const blockAlign = numChannels * bytesPerSample;
+    const dataSize = numFrames * blockAlign;
+    const bufferArr = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(bufferArr);
+
+    function writeString(offset, str) {
+      for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+    }
+
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + dataSize, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * blockAlign, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bytesPerSample * 8, true);
+    writeString(36, 'data');
+    view.setUint32(40, dataSize, true);
+
+    const channelData = [];
+    for (let c = 0; c < numChannels; c++) channelData.push(buffer.getChannelData(c));
+
+    let offset = 44;
+    for (let i = 0; i < numFrames; i++) {
+      for (let c = 0; c < numChannels; c++) {
+        let sample = channelData[c][i];
+        sample = Math.max(-1, Math.min(1, sample));
+        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+        offset += 2;
+      }
+    }
+
+    return new Blob([bufferArr], { type: 'audio/wav' });
+  }
+
+  document.getElementById('downloadEnhancedBtn').addEventListener('click', async () => {
+    if (!audioBuffer) return;
+    const btn = document.getElementById('downloadEnhancedBtn');
+    const status = document.getElementById('downloadStatus');
+    btn.disabled = true;
+    status.textContent = 'Rendering enhanced master…';
+    try {
+      const rendered = await renderEnhancedBuffer();
+      const blob = audioBufferToWavBlob(rendered);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const baseName = (currentFileName || 'master').replace(/\.[^/.]+$/, '');
+      a.href = url;
+      a.download = `${baseName}_enhanced_-14LUFS.wav`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      status.textContent = 'Downloaded.';
+    } catch (err) {
+      status.textContent = 'Render failed: ' + err.message;
+    } finally {
+      btn.disabled = false;
+      setTimeout(() => { status.textContent = ''; }, 4000);
+    }
+  });
 
   // Approximate true peak via 4x oversampling (linear interpolation, not full ITU polyphase filter)
   function estimateTruePeakDb() {
@@ -588,6 +786,9 @@
 
       renderPlatformPreview(lufs, truePeakDb);
       applyAbMode(abMode);
+      enhancedCalibrationStatus = 'idle';
+      enhancedMakeupLinear = 1.0;
+      calibrateEnhancedGain();
     }, 30);
   }
 
@@ -926,9 +1127,13 @@
       presenceFilter.gain.setTargetAtTime(3, now, rampTime);
       compressor.threshold.setTargetAtTime(-18, now, rampTime);
       compressor.ratio.setTargetAtTime(3, now, rampTime);
-      makeupGain.gain.setTargetAtTime(1.4, now, rampTime);
-      document.getElementById('abGainInfo').textContent =
-        `Same −14 LUFS target, plus −3.5 dB at 380 Hz, +3 dB at 3.2 kHz, and gentle 3:1 glue compression.`;
+      makeupGain.gain.setTargetAtTime(enhancedMakeupLinear, now, rampTime);
+      if (enhancedCalibrationStatus === 'done') {
+        document.getElementById('abGainInfo').textContent =
+          `Calibrated to measure exactly −14 LUFS after EQ + compression (makeup ${(20*Math.log10(enhancedMakeupLinear)).toFixed(1)} dB) — −3.5 dB at 380 Hz, +3 dB at 3.2 kHz, 3:1 glue compression.`;
+      } else {
+        document.getElementById('abGainInfo').textContent = 'Calibrating Enhanced gain to land exactly on −14 LUFS…';
+      }
     }
   }
 
