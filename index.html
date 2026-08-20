@@ -646,6 +646,7 @@
   <a href="#panel-stereofield">Stereo Field</a>
   <a href="#panel-reference">Reference</a>
   <a href="#panel-waveform">Waveform</a>
+  <a href="#panel-automation">Gain Automation</a>
   <a href="#panel-platforms">Platforms</a>
 </nav>
 
@@ -925,6 +926,31 @@
       </div>
       <canvas id="sampleCanvas"></canvas>
       <div id="sampleInfo">Hover over the sample view to inspect individual sample values.</div>
+    </div>
+
+    <div class="panel" id="panel-automation">
+      <h2>Gain Automation Preview</h2>
+      <p class="info-text" style="margin-top:0">Drag a selection on the Waveform panel above, then apply a gain boost to just that region — the way you'd automate a quiet section up in your DAW. This shows you the before/after LUFS and crest factor without touching your DAW project, so you can see if it's worth doing before you commit.</p>
+      <div id="automationRegionInfo" class="eq-hint">No region selected. Drag on the waveform above to select a section, or use auto-detect below.</div>
+      <div class="controls-row" style="margin-top:8px">
+        <button class="tool-btn" id="autoDetectQuietBtn">Auto-Detect Quiet Sections</button>
+      </div>
+      <div id="quietSectionsList" class="history-list"></div>
+      <div class="controls-row" id="applyAllRow" style="display:none">
+        <button class="tool-btn" id="applyAllQuietBtn">Apply All Detected + Normalize Back to Original LUFS</button>
+      </div>
+      <div class="controls-row" style="margin-top:10px">
+        <label class="zoom-label" for="automationGainInput">Gain for selected region:</label>
+        <input type="range" id="automationGainInput" min="-12" max="12" step="0.5" value="0" style="width:200px">
+        <span class="zoom-label" id="automationGainValue">0.0 dB</span>
+      </div>
+      <div class="controls-row">
+        <button class="tool-btn" id="automationPreviewBtn">Preview This Change</button>
+        <button class="tool-btn" id="automationPlayBtn">▶ Play Adjusted</button>
+        <button class="tool-btn" id="automationDownloadBtn">Download Adjusted WAV</button>
+        <button class="tool-btn" id="automationResetBtn">Reset</button>
+      </div>
+      <div id="automationCompareTable"></div>
     </div>
 
   </div>
@@ -2495,6 +2521,318 @@
   }
   initReferenceUI();
 
+  // ---- Gain Automation Preview ----
+  let automationAdjustedBuffer = null;
+  let automationSourceNode = null;
+  let automationIsPlaying = false;
+  let lastDetectedQuietRegions = []; // [{start, end, gainDb}] in samples
+
+  function applyRegionGain(buffer, startSample, endSample, gainDb) {
+    const out = audioCtx.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+    const gainLinear = Math.pow(10, gainDb / 20);
+    const fadeSamples = Math.min(Math.round(0.02 * buffer.sampleRate), Math.floor((endSample - startSample) / 4)); // 20ms crossfade, capped
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+      const src = buffer.getChannelData(c);
+      const dst = out.getChannelData(c);
+      dst.set(src);
+      for (let i = startSample; i < endSample && i < dst.length; i++) {
+        let g = gainLinear;
+        // smooth the edges so there's no click at the boundary of the automated region
+        if (fadeSamples > 0) {
+          if (i - startSample < fadeSamples) {
+            const t = (i - startSample) / fadeSamples;
+            g = 1 + (gainLinear - 1) * t;
+          } else if (endSample - i < fadeSamples) {
+            const t = (endSample - i) / fadeSamples;
+            g = 1 + (gainLinear - 1) * t;
+          }
+        }
+        dst[i] = src[i] * g;
+      }
+    }
+    return out;
+  }
+
+  function updateAutomationRegionInfo() {
+    const el = document.getElementById('automationRegionInfo');
+    if (!el || !audioBuffer) return;
+    if (!selection) {
+      el.textContent = 'No region selected. Drag on the waveform above to select a section, or use auto-detect below.';
+      return;
+    }
+    const fs = audioBuffer.sampleRate;
+    const startSec = selection.start / fs, endSec = selection.end / fs;
+    const fmt = t => `${Math.floor(t/60)}:${Math.floor(t%60).toString().padStart(2,'0')}`;
+    el.textContent = `Selected region: ${fmt(startSec)} – ${fmt(endSec)} (${(endSec-startSec).toFixed(1)}s)`;
+  }
+
+  function detectQuietSections() {
+    const listEl = document.getElementById('quietSectionsList');
+    if (!listEl) return;
+    if (!loudnessTimelineBlocks || loudnessTimelineBlocks.length === 0) {
+      listEl.innerHTML = `<div class="history-empty">Loudness data isn't ready yet — wait for analysis to finish and try again.</div>`;
+      return;
+    }
+    const toLUFS = z => z > 1e-12 ? -0.691 + 10*Math.log10(z) : -70;
+    const hopSec = 0.1; // matches the 100ms hop used to build loudnessTimelineBlocks
+    const stWindow = 30; // ~3s rolling short-term window, same as the timeline chart
+    const shortTerm = [];
+    let rollSum = 0;
+    for (let i = 0; i < loudnessTimelineBlocks.length; i++) {
+      rollSum += loudnessTimelineBlocks[i];
+      if (i >= stWindow) rollSum -= loudnessTimelineBlocks[i - stWindow];
+      shortTerm.push(toLUFS(rollSum / Math.min(i+1, stWindow)));
+    }
+
+    const valid = shortTerm.filter(v => v > -60);
+    if (valid.length === 0) { listEl.innerHTML = `<div class="history-empty">Not enough signal to analyze.</div>`; return; }
+    const sorted = [...valid].sort((a,b)=>a-b);
+    const median = sorted[Math.floor(sorted.length/2)];
+    const dipThreshold = median - 3.5; // meaningfully quieter, not just normal micro-dynamics
+    const minDurationBlocks = Math.round(2.0 / hopSec); // ignore anything shorter than 2s — too brief to be worth automating
+
+    // exclude the natural intro/outro fade at the very start/end of the track —
+    // those are *supposed* to be quiet, boosting them would undo an intentional fade
+    const fadeExcludeSec = Math.min(5, audioBuffer.duration * 0.04);
+    const excludeBlocks = Math.round(fadeExcludeSec / hopSec);
+
+    const regions = [];
+    let regionStart = null;
+    for (let i = excludeBlocks; i < shortTerm.length - excludeBlocks; i++) {
+      const isDip = shortTerm[i] < dipThreshold && shortTerm[i] > -60;
+      if (isDip && regionStart === null) regionStart = i;
+      if (!isDip && regionStart !== null) {
+        if (i - regionStart >= minDurationBlocks) regions.push({ start: regionStart, end: i });
+        regionStart = null;
+      }
+    }
+    if (regionStart !== null && (shortTerm.length - excludeBlocks) - regionStart >= minDurationBlocks) regions.push({ start: regionStart, end: shortTerm.length - excludeBlocks });
+
+    // merge regions less than 1.5s apart (avoids chopping one real dip into several fragments)
+    let merged = [];
+    for (const r of regions) {
+      if (merged.length && (r.start - merged[merged.length-1].end) * hopSec < 1.5) {
+        merged[merged.length-1].end = r.end;
+      } else merged.push({...r});
+    }
+
+    // rank by how significant the dip actually is (depth × duration), keep only the ones that matter
+    merged = merged.map(r => {
+      const avgDb = shortTerm.slice(r.start, r.end).reduce((a,b)=>a+b,0) / (r.end - r.start);
+      return { ...r, belowBy: median - avgDb, durationSec: (r.end - r.start) * hopSec };
+    }).sort((a,b) => (b.belowBy * b.durationSec) - (a.belowBy * a.durationSec)).slice(0, 4);
+
+    // fallback: nothing crossed the threshold, but there's usually still a relatively
+    // quieter stretch worth looking at — find the single lowest ~2s window and offer it
+    if (merged.length === 0) {
+      const winBlocks = Math.round(2.0 / hopSec);
+      let bestStart = -1, bestAvg = Infinity;
+      for (let i = excludeBlocks; i + winBlocks <= shortTerm.length - excludeBlocks; i++) {
+        const slice = shortTerm.slice(i, i + winBlocks).filter(v => v > -60);
+        if (slice.length < winBlocks * 0.8) continue;
+        const avg = slice.reduce((a,b)=>a+b,0) / slice.length;
+        if (avg < bestAvg) { bestAvg = avg; bestStart = i; }
+      }
+      if (bestStart >= 0 && median - bestAvg > 1.2) {
+        merged.push({ start: bestStart, end: bestStart + winBlocks, isFallback: true, belowBy: median - bestAvg, durationSec: 2.0 });
+      }
+    }
+
+    if (merged.length === 0) {
+      listEl.innerHTML = `<div class="history-empty">This track's level is already very consistent throughout — no meaningful quiet section to automate up.</div>`;
+      document.getElementById('applyAllRow').style.display = 'none';
+      return;
+    }
+
+    const fs = audioBuffer.sampleRate;
+    lastDetectedQuietRegions = merged.map(r => {
+      const startSec = r.start * hopSec, endSec = r.end * hopSec;
+      const avgDb = shortTerm.slice(r.start, r.end).reduce((a,b)=>a+b,0) / (r.end - r.start);
+      const belowBy = median - avgDb;
+      const suggestedGain = Math.min(8, Math.max(1, belowBy * 0.8));
+      return { start: Math.round(startSec*fs), end: Math.round(endSec*fs), gainDb: suggestedGain, startSec, endSec, belowBy, isFallback: !!r.isFallback };
+    }).sort((a,b) => a.startSec - b.startSec); // display chronologically, even though selection above was by severity
+    document.getElementById('applyAllRow').style.display = 'flex';
+    drawWaveform();
+
+    listEl.innerHTML = lastDetectedQuietRegions.map((r, idx) => {
+      const fmt = t => `${Math.floor(t/60)}:${Math.floor(t%60).toString().padStart(2,'0')}`;
+      const metaLabel = r.isFallback
+        ? `quietest stretch found · only ${r.belowBy.toFixed(1)}dB below average, likely a minor gain · suggested +${r.gainDb.toFixed(1)}dB`
+        : `${r.belowBy.toFixed(1)}dB below track average · suggested +${r.gainDb.toFixed(1)}dB`;
+      return `
+        <div class="history-item" data-idx="${idx}" data-start="${r.start}" data-end="${r.end}" data-gain="${r.gainDb.toFixed(1)}">
+          <span class="h-name">#${idx+1} · ${fmt(r.startSec)} – ${fmt(r.endSec)}</span>
+          <span class="h-meta">${metaLabel}</span>
+        </div>`;
+    }).join('');
+
+    listEl.querySelectorAll('.history-item').forEach(el => {
+      el.addEventListener('click', () => {
+        selection = { start: parseInt(el.dataset.start), end: parseInt(el.dataset.end) };
+        drawWaveform();
+        drawSampleView();
+        updateAutomationRegionInfo();
+        document.getElementById('automationGainInput').value = el.dataset.gain;
+        document.getElementById('automationGainValue').textContent = `${parseFloat(el.dataset.gain).toFixed(1)} dB`;
+        listEl.querySelectorAll('.history-item').forEach(x => x.classList.remove('selected'));
+        el.classList.add('selected');
+        previewAutomation();
+      });
+    });
+  }
+
+  function previewAutomation() {
+    if (!audioBuffer) { alert('Analyze a track first.'); return; }
+    if (!selection) { alert('Drag a selection on the Waveform panel first, then come back and preview.'); return; }
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const gainDb = parseFloat(document.getElementById('automationGainInput').value);
+    const tableEl = document.getElementById('automationCompareTable');
+    tableEl.innerHTML = `<div class="info-text">Rendering preview…</div>`;
+    setTimeout(() => {
+      automationAdjustedBuffer = applyRegionGain(audioBuffer, selection.start, selection.end, gainDb);
+      const stats = analyzeBufferForReference(automationAdjustedBuffer);
+      const before = { lufs: integratedLufs, truePeak: lastTruePeakDb, crest: lastCrestVal };
+      const rows = [
+        { label: 'Integrated Loudness', unit: 'LUFS', bv: before.lufs, av: stats.lufs },
+        { label: 'True Peak', unit: 'dBTP', bv: before.truePeak, av: stats.truePeak },
+        { label: 'Crest Factor', unit: 'dB', bv: before.crest, av: stats.crest },
+      ].map(r => {
+        if (!isFinite(r.bv) || !isFinite(r.av)) return '';
+        const delta = r.av - r.bv;
+        return `<tr><td class="metric-name">${r.label}</td><td>${r.bv.toFixed(1)} ${r.unit}</td><td>${r.av.toFixed(1)} ${r.unit}</td><td class="delta ${Math.abs(delta)<0.05?'neutral':(delta>0?'bad':'good')}">${delta>=0?'+':''}${delta.toFixed(2)} ${r.unit}</td></tr>`;
+      }).join('');
+      tableEl.innerHTML = `
+        <table class="compare-table">
+          <thead><tr><th>Metric</th><th>Original</th><th>With Automation</th><th>Change</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <p class="info-text">Loudness color-coding here just shows direction of change (this tool doesn't know your target) — since you're already at −14 LUFS, you'd typically want a small overall trim afterward to bring it back to target once you're happy with the shape.</p>
+      `;
+    }, 30);
+  }
+
+  function stopAutomationPlayback() {
+    if (automationSourceNode) { try { automationSourceNode.stop(); } catch(e){} automationSourceNode = null; }
+    automationIsPlaying = false;
+    const btn = document.getElementById('automationPlayBtn');
+    if (btn) btn.textContent = '▶ Play Adjusted';
+  }
+
+  function applyAllQuietRegionsAndNormalize() {
+    if (!audioBuffer) { alert('Analyze a track first.'); return; }
+    if (lastDetectedQuietRegions.length === 0) { alert('Run "Auto-Detect Quiet Sections" first.'); return; }
+    if (!isFinite(integratedLufs)) { alert('Original loudness measurement not ready yet.'); return; }
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const tableEl = document.getElementById('automationCompareTable');
+    tableEl.innerHTML = `<div class="info-text">Applying gain to ${lastDetectedQuietRegions.length} region${lastDetectedQuietRegions.length===1?'':'s'} and normalizing back to your original loudness…</div>`;
+
+    setTimeout(() => {
+      // apply each region's boost in sequence, feeding forward
+      let working = audioBuffer;
+      for (const r of lastDetectedQuietRegions) {
+        working = applyRegionGain(working, r.start, r.end, r.gainDb);
+      }
+
+      // measure where that landed, then trim the whole track uniformly back to the original LUFS
+      const boostedStats = analyzeBufferForReference(working);
+      const trimDb = integratedLufs - boostedStats.lufs;
+      const trimLinear = Math.pow(10, trimDb / 20);
+      const final = audioCtx.createBuffer(working.numberOfChannels, working.length, working.sampleRate);
+      for (let c = 0; c < working.numberOfChannels; c++) {
+        const src = working.getChannelData(c), dst = final.getChannelData(c);
+        for (let i = 0; i < src.length; i++) dst[i] = src[i] * trimLinear;
+      }
+
+      automationAdjustedBuffer = final;
+      const finalStats = analyzeBufferForReference(final);
+
+      const rows = [
+        { label: 'Integrated Loudness', unit: 'LUFS', bv: integratedLufs, av: finalStats.lufs },
+        { label: 'True Peak', unit: 'dBTP', bv: lastTruePeakDb, av: finalStats.truePeak },
+        { label: 'Crest Factor', unit: 'dB', bv: lastCrestVal, av: finalStats.crest },
+      ].map(r => {
+        if (!isFinite(r.bv) || !isFinite(r.av)) return '';
+        const delta = r.av - r.bv;
+        const isLoudness = r.label === 'Integrated Loudness';
+        const cls = isLoudness ? (Math.abs(delta) < 0.15 ? 'good' : 'neutral') : (Math.abs(delta)<0.05?'neutral':(delta>0?'good':'bad'));
+        return `<tr><td class="metric-name">${r.label}</td><td>${r.bv.toFixed(1)} ${r.unit}</td><td>${r.av.toFixed(1)} ${r.unit}</td><td class="delta ${cls}">${delta>=0?'+':''}${delta.toFixed(2)} ${r.unit}</td></tr>`;
+      }).join('');
+
+      tableEl.innerHTML = `
+        <table class="compare-table">
+          <thead><tr><th>Metric</th><th>Original</th><th>After (region boosts + trim)</th><th>Change</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <p class="info-text">${lastDetectedQuietRegions.length} quiet region${lastDetectedQuietRegions.length===1?'':'s'} boosted, then the whole track trimmed ${trimDb>=0?'up':'down'} by ${Math.abs(trimDb).toFixed(2)}dB to land back at your original loudness. If crest factor went up (or stayed flat) here, the automation is doing real work — the loud sections needed less limiting to hit the same target. Use "Play Adjusted" or "Download Adjusted WAV" below to check it by ear.</p>
+      `;
+    }, 30);
+  }
+
+  function initAutomationUI() {
+    const gainInput = document.getElementById('automationGainInput');
+    const gainValue = document.getElementById('automationGainValue');
+    const previewBtn = document.getElementById('automationPreviewBtn');
+    const playBtn = document.getElementById('automationPlayBtn');
+    const downloadBtn = document.getElementById('automationDownloadBtn');
+    const resetBtn = document.getElementById('automationResetBtn');
+    if (!gainInput) return;
+
+    gainInput.addEventListener('input', () => {
+      gainValue.textContent = `${parseFloat(gainInput.value).toFixed(1)} dB`;
+    });
+
+    previewBtn.addEventListener('click', previewAutomation);
+
+    const detectBtn = document.getElementById('autoDetectQuietBtn');
+    if (detectBtn) detectBtn.addEventListener('click', detectQuietSections);
+
+    const applyAllBtn = document.getElementById('applyAllQuietBtn');
+    if (applyAllBtn) applyAllBtn.addEventListener('click', applyAllQuietRegionsAndNormalize);
+
+    playBtn.addEventListener('click', () => {
+      if (automationIsPlaying) { stopAutomationPlayback(); return; }
+      if (!automationAdjustedBuffer) { alert('Click "Preview This Change" first.'); return; }
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      automationSourceNode = audioCtx.createBufferSource();
+      automationSourceNode.buffer = automationAdjustedBuffer;
+      automationSourceNode.connect(audioCtx.destination);
+      automationSourceNode.start();
+      automationSourceNode.onended = stopAutomationPlayback;
+      automationIsPlaying = true;
+      playBtn.textContent = '■ Stop';
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (!automationAdjustedBuffer) { alert('Click "Preview This Change" first.'); return; }
+      const blob = audioBufferToWavBlob(automationAdjustedBuffer);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${(currentFileName||'master').replace(/\.[^.]+$/,'')}_automated.wav`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      stopAutomationPlayback();
+      automationAdjustedBuffer = null;
+      gainInput.value = 0;
+      gainValue.textContent = '0.0 dB';
+      document.getElementById('automationCompareTable').innerHTML = '';
+      document.getElementById('quietSectionsList').innerHTML = '';
+      document.getElementById('applyAllRow').style.display = 'none';
+      lastDetectedQuietRegions = [];
+      selection = null;
+      drawWaveform();
+      updateAutomationRegionInfo();
+    });
+  }
+  initAutomationUI();
+
   function renderTransientAnalysis(buffer) {
     const summaryEl = document.getElementById('transientSummary');
     const diagEl = document.getElementById('transientDiagnosis');
@@ -2859,6 +3197,21 @@
     }
     sctx.stroke();
 
+    if (lastDetectedQuietRegions && lastDetectedQuietRegions.length) {
+      lastDetectedQuietRegions.forEach((r, idx) => {
+        const rx1 = (r.start / data.length) * w;
+        const rx2 = (r.end / data.length) * w;
+        sctx.fillStyle = '#ec489933';
+        sctx.fillRect(rx1, 0, rx2 - rx1, h);
+        sctx.strokeStyle = '#ec4899';
+        sctx.lineWidth = 2;
+        sctx.strokeRect(rx1, 0, rx2 - rx1, h);
+        sctx.fillStyle = '#ec4899';
+        sctx.font = '10px monospace';
+        sctx.fillText(`${idx+1}`, rx1 + 3, 12);
+      });
+    }
+
     if (selection) {
       const x1 = (selection.start / data.length) * w;
       const x2 = (selection.end / data.length) * w;
@@ -2938,6 +3291,7 @@
     if (dragStart !== null) {
       dragStart = null;
       drawSampleView();
+      updateAutomationRegionInfo();
     }
   });
 
