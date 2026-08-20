@@ -140,6 +140,35 @@
   .diagnosis-title { font-size: 12.5px; font-weight: 600; font-family: var(--font-mono); letter-spacing: 0.01em; }
   .diagnosis-body { font-size: 12px; color: var(--text-dim); margin-top: 3px; line-height: 1.5; }
 
+  .history-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 9px 12px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .history-item:hover { border-color: var(--border-bright); }
+  .history-item.selected { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--bg-panel-2)); }
+  .history-item input[type=checkbox] { accent-color: var(--accent); flex-shrink: 0; }
+  .history-item .h-name { font-family: var(--font-mono); font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .history-item .h-meta { font-family: var(--font-mono); color: var(--text-faint); font-size: 10.5px; white-space: nowrap; }
+  .history-item .h-delete { color: var(--text-faint); cursor: pointer; padding: 2px 6px; flex-shrink: 0; }
+  .history-item .h-delete:hover { color: var(--danger); }
+  .history-empty { font-size: 12px; color: var(--text-faint); padding: 10px 0; }
+
+  .compare-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 12px; }
+  .compare-table th { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .compare-table td { font-family: var(--font-mono); padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  .compare-table td.metric-name { font-family: var(--font-display); color: var(--text-dim); }
+  .compare-table .delta.good { color: var(--accent2); }
+  .compare-table .delta.bad { color: var(--danger); }
+  .compare-table .delta.neutral { color: var(--text-faint); }
+
   .landing { margin-bottom: 26px; }
   .hero {
     text-align: center;
@@ -372,6 +401,7 @@
     transition: border-color 0.15s, color 0.15s, background 0.15s;
   }
   button.tool-btn:hover { border-color: var(--border-bright); color: var(--text); }
+  button.tool-btn.active { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--bg-panel-2)); }
   button.tool-btn.active {
     border-color: var(--accent);
     color: var(--accent);
@@ -384,6 +414,17 @@
   #waveformCanvas { height: 180px; cursor: crosshair; }
   #sampleCanvas { height: 160px; cursor: crosshair; }
   #spectrumCanvas { height: 180px; }
+  #spectrogramCanvas { height: 260px; cursor: crosshair; }
+  #stereoFieldCanvas { height: 220px; cursor: crosshair; }
+  .spectrogram-legend-info { font-size: 11.5px; font-family: var(--font-mono); color: var(--text-dim); margin-top: 6px; }
+  .spectrogram-legend { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); }
+  .spectrogram-gradient {
+    flex: 1;
+    height: 8px;
+    border-radius: 2px;
+    background: linear-gradient(to right, #0a0e2e, #1e3a8a, #0891b2, #10b981, #eab308, #f97316, #ef4444, #ffffff);
+  }
+  #spectrogramInfo { font-size: 11.5px; font-family: var(--font-mono); color: var(--text-dim); margin-top: 6px; }
 
   .metrics-grid {
     display: grid;
@@ -554,6 +595,8 @@
     #waveformCanvas { height: 130px; }
     #sampleCanvas { height: 120px; }
     #spectrumCanvas { height: 140px; }
+    #spectrogramCanvas { height: 180px; }
+    #stereoFieldCanvas { height: 160px; }
     #eqCanvas { height: 200px; }
     #lufsTimelineCanvas { height: 130px; }
 
@@ -592,11 +635,16 @@
   <a href="#panel-overview">Overview</a>
   <a href="#panel-loudness">Loudness</a>
   <a href="#panel-diagnosis">Mix Diagnosis</a>
-  <a href="#panel-timeline">History</a>
+  <a href="#panel-transients">Transients</a>
+  <a href="#panel-history">Versions</a>
+  <a href="#panel-timeline">Loudness History</a>
   <a href="#panel-eq">EQ</a>
   <a href="#panel-ab">A/B Compare</a>
   <a href="#panel-spectrum">Spectrum</a>
+  <a href="#panel-spectrogram">Spectrogram</a>
   <a href="#panel-vectorscope">Vectorscope</a>
+  <a href="#panel-stereofield">Stereo Field</a>
+  <a href="#panel-reference">Reference</a>
   <a href="#panel-waveform">Waveform</a>
   <a href="#panel-platforms">Platforms</a>
 </nav>
@@ -659,6 +707,36 @@
         <div class="feature-desc">See exactly how Spotify, Apple Music, and others will turn your master up or down — before you upload anywhere.</div>
         <div class="feature-try">Try it with a demo track →</div>
       </div>
+      <div class="feature-card" data-panel="panel-reference">
+        <div class="feature-icon">⇄</div>
+        <div class="feature-title">Reference Compare</div>
+        <div class="feature-desc">Load a commercial reference track and A/B against it with playback automatically level-matched, so you're judging tone, not loudness.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
+      <div class="feature-card" data-panel="panel-stereofield">
+        <div class="feature-icon">◐</div>
+        <div class="feature-title">Stereo Field Map</div>
+        <div class="feature-desc">The whole track's stereo width plotted by frequency — instantly spot wide bass or a narrow, phasey top end.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
+      <div class="feature-card" data-panel="panel-spectrogram">
+        <div class="feature-icon">▨</div>
+        <div class="feature-title">Spectrogram</div>
+        <div class="feature-desc">A full frequency-over-time heatmap of the whole track — see exactly where and when resonances, mud, or harshness actually happen.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
+      <div class="feature-card" data-panel="panel-transients">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">Transient Analysis</div>
+        <div class="feature-desc">Detects kick/drum hits and tells you if a "bassy" feeling is the transient's own tail or a bass note sustaining underneath it.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
+      <div class="feature-card" data-panel="panel-history">
+        <div class="feature-icon">⟳</div>
+        <div class="feature-title">Version History</div>
+        <div class="feature-desc">Every file you analyze is logged locally. Compare any two versions side by side to see exactly what actually changed.</div>
+        <div class="feature-try">Try it with a demo track →</div>
+      </div>
     </div>
     <p class="landing-hint">Click any card above to load a synthesized demo track and jump straight to that panel — no upload needed.</p>
   </section>
@@ -703,6 +781,27 @@
       <div id="diagnosisList" class="diagnosis-list"></div>
     </div>
 
+    <div class="panel" id="panel-transients">
+      <h2>Transient Analysis — Kick/Drum Detail</h2>
+      <p class="info-text" style="margin-top:0">Detects percussive hits (kick/snare-type transients) and measures how hot they sit above the mix, how long they ring out, and whether lingering low end afterward is the transient itself or the bass note underneath it merging in.</p>
+      <div id="transientSummary" class="metrics-grid"></div>
+      <div id="transientDiagnosis" class="diagnosis-list" style="margin-top:12px"></div>
+    </div>
+
+    <div class="panel" id="panel-history">
+      <h2>Version History &amp; Compare</h2>
+      <p class="info-text" style="margin-top:0">Every file you analyze is automatically logged here (metrics only, stored locally in your browser — no audio is saved). Select two versions to see exactly what changed between them, the same way we've been comparing versions manually.</p>
+      <div class="controls-row">
+        <button class="tool-btn" id="exportReportBtn">Export Report (current file)</button>
+        <button class="tool-btn" id="exportHistoryJsonBtn">Export History (JSON)</button>
+        <button class="tool-btn" id="importHistoryJsonBtn">Import History (JSON)</button>
+        <input type="file" id="importHistoryFileInput" accept="application/json" style="display:none">
+      </div>
+      <div id="historyControls" class="controls-row"></div>
+      <div id="historyList" class="history-list"></div>
+      <div id="historyCompare" class="history-compare"></div>
+    </div>
+
     <div class="panel" id="panel-timeline">
       <h2>Loudness History Timeline</h2>
       <canvas id="lufsTimelineCanvas"></canvas>
@@ -744,10 +843,23 @@
       <h2>Frequency Spectrum (live playback analysis)</h2>
       <div class="controls-row">
         <button class="tool-btn" id="playBtn">▶ Play</button>
+        <button class="tool-btn" id="monoFoldBtn" title="Fold to mono to check phone/club/Bluetooth compatibility">Mono Check</button>
         <span class="zoom-label" id="playTime">0:00 / 0:00</span>
       </div>
       <canvas id="spectrumCanvas"></canvas>
       <div class="freq-guide" id="freqGuide"></div>
+    </div>
+
+    <div class="panel" id="panel-spectrogram">
+      <h2>Spectrogram — Frequency Over Time</h2>
+      <p class="info-text" style="margin-top:0">The whole track's frequency content plotted over time — brighter/hotter colors mean more energy at that frequency at that moment. Great for spotting resonant buildups, where mud or harshness actually lives in the arrangement, and how long low-end content rings out.</p>
+      <canvas id="spectrogramCanvas"></canvas>
+      <div class="spectrogram-legend">
+        <span>20 Hz</span>
+        <div class="spectrogram-gradient"></div>
+        <span>20 kHz</span>
+      </div>
+      <div id="spectrogramInfo">Hover over the spectrogram to inspect time/frequency/level at any point.</div>
     </div>
 
     <div class="panel" id="panel-vectorscope">
@@ -761,6 +873,33 @@
           <div class="corr-labels"><span>−1 (out of phase)</span><span>0</span><span>+1 (mono)</span></div>
           <p class="info-text">The scope shows L/R as a Lissajous pattern: a vertical line means perfectly mono/correlated, a wide circle means very wide or phase-incoherent stereo. Correlation near −1 is a real problem, it means content will cancel out in mono playback (phones, clubs, some Bluetooth speakers).</p>
         </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-stereofield">
+      <h2>Stereo Field Map — Width by Frequency</h2>
+      <p class="info-text" style="margin-top:0">The same idea as the spectrogram, but for stereo width instead of time: every frequency in the track summed up and plotted by how centered (mono) or spread (wide) it is. Bass generally belongs low on this chart — wide bass is a common mono-compatibility problem.</p>
+      <canvas id="stereoFieldCanvas"></canvas>
+      <div class="freq-guide" id="stereoFieldFreqGuide"></div>
+      <div id="stereoFieldInfo" class="spectrogram-legend-info">Hover to inspect width at a given frequency.</div>
+      <div id="stereoFieldSummary" class="metrics-grid" style="margin-top:12px"></div>
+    </div>
+
+    <div class="panel" id="panel-reference">
+      <h2>Reference Track Compare</h2>
+      <p class="info-text" style="margin-top:0">Load a commercial reference (or an earlier version of your own track) to compare against. Playback is automatically level-matched to −14 LUFS on both, so you're judging tone and balance, not just "louder sounds better."</p>
+      <div id="referenceUploadZone" class="upload-zone" style="padding:20px">
+        <input type="file" id="referenceFileInput" accept="audio/*" style="display:none">
+        <button class="tool-btn" id="referenceUploadBtn">Upload Reference Track</button>
+        <span id="referenceFileName" class="eq-hint" style="margin-left:10px"></span>
+      </div>
+      <div id="referenceContent" style="display:none">
+        <div class="controls-row" style="margin-top:14px">
+          <button class="tool-btn" id="refPlayMineBtn">▶ Play Yours (matched)</button>
+          <button class="tool-btn" id="refPlayRefBtn">▶ Play Reference (matched)</button>
+          <button class="tool-btn" id="refClearBtn">Clear Reference</button>
+        </div>
+        <div id="referenceCompareTable"></div>
       </div>
     </div>
 
@@ -818,7 +957,7 @@
     html.setAttribute('data-theme', isDark ? 'light' : 'dark');
     themeToggle.textContent = isDark ? '🌙 Dark Mode' : '☀ Light Mode';
     if (audioBuffer) {
-      drawWaveform(); drawSampleView(); drawEqCurve(); drawLufsTimeline();
+      drawWaveform(); drawSampleView(); drawEqCurve(); drawLufsTimeline(); drawSpectrogram(); drawStereoFieldMap();
       if (integratedLufs !== null) drawArcGauge('lufsGaugeCanvas', integratedLufs, -30, 0, -14, 'LUFS', 1);
       if (lastTruePeakDb !== null) drawArcGauge('tpGaugeCanvas', lastTruePeakDb, -12, 1, -1, 'dBTP', 1);
     }
@@ -852,6 +991,9 @@
   let animFrame;
   let integratedLufs = null;
   let lastTruePeakDb = null;
+  let lastTransientResult = null;
+  let lastDiagnosisResult = null;
+  let lastCrestVal = null, lastLraVal = null;
   let enhancedMakeupLinear = 1.0; // calibrated so Enhanced mode actually lands at -14 LUFS
   let enhancedCalibrationStatus = 'idle'; // idle | calculating | done
   let currentFileName = 'master';
@@ -975,6 +1117,283 @@
     }
     return buf;
   }
+
+  // ---- Version History (localStorage-backed, metrics only, no audio stored) ----
+  const HISTORY_KEY = 'masterscope_version_history';
+  const MAX_HISTORY = 40;
+  let selectedHistoryIds = [];
+
+  function loadHistory() {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+  function persistHistory(list) {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) { /* storage full or unavailable, fail quietly */ }
+  }
+
+  function saveToHistory(entry) {
+    const list = loadHistory();
+    entry.id = 'v' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+    list.push(entry);
+    if (list.length > MAX_HISTORY) list.shift();
+    persistHistory(list);
+    renderHistoryList();
+  }
+
+  function deleteHistoryEntry(id) {
+    let list = loadHistory().filter(e => e.id !== id);
+    persistHistory(list);
+    selectedHistoryIds = selectedHistoryIds.filter(x => x !== id);
+    renderHistoryList();
+  }
+
+  function fmtDate(ts) {
+    const d = new Date(ts);
+    return d.toLocaleDateString(undefined, {month:'short', day:'numeric'}) + ' ' + d.toLocaleTimeString(undefined, {hour:'2-digit', minute:'2-digit'});
+  }
+
+  function renderHistoryList() {
+    const listEl = document.getElementById('historyList');
+    const controlsEl = document.getElementById('historyControls');
+    const compareEl = document.getElementById('historyCompare');
+    if (!listEl) return;
+    const list = loadHistory().slice().reverse(); // newest first
+
+    controlsEl.innerHTML = `
+      <span class="eq-hint">${list.length} version${list.length===1?'':'s'} saved locally</span>
+      <button class="tool-btn" id="clearHistoryBtn">Clear All</button>
+    `;
+    const clearBtn = document.getElementById('clearHistoryBtn');
+    if (clearBtn) clearBtn.addEventListener('click', () => {
+      if (confirm('Clear all saved version history? This cannot be undone.')) {
+        persistHistory([]);
+        selectedHistoryIds = [];
+        renderHistoryList();
+      }
+    });
+
+    if (list.length === 0) {
+      listEl.innerHTML = `<div class="history-empty">No versions analyzed yet. Every file you upload gets logged here automatically.</div>`;
+      compareEl.innerHTML = '';
+      return;
+    }
+
+    listEl.innerHTML = list.map(e => {
+      const selected = selectedHistoryIds.includes(e.id);
+      return `
+        <div class="history-item ${selected?'selected':''}" data-id="${e.id}">
+          <input type="checkbox" ${selected?'checked':''} data-id="${e.id}">
+          <span class="h-name">${e.name || 'Untitled'}</span>
+          <span class="h-meta">${isFinite(e.lufs)?e.lufs.toFixed(1):'—'} LUFS · ${isFinite(e.truePeak)?e.truePeak.toFixed(1):'—'} dBTP · ${fmtDate(e.date)}</span>
+          <span class="h-delete" data-del="${e.id}">✕</span>
+        </div>
+      `;
+    }).join('');
+
+    listEl.querySelectorAll('.h-delete').forEach(el => {
+      el.addEventListener('click', (ev) => { ev.stopPropagation(); deleteHistoryEntry(el.dataset.del); });
+    });
+    listEl.querySelectorAll('.history-item').forEach(el => {
+      el.addEventListener('click', (ev) => {
+        if (ev.target.classList.contains('h-delete')) return;
+        const id = el.dataset.id;
+        if (selectedHistoryIds.includes(id)) {
+          selectedHistoryIds = selectedHistoryIds.filter(x => x !== id);
+        } else {
+          if (selectedHistoryIds.length >= 2) selectedHistoryIds.shift();
+          selectedHistoryIds.push(id);
+        }
+        renderHistoryList();
+      });
+    });
+
+    if (selectedHistoryIds.length === 2) {
+      const a = list.find(e => e.id === selectedHistoryIds[0]);
+      const b = list.find(e => e.id === selectedHistoryIds[1]);
+      // order chronologically so the comparison reads as "before -> after"
+      const [before, after] = a.date <= b.date ? [a,b] : [b,a];
+      renderHistoryCompare(before, after);
+    } else {
+      compareEl.innerHTML = selectedHistoryIds.length === 1
+        ? `<p class="info-text">Select one more version to compare.</p>` : '';
+    }
+  }
+
+  // metric config: how to read the value, and which direction counts as "good"
+  const COMPARE_METRICS = [
+    { key: 'lufs', label: 'Integrated Loudness', unit: 'LUFS', get: e => e.lufs, fmt: v => v.toFixed(1),
+      judge: (bv, av) => Math.abs(av - (-14)) < Math.abs(bv - (-14)) ? 'good' : (Math.abs(av-(-14))>Math.abs(bv-(-14)) ? 'bad' : 'neutral') },
+    { key: 'truePeak', label: 'True Peak', unit: 'dBTP', get: e => e.truePeak, fmt: v => v.toFixed(1),
+      judge: (bv, av) => av < bv - 0.05 ? 'good' : (av > bv + 0.05 ? 'bad' : 'neutral') },
+    { key: 'crest', label: 'Crest Factor', unit: 'dB', get: e => e.crest, fmt: v => v.toFixed(1), judge: () => 'neutral' },
+    { key: 'lra', label: 'Loudness Range', unit: 'LU', get: e => e.lra, fmt: v => v.toFixed(1), judge: () => 'neutral' },
+    { key: 'gap', label: 'Mud/Presence Gap', unit: 'dB', get: e => e.diagnosis && e.diagnosis.mudPresenceGap, fmt: v => v.toFixed(1),
+      judge: (bv, av) => av > bv + 0.3 ? 'good' : (av < bv - 0.3 ? 'bad' : 'neutral') },
+    { key: 'corr', label: 'Phase Correlation', unit: '', get: e => e.diagnosis && e.diagnosis.corr, fmt: v => v.toFixed(2),
+      judge: (bv, av) => {
+        const goodRange = v => v >= 0.25 && v <= 0.9;
+        if (goodRange(av) && !goodRange(bv)) return 'good';
+        if (!goodRange(av) && goodRange(bv)) return 'bad';
+        return 'neutral';
+      }},
+    { key: 'kickVsRms', label: 'Transient Level vs Mix', unit: 'dB', get: e => e.transient && e.transient.kickVsRmsDb, fmt: v => '+'+v.toFixed(1),
+      judge: (bv, av) => {
+        const dist = v => Math.abs(v - 7.5);
+        return dist(av) < dist(bv) - 0.3 ? 'good' : (dist(av) > dist(bv) + 0.3 ? 'bad' : 'neutral');
+      }},
+    { key: 'kickDecay', label: 'Transient Decay', unit: 'ms', get: e => e.transient && e.transient.kickBandDecay, fmt: v => v.toFixed(0), judge: () => 'neutral' },
+    { key: 'kickToMid', label: 'Transient-to-Mid Ratio', unit: 'dB', get: e => e.transient && e.transient.kickToMidDb, fmt: v => v.toFixed(1),
+      judge: (bv, av) => av < bv - 0.5 ? 'good' : (av > bv + 0.5 ? 'bad' : 'neutral') },
+  ];
+
+  function renderHistoryCompare(before, after) {
+    const el = document.getElementById('historyCompare');
+    const rows = COMPARE_METRICS.map(m => {
+      const bv = m.get(before), av = m.get(after);
+      if (bv === null || bv === undefined || av === null || av === undefined || !isFinite(bv) || !isFinite(av)) return '';
+      const delta = av - bv;
+      const status = m.judge(bv, av);
+      const sign = delta >= 0 ? '+' : '';
+      return `
+        <tr>
+          <td class="metric-name">${m.label}</td>
+          <td>${m.fmt(bv)} ${m.unit}</td>
+          <td>${m.fmt(av)} ${m.unit}</td>
+          <td class="delta ${status}">${sign}${delta.toFixed(m.key==='kickDecay'?0:2)} ${m.unit}</td>
+        </tr>`;
+    }).join('');
+
+    el.innerHTML = `
+      <table class="compare-table">
+        <thead><tr><th>Metric</th><th>${before.name||'Before'}</th><th>${after.name||'After'}</th><th>Change</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }
+
+  // ---- Report export (plain text, printable to PDF via browser print dialog) ----
+  function buildReportText() {
+    if (!audioBuffer) return null;
+    const lines = [];
+    const now = new Date();
+    lines.push('MASTERSCOPE MASTERING REPORT');
+    lines.push('='.repeat(40));
+    lines.push(`File: ${currentFileName || 'Untitled'}`);
+    lines.push(`Generated: ${now.toLocaleString()}`);
+    lines.push('');
+    lines.push('LOUDNESS & DYNAMICS');
+    lines.push('-'.repeat(40));
+    lines.push(`Integrated Loudness: ${isFinite(integratedLufs) ? integratedLufs.toFixed(1)+' LUFS' : '—'}`);
+    lines.push(`True Peak: ${isFinite(lastTruePeakDb) ? lastTruePeakDb.toFixed(1)+' dBTP' : '—'}`);
+    lines.push(`Crest Factor: ${isFinite(lastCrestVal) ? lastCrestVal.toFixed(1)+' dB' : '—'}`);
+    lines.push(`Loudness Range: ${isFinite(lastLraVal) ? lastLraVal.toFixed(1)+' LU' : '—'}`);
+    lines.push('');
+    if (lastDiagnosisResult) {
+      lines.push('MIX BALANCE');
+      lines.push('-'.repeat(40));
+      lines.push(`Mud/Presence Gap: ${lastDiagnosisResult.mudPresenceGap.toFixed(1)} dB`);
+      lines.push(`Sub/Bass Gap: ${lastDiagnosisResult.subBassGap.toFixed(1)} dB`);
+      lines.push(`Phase Correlation: ${lastDiagnosisResult.corr.toFixed(2)}`);
+      lines.push('');
+    }
+    if (lastTransientResult) {
+      lines.push('TRANSIENT ANALYSIS');
+      lines.push('-'.repeat(40));
+      lines.push(`Hits Detected: ${lastTransientResult.hitCount}`);
+      lines.push(`Level vs Mix RMS: +${lastTransientResult.kickVsRmsDb.toFixed(1)} dB`);
+      if (lastTransientResult.kickBandDecay !== null) lines.push(`Isolated Transient Decay: ${lastTransientResult.kickBandDecay.toFixed(0)} ms`);
+      if (lastTransientResult.bassRangeDecay !== null) lines.push(`Bass-Range Decay (60-250Hz): ${lastTransientResult.bassRangeDecay.toFixed(0)} ms`);
+      if (lastTransientResult.kickToMidDb !== null) lines.push(`Transient-to-Mid Ratio: ${lastTransientResult.kickToMidDb.toFixed(1)} dB`);
+      lines.push('');
+    }
+    if (stereoFieldData) {
+      const { freqBins, widthPct, energyDb } = stereoFieldData;
+      let ws=0,wt=0,bs=0,bw=0;
+      for (let k=1;k<freqBins.length;k++){ const e=Math.pow(10,energyDb[k]/10); ws+=widthPct[k]*e; wt+=e; if(freqBins[k]<200){bs+=widthPct[k]*e; bw+=e;} }
+      lines.push('STEREO FIELD');
+      lines.push('-'.repeat(40));
+      lines.push(`Overall Width: ${(wt>0?ws/wt:0).toFixed(0)}%`);
+      lines.push(`Sub/Bass Width (<200Hz): ${(bw>0?bs/bw:0).toFixed(0)}%`);
+      lines.push('');
+    }
+
+    // pull the plain-English diagnosis + transient findings straight from the DOM,
+    // since that's the single source of truth for the generated findings text
+    lines.push('FINDINGS');
+    lines.push('-'.repeat(40));
+    ['diagnosisList','transientDiagnosis'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.querySelectorAll('.diagnosis-item').forEach(item => {
+        const title = item.querySelector('.diagnosis-title');
+        const body = item.querySelector('.diagnosis-body');
+        if (title) lines.push(`• ${title.textContent}`);
+        if (body) lines.push(`  ${body.textContent}`);
+        lines.push('');
+      });
+    });
+
+    return lines.join('\n');
+  }
+
+  function exportReport() {
+    const text = buildReportText();
+    if (!text) { alert('Analyze a file first.'); return; }
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(currentFileName||'master').replace(/\.[^.]+$/,'')}_report.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function exportHistoryJson() {
+    const list = loadHistory();
+    if (!list.length) { alert('No history to export yet.'); return; }
+    const blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'masterscope_version_history.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function importHistoryJson(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const imported = JSON.parse(reader.result);
+        if (!Array.isArray(imported)) throw new Error('File is not a valid history export.');
+        const existing = loadHistory();
+        const existingIds = new Set(existing.map(e => e.id));
+        const merged = existing.concat(imported.filter(e => e && e.id && !existingIds.has(e.id)));
+        merged.sort((a,b) => a.date - b.date);
+        persistHistory(merged.slice(-MAX_HISTORY));
+        renderHistoryList();
+        alert(`Imported ${imported.length} version${imported.length===1?'':'s'} (duplicates skipped).`);
+      } catch (e) {
+        alert('Could not import this file: ' + e.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  document.getElementById('exportReportBtn')?.addEventListener('click', exportReport);
+  document.getElementById('exportHistoryJsonBtn')?.addEventListener('click', exportHistoryJson);
+  document.getElementById('importHistoryJsonBtn')?.addEventListener('click', () => document.getElementById('importHistoryFileInput').click());
+  document.getElementById('importHistoryFileInput')?.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) importHistoryJson(file);
+    e.target.value = '';
+  });
 
   function loadDemoAndJumpTo(panelId) {
     const demoBuffer = generateDemoBuffer();
@@ -1488,6 +1907,678 @@
     return sumLR / (Math.sqrt(sumL2*sumR2) + 1e-12);
   }
 
+  // ---- Transient Analysis engine ----
+
+  function designBandpass(fs, f0, q) {
+    const w0 = 2 * Math.PI * f0 / fs;
+    const alpha = Math.sin(w0) / (2 * q);
+    const b0 = alpha, b1 = 0, b2 = -alpha;
+    const a0 = 1 + alpha, a1 = -2 * Math.cos(w0), a2 = 1 - alpha;
+    return { b0: b0/a0, b1: b1/a0, b2: b2/a0, a1: a1/a0, a2: a2/a0 };
+  }
+
+  function bandpassFilter(data, fs, lo, hi, cascades) {
+    const f0 = Math.sqrt(lo * hi);
+    const q = f0 / (hi - lo);
+    const coef = designBandpass(fs, f0, q);
+    let out = data;
+    for (let c = 0; c < (cascades || 2); c++) out = applyBiquad(out, coef);
+    return out;
+  }
+
+  // Fast boxcar RMS envelope via prefix-sum (avoids O(n*win) cost)
+  function rmsEnvelope(data, winSamples) {
+    const n = data.length;
+    const prefix = new Float64Array(n + 1);
+    for (let i = 0; i < n; i++) prefix[i+1] = prefix[i] + data[i]*data[i];
+    const env = new Float32Array(n);
+    const half = Math.floor(winSamples / 2);
+    for (let i = 0; i < n; i++) {
+      const lo = Math.max(0, i - half), hi = Math.min(n, i + half);
+      env[i] = Math.sqrt((prefix[hi] - prefix[lo]) / Math.max(1, hi - lo));
+    }
+    return env;
+  }
+
+  function findPeaksSimple(env, minHeight, minDistance) {
+    const peaks = [];
+    let lastPeak = -minDistance;
+    for (let i = 1; i < env.length - 1; i++) {
+      if (env[i] > minHeight && env[i] >= env[i-1] && env[i] >= env[i+1] && (i - lastPeak) >= minDistance) {
+        peaks.push(i);
+        lastPeak = i;
+      }
+    }
+    return peaks;
+  }
+
+  function decayMs(env, peakIdx, fs, windowSec) {
+    const peakVal = env[peakIdx];
+    const thresh = peakVal * 0.1; // -20dB
+    const limit = Math.min(env.length, peakIdx + Math.floor((windowSec||0.5) * fs));
+    for (let i = peakIdx; i < limit; i++) {
+      if (env[i] < thresh) return (i - peakIdx) / fs * 1000;
+    }
+    return null;
+  }
+
+  function percentile(arr, p) {
+    const sorted = Array.from(arr).sort((a,b)=>a-b);
+    const idx = Math.floor(p * (sorted.length - 1));
+    return sorted[idx];
+  }
+
+  function analyzeTransients(buffer) {
+    const fs = buffer.sampleRate;
+    const mono = new Float32Array(buffer.length);
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+      const ch = buffer.getChannelData(c);
+      for (let i = 0; i < ch.length; i++) mono[i] += ch[i] / buffer.numberOfChannels;
+    }
+
+    const broadEnv = rmsEnvelope(mono, Math.round(0.01 * fs));
+    const heightThresh = percentile(broadEnv, 0.85);
+    const peaks = findPeaksSimple(broadEnv, heightThresh, Math.round(0.3 * fs));
+
+    if (peaks.length < 3) return null; // not enough detected hits to say anything meaningful
+
+    const overallRms = Math.sqrt(mono.reduce((s,v)=>s+v*v,0) / mono.length);
+    const peakVals = peaks.map(p => broadEnv[p]);
+    const medianPeak = percentile(peakVals, 0.5);
+    const kickVsRmsDb = 20 * Math.log10((medianPeak / overallRms) || 1e-9);
+
+    const usedPeaks = peaks.slice(0, 60);
+
+    // band-limited envelopes for decay isolation
+    const kickBandSignal = bandpassFilter(mono, fs, 50, 90, 2);
+    const clickBandSignal = bandpassFilter(mono, fs, 1000, 3000, 2);
+    const bassRangeSignal = bandpassFilter(mono, fs, 60, 250, 2);
+    const kickBandEnv = rmsEnvelope(kickBandSignal, Math.round(0.005*fs));
+    const clickBandEnv = rmsEnvelope(clickBandSignal, Math.round(0.005*fs));
+    const bassRangeEnv = rmsEnvelope(bassRangeSignal, Math.round(0.005*fs));
+
+    function avgDecay(env) {
+      const vals = usedPeaks.map(p => decayMs(env, p, fs)).filter(v => v !== null);
+      return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+    }
+    const kickBandDecay = avgDecay(kickBandEnv);
+    const clickBandDecay = avgDecay(clickBandEnv);
+    const bassRangeDecay = avgDecay(bassRangeEnv);
+
+    // spectral ratio at hit moments: kick fundamental vs midrange
+    const chunkLen = Math.round(0.08 * fs);
+    const fftLen = 1 << Math.ceil(Math.log2(chunkLen));
+    const hann = new Float32Array(fftLen);
+    for (let i = 0; i < fftLen; i++) hann[i] = 0.5 - 0.5*Math.cos(2*Math.PI*i/(fftLen-1));
+    let kickSum = 0, midSum = 0, count = 0;
+    for (const p of usedPeaks) {
+      const start = Math.max(0, p - Math.round(0.005*fs));
+      if (start + fftLen > mono.length) continue;
+      const re = new Float64Array(fftLen), im = new Float64Array(fftLen);
+      for (let i = 0; i < fftLen; i++) re[i] = mono[start+i] * hann[i];
+      fft(re, im);
+      const binHz = fs / fftLen;
+      function bandDb(lo, hi) {
+        const kLo = Math.max(1, Math.floor(lo/binHz)), kHi = Math.min(fftLen/2-1, Math.ceil(hi/binHz));
+        let s=0,n=0;
+        for (let k=kLo;k<=kHi;k++){ s += Math.sqrt(re[k]*re[k]+im[k]*im[k]); n++; }
+        return 20*Math.log10((n?s/n:1e-9)||1e-9);
+      }
+      kickSum += bandDb(40,100);
+      midSum += bandDb(500,3000);
+      count++;
+    }
+    const kickToMidDb = count > 0 ? (kickSum/count - midSum/count) : null;
+
+    return {
+      hitCount: peaks.length,
+      kickVsRmsDb,
+      kickBandDecay, clickBandDecay, bassRangeDecay,
+      kickToMidDb,
+    };
+  }
+
+  // ---- Spectrogram (frequency-over-time heatmap) ----
+  let spectrogramData = null; // { columns: Float32Array[] (dB per bin), fs, fftSize, duration }
+
+  function computeSpectrogramColumns(buffer, numColumns, fftSize) {
+    const fs = buffer.sampleRate;
+    const mono = new Float32Array(buffer.length);
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+      const ch = buffer.getChannelData(c);
+      for (let i = 0; i < ch.length; i++) mono[i] += ch[i] / buffer.numberOfChannels;
+    }
+    const hann = new Float32Array(fftSize);
+    for (let i = 0; i < fftSize; i++) hann[i] = 0.5 - 0.5*Math.cos(2*Math.PI*i/(fftSize-1));
+
+    const hop = Math.max(1, Math.floor((mono.length - fftSize) / numColumns));
+    const columns = [];
+    let maxDb = -Infinity;
+
+    for (let col = 0; col < numColumns; col++) {
+      const start = col * hop;
+      if (start + fftSize > mono.length) break;
+      const re = new Float64Array(fftSize), im = new Float64Array(fftSize);
+      for (let i = 0; i < fftSize; i++) re[i] = mono[start+i] * hann[i];
+      fft(re, im);
+      const half = fftSize / 2;
+      const dbCol = new Float32Array(half);
+      for (let k = 0; k < half; k++) {
+        const mag = Math.sqrt(re[k]*re[k] + im[k]*im[k]);
+        const db = 20 * Math.log10(mag || 1e-9);
+        dbCol[k] = db;
+        if (db > maxDb) maxDb = db;
+      }
+      columns.push(dbCol);
+    }
+    return { columns, fs, fftSize, maxDb, duration: buffer.duration };
+  }
+
+  // Perceptual-ish heat gradient: dark blue -> cyan -> green -> yellow -> red -> white
+  function heatColor(t) { // t in [0,1]
+    t = Math.max(0, Math.min(1, t));
+    const stops = [
+      [10, 14, 46], [30, 58, 138], [8, 145, 178], [16, 185, 129], [234, 179, 8], [249, 115, 22], [239, 68, 68], [255, 255, 255]
+    ];
+    const scaled = t * (stops.length - 1);
+    const i = Math.min(stops.length - 2, Math.floor(scaled));
+    const frac = scaled - i;
+    const a = stops[i], b = stops[i+1];
+    const r = Math.round(a[0] + (b[0]-a[0])*frac);
+    const g = Math.round(a[1] + (b[1]-a[1])*frac);
+    const bl = Math.round(a[2] + (b[2]-a[2])*frac);
+    return `rgb(${r},${g},${bl})`;
+  }
+
+  const spectrogramCanvas = document.getElementById('spectrogramCanvas');
+
+  function drawSpectrogram() {
+    if (!spectrogramCanvas || !spectrogramData) return;
+    const { ctx, w, h } = fitCanvas(spectrogramCanvas, true);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = css('--bg-panel-2');
+    ctx.fillRect(0, 0, w, h);
+
+    const { columns, fs, fftSize, maxDb } = spectrogramData;
+    if (!columns.length) return;
+    const binHz = fs / fftSize;
+    const nBins = columns[0].length;
+    const minDb = maxDb - 70; // 70dB dynamic range display window
+    const fMin = 20, fMax = Math.min(20000, fs/2);
+
+    const colWidth = w / columns.length;
+    for (let c = 0; c < columns.length; c++) {
+      const x = c * colWidth;
+      const col = columns[c];
+      // draw in small vertical strips per pixel row for smoother log-frequency mapping
+      const rows = Math.ceil(h);
+      for (let y = 0; y < rows; y++) {
+        // y=0 is top (high freq), y=h is bottom (low freq)
+        const frac = 1 - y / h;
+        const freq = fMin * Math.pow(fMax / fMin, frac);
+        const bin = Math.min(nBins - 1, Math.max(0, Math.round(freq / binHz)));
+        const db = col[bin];
+        const t = (db - minDb) / (maxDb - minDb);
+        ctx.fillStyle = heatColor(t);
+        ctx.fillRect(x, y, colWidth + 1, 1);
+      }
+    }
+  }
+
+  function renderSpectrogram(buffer) {
+    const infoEl = document.getElementById('spectrogramInfo');
+    if (infoEl) infoEl.textContent = 'Computing spectrogram…';
+    setTimeout(() => {
+      spectrogramData = computeSpectrogramColumns(buffer, 500, 2048);
+      drawSpectrogram();
+      if (infoEl) infoEl.textContent = 'Hover over the spectrogram to inspect time/frequency/level at any point.';
+    }, 30);
+  }
+
+  if (spectrogramCanvas) {
+    spectrogramCanvas.addEventListener('mousemove', e => {
+      if (!spectrogramData || !audioBuffer) return;
+      const rect = spectrogramCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left, y = e.clientY - rect.top;
+      const t = (x / rect.width) * spectrogramData.duration;
+      const frac = 1 - (y / rect.height);
+      const freq = 20 * Math.pow(Math.min(20000, spectrogramData.fs/2) / 20, frac);
+      const colIdx = Math.min(spectrogramData.columns.length - 1, Math.max(0, Math.round((x/rect.width) * spectrogramData.columns.length)));
+      const binHz = spectrogramData.fs / spectrogramData.fftSize;
+      const bin = Math.min(spectrogramData.columns[0].length - 1, Math.round(freq / binHz));
+      const db = spectrogramData.columns[colIdx] ? spectrogramData.columns[colIdx][bin] : null;
+      const mins = Math.floor(t/60), secs = Math.floor(t%60).toString().padStart(2,'0');
+      const infoEl = document.getElementById('spectrogramInfo');
+      if (infoEl) infoEl.textContent = `t=${mins}:${secs} · ${freq < 1000 ? freq.toFixed(0)+' Hz' : (freq/1000).toFixed(2)+' kHz'} · ${db!==null ? db.toFixed(1)+' dB (rel. peak '+(db-spectrogramData.maxDb).toFixed(1)+' dB)' : ''}`;
+    });
+    spectrogramCanvas.addEventListener('click', e => {
+      if (!spectrogramData || !audioBuffer) return;
+      const rect = spectrogramCanvas.getBoundingClientRect();
+      const t = ((e.clientX - rect.left) / rect.width) * spectrogramData.duration;
+      seekTo(t);
+    });
+  }
+
+  // ---- Stereo Field Map (width-by-frequency, summed across whole track) ----
+  let stereoFieldData = null; // { freqBins: Float32Array (Hz per bin), widthPct: Float32Array, energyDb: Float32Array }
+
+  function computeStereoFieldMap(buffer) {
+    const fs = buffer.sampleRate;
+    if (buffer.numberOfChannels < 2) return null; // mono file, no stereo field to map
+
+    const L = buffer.getChannelData(0), R = buffer.getChannelData(1);
+    const fftSize = 2048;
+    const hop = fftSize; // non-overlapping is fine, we're summing energy not doing time analysis
+    const hann = new Float32Array(fftSize);
+    for (let i = 0; i < fftSize; i++) hann[i] = 0.5 - 0.5*Math.cos(2*Math.PI*i/(fftSize-1));
+
+    const half = fftSize / 2;
+    const midEnergy = new Float64Array(half);
+    const sideEnergy = new Float64Array(half);
+    let frames = 0;
+
+    for (let start = 0; start + fftSize <= L.length; start += hop) {
+      const midRe = new Float64Array(fftSize), midIm = new Float64Array(fftSize);
+      const sideRe = new Float64Array(fftSize), sideIm = new Float64Array(fftSize);
+      for (let i = 0; i < fftSize; i++) {
+        const w = hann[i];
+        const l = L[start+i], r = R[start+i];
+        midRe[i] = ((l + r) / 2) * w;
+        sideRe[i] = ((l - r) / 2) * w;
+      }
+      fft(midRe, midIm);
+      fft(sideRe, sideIm);
+      for (let k = 0; k < half; k++) {
+        midEnergy[k] += midRe[k]*midRe[k] + midIm[k]*midIm[k];
+        sideEnergy[k] += sideRe[k]*sideRe[k] + sideIm[k]*sideIm[k];
+      }
+      frames++;
+    }
+    if (frames === 0) return null;
+
+    const binHz = fs / fftSize;
+    const freqBins = new Float32Array(half);
+    const widthPct = new Float32Array(half);
+    const energyDb = new Float32Array(half);
+    let maxEnergyDb = -Infinity;
+    for (let k = 0; k < half; k++) {
+      freqBins[k] = k * binHz;
+      const total = midEnergy[k] + sideEnergy[k];
+      widthPct[k] = total > 1e-12 ? (sideEnergy[k] / total) * 100 : 0; // 0 = fully mono, 50 = equal mid/side power
+      const db = 10 * Math.log10(total || 1e-12);
+      energyDb[k] = db;
+      if (db > maxEnergyDb) maxEnergyDb = db;
+    }
+    return { freqBins, widthPct, energyDb, maxEnergyDb, fs };
+  }
+
+  function widthColor(pct) { // 0-100, narrow(mono)->wide
+    const t = Math.max(0, Math.min(1, pct / 60));
+    // interpolate between accent2 (green, narrow/centered) and accent (amber, wide)
+    const a = [94, 255, 158]; // --accent2
+    const b = [255, 178, 56]; // --accent
+    const r = Math.round(a[0] + (b[0]-a[0])*t);
+    const g = Math.round(a[1] + (b[1]-a[1])*t);
+    const bl = Math.round(a[2] + (b[2]-a[2])*t);
+    return `rgb(${r},${g},${bl})`;
+  }
+
+  const stereoFieldCanvas = document.getElementById('stereoFieldCanvas');
+
+  function freqToXlog(freq, w, fMin, fMax) {
+    return (Math.log(freq/fMin) / Math.log(fMax/fMin)) * w;
+  }
+
+  function drawStereoFieldMap() {
+    if (!stereoFieldCanvas || !stereoFieldData) return;
+    const { ctx, w, h } = fitCanvas(stereoFieldCanvas, true);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = css('--bg-panel-2');
+    ctx.fillRect(0, 0, w, h);
+
+    const { freqBins, widthPct, energyDb, maxEnergyDb } = stereoFieldData;
+    const fMin = 20, fMax = Math.min(20000, stereoFieldData.fs/2);
+    const minEnergyDb = maxEnergyDb - 60;
+
+    // gridlines
+    ctx.strokeStyle = css('--border');
+    ctx.lineWidth = 1;
+    [0, 25, 50, 75, 100].forEach(pct => {
+      const y = h - (pct/100)*h;
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+    });
+
+    // plot: bar per bin, height = energy-weighted opacity, color = width, position = width value on y-axis
+    for (let k = 1; k < freqBins.length; k++) {
+      const freq = freqBins[k];
+      if (freq < fMin || freq > fMax) continue;
+      const x = freqToXlog(freq, w, fMin, fMax);
+      const xNext = freqToXlog(freqBins[Math.min(freqBins.length-1,k+1)], w, fMin, fMax);
+      const barW = Math.max(1, xNext - x);
+      const energyNorm = Math.max(0, Math.min(1, (energyDb[k] - minEnergyDb) / (maxEnergyDb - minEnergyDb)));
+      if (energyNorm < 0.03) continue; // skip near-silent bins
+      const yTop = h - (Math.min(100, widthPct[k]*1.6) / 100) * h; // scale so typical width range uses more of the chart height
+      ctx.globalAlpha = 0.25 + energyNorm * 0.75;
+      ctx.fillStyle = widthColor(widthPct[k]);
+      ctx.fillRect(x, yTop, barW, h - yTop);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function renderStereoFieldFreqGuide() {
+    const guide = document.getElementById('stereoFieldFreqGuide');
+    if (!guide) return;
+    const ticks = [20,50,100,250,500,'1k','2.5k','5k','10k','20k'];
+    guide.style.display = 'flex';
+    guide.style.justifyContent = 'space-between';
+    guide.innerHTML = ticks.map(t => `<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint)">${t}${typeof t==='number'?'Hz':''}</span>`).join('');
+  }
+
+  function renderStereoFieldMap(buffer) {
+    const infoEl = document.getElementById('stereoFieldInfo');
+    const summaryEl = document.getElementById('stereoFieldSummary');
+    if (buffer.numberOfChannels < 2) {
+      if (infoEl) infoEl.textContent = 'This file is mono — no stereo field to map.';
+      if (summaryEl) summaryEl.innerHTML = '';
+      stereoFieldData = null;
+      return;
+    }
+    if (infoEl) infoEl.textContent = 'Computing stereo field map…';
+    renderStereoFieldFreqGuide();
+    setTimeout(() => {
+      stereoFieldData = computeStereoFieldMap(buffer);
+      if (!stereoFieldData) return;
+      drawStereoFieldMap();
+      if (infoEl) infoEl.textContent = 'Hover to inspect width at a given frequency. Green = centered/mono, amber = wide.';
+
+      // overall + bass-specific width summary
+      const { freqBins, widthPct, energyDb } = stereoFieldData;
+      let weightedSum = 0, weightTotal = 0, bassSum = 0, bassWeight = 0;
+      for (let k = 1; k < freqBins.length; k++) {
+        const e = Math.pow(10, energyDb[k]/10);
+        weightedSum += widthPct[k] * e; weightTotal += e;
+        if (freqBins[k] < 200) { bassSum += widthPct[k] * e; bassWeight += e; }
+      }
+      const overallWidth = weightTotal > 0 ? weightedSum/weightTotal : 0;
+      const bassWidth = bassWeight > 0 ? bassSum/bassWeight : 0;
+      const bassClass = bassWidth > 15 ? 'warn' : 'ok';
+      if (summaryEl) {
+        summaryEl.innerHTML = `
+          <div class="metric-box"><div class="label">Overall Width</div><div class="value">${overallWidth.toFixed(0)}%</div></div>
+          <div class="metric-box"><div class="label">Sub/Bass Width (&lt;200Hz)</div><div class="value ${bassClass}">${bassWidth.toFixed(0)}%</div></div>
+        `;
+      }
+    }, 30);
+  }
+
+  if (stereoFieldCanvas) {
+    stereoFieldCanvas.addEventListener('mousemove', e => {
+      if (!stereoFieldData) return;
+      const rect = stereoFieldCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const fMin = 20, fMax = Math.min(20000, stereoFieldData.fs/2);
+      const freq = fMin * Math.pow(fMax/fMin, x/rect.width);
+      const binHz = stereoFieldData.fs / 2048;
+      const bin = Math.min(stereoFieldData.freqBins.length-1, Math.max(0, Math.round(freq/binHz)));
+      const infoEl = document.getElementById('stereoFieldInfo');
+      if (infoEl) infoEl.textContent = `${freq < 1000 ? freq.toFixed(0)+' Hz' : (freq/1000).toFixed(2)+' kHz'} · width ${stereoFieldData.widthPct[bin].toFixed(0)}%`;
+    });
+  }
+
+  // ---- Reference Track Compare ----
+  let referenceBuffer = null;
+  let referenceStats = null;
+  let refSourceNode = null;
+  let refIsPlaying = false;
+  let mineSourceNode = null;
+  let mineIsPlaying = false;
+
+  function estimateTruePeakDbFor(buffer) {
+    const oversample = 4;
+    let maxPeak = 0;
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+      const data = buffer.getChannelData(c);
+      for (let i = 0; i < data.length - 1; i++) {
+        const a = data[i], b = data[i+1];
+        for (let k = 0; k < oversample; k++) {
+          const interp = a + (b - a) * (k / oversample);
+          const av = Math.abs(interp);
+          if (av > maxPeak) maxPeak = av;
+        }
+      }
+      const av = Math.abs(data[data.length - 1]);
+      if (av > maxPeak) maxPeak = av;
+    }
+    return 20 * Math.log10(maxPeak || 1e-10);
+  }
+
+  function analyzeBufferForReference(buffer) {
+    const { lufs, blocks } = calculateIntegratedLoudness(buffer);
+    const truePeak = estimateTruePeakDbFor(buffer);
+    const lra = loudnessRangeEstimate(blocks);
+
+    const ch0 = buffer.getChannelData(0);
+    let sumSquares = 0, peak = 0;
+    for (let i = 0; i < ch0.length; i++) { sumSquares += ch0[i]*ch0[i]; peak = Math.max(peak, Math.abs(ch0[i])); }
+    const rmsDb = 20*Math.log10(Math.sqrt(sumSquares/ch0.length) || 1e-10);
+    const crest = 20*Math.log10(peak || 1e-10) - rmsDb;
+
+    const mono = new Float32Array(buffer.length);
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+      const ch = buffer.getChannelData(c);
+      for (let i = 0; i < ch.length; i++) mono[i] += ch[i] / buffer.numberOfChannels;
+    }
+    const chunkSize = 4096;
+    const spectrum = welchAverageSpectrum(mono, chunkSize, 60);
+    const mud = bandAverageDb(spectrum, buffer.sampleRate, chunkSize, 250, 500);
+    const presence = bandAverageDb(spectrum, buffer.sampleRate, chunkSize, 2000, 5000);
+    const corr = buffer.numberOfChannels > 1 ? wholeTrackCorrelation(buffer) : 1;
+
+    return { lufs, truePeak, lra, crest, mudPresenceGap: presence - mud, corr };
+  }
+
+  function renderReferenceCompareTable() {
+    const el = document.getElementById('referenceCompareTable');
+    if (!el || !referenceStats) return;
+    const mine = { lufs: integratedLufs, truePeak: lastTruePeakDb, crest: lastCrestVal, lra: lastLraVal,
+      diagnosis: lastDiagnosisResult };
+    const mineFlat = { lufs: mine.lufs, truePeak: mine.truePeak, crest: mine.crest, lra: mine.lra,
+      mudPresenceGap: mine.diagnosis ? mine.diagnosis.mudPresenceGap : null, corr: mine.diagnosis ? mine.diagnosis.corr : null };
+    const refFlat = { lufs: referenceStats.lufs, truePeak: referenceStats.truePeak, crest: referenceStats.crest,
+      lra: referenceStats.lra, mudPresenceGap: referenceStats.mudPresenceGap, corr: referenceStats.corr };
+
+    const rows = [
+      { label: 'Integrated Loudness', key: 'lufs', unit: 'LUFS', fmt: v=>v.toFixed(1) },
+      { label: 'True Peak', key: 'truePeak', unit: 'dBTP', fmt: v=>v.toFixed(1) },
+      { label: 'Crest Factor', key: 'crest', unit: 'dB', fmt: v=>v.toFixed(1) },
+      { label: 'Loudness Range', key: 'lra', unit: 'LU', fmt: v=>v.toFixed(1) },
+      { label: 'Mud/Presence Gap', key: 'mudPresenceGap', unit: 'dB', fmt: v=>v.toFixed(1) },
+      { label: 'Phase Correlation', key: 'corr', unit: '', fmt: v=>v.toFixed(2) },
+    ].map(r => {
+      const mv = mineFlat[r.key], rv = refFlat[r.key];
+      if (mv===null||mv===undefined||!isFinite(mv)||rv===null||rv===undefined||!isFinite(rv)) return '';
+      return `<tr><td class="metric-name">${r.label}</td><td>${r.fmt(mv)} ${r.unit}</td><td>${r.fmt(rv)} ${r.unit}</td></tr>`;
+    }).join('');
+
+    el.innerHTML = `
+      <table class="compare-table">
+        <thead><tr><th>Metric</th><th>Yours</th><th>Reference</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <p class="info-text">Playback below is level-matched to −14 LUFS on both tracks so you can judge tone/balance rather than raw loudness.</p>
+    `;
+  }
+
+  function stopRefPlayback() {
+    if (refSourceNode) { try { refSourceNode.stop(); } catch(e){} refSourceNode = null; }
+    refIsPlaying = false;
+    const btn = document.getElementById('refPlayRefBtn');
+    if (btn) btn.textContent = '▶ Play Reference (matched)';
+  }
+  function stopMinePlayback() {
+    if (mineSourceNode) { try { mineSourceNode.stop(); } catch(e){} mineSourceNode = null; }
+    mineIsPlaying = false;
+    const btn = document.getElementById('refPlayMineBtn');
+    if (btn) btn.textContent = '▶ Play Yours (matched)';
+  }
+
+  function playMatched(buffer, lufsVal, isRef) {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const targetLufs = -14;
+    const gainLinear = isFinite(lufsVal) ? Math.pow(10, (targetLufs - lufsVal) / 20) : 1;
+    const src = audioCtx.createBufferSource();
+    src.buffer = buffer;
+    const g = audioCtx.createGain();
+    g.gain.value = gainLinear;
+    src.connect(g);
+    g.connect(audioCtx.destination);
+    src.start();
+    src.onended = () => { if (isRef) stopRefPlayback(); else stopMinePlayback(); };
+    return src;
+  }
+
+  function initReferenceUI() {
+    const uploadBtn = document.getElementById('referenceUploadBtn');
+    const fileInput = document.getElementById('referenceFileInput');
+    const nameEl = document.getElementById('referenceFileName');
+    const contentEl = document.getElementById('referenceContent');
+    const clearBtn = document.getElementById('refClearBtn');
+    const playRefBtn = document.getElementById('refPlayRefBtn');
+    const playMineBtn = document.getElementById('refPlayMineBtn');
+    if (!uploadBtn) return;
+
+    uploadBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      nameEl.textContent = 'Loading & analyzing…';
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const decoded = await audioCtx.decodeAudioData(arrayBuffer);
+        referenceBuffer = decoded;
+        referenceStats = analyzeBufferForReference(decoded);
+        nameEl.textContent = file.name;
+        contentEl.style.display = 'block';
+        renderReferenceCompareTable();
+      } catch (err) {
+        nameEl.textContent = '';
+        alert('Could not decode reference file: ' + err.message);
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      stopRefPlayback(); stopMinePlayback();
+      referenceBuffer = null; referenceStats = null;
+      nameEl.textContent = '';
+      contentEl.style.display = 'none';
+      fileInput.value = '';
+    });
+
+    playRefBtn.addEventListener('click', () => {
+      if (!referenceBuffer) return;
+      if (refIsPlaying) { stopRefPlayback(); return; }
+      stopMinePlayback();
+      refSourceNode = playMatched(referenceBuffer, referenceStats.lufs, true);
+      refIsPlaying = true;
+      playRefBtn.textContent = '■ Stop Reference';
+    });
+
+    playMineBtn.addEventListener('click', () => {
+      if (!audioBuffer) { alert('Upload and analyze your own track first.'); return; }
+      if (mineIsPlaying) { stopMinePlayback(); return; }
+      stopRefPlayback();
+      mineSourceNode = playMatched(audioBuffer, integratedLufs, false);
+      mineIsPlaying = true;
+      playMineBtn.textContent = '■ Stop Yours';
+    });
+  }
+  initReferenceUI();
+
+  function renderTransientAnalysis(buffer) {
+    const summaryEl = document.getElementById('transientSummary');
+    const diagEl = document.getElementById('transientDiagnosis');
+    if (!summaryEl || !diagEl) return;
+    summaryEl.innerHTML = `<div class="info-text">Detecting transients…</div>`;
+    diagEl.innerHTML = '';
+
+    setTimeout(() => {
+      const r = analyzeTransients(buffer);
+      lastTransientResult = r;
+      if (!r) {
+        summaryEl.innerHTML = `<div class="info-text">Couldn't confidently detect repeated percussive hits in this file (may not be drum/kick-driven material).</div>`;
+        return;
+      }
+
+      function box(label, val, cls) {
+        return `<div class="metric-box"><div class="label">${label}</div><div class="value ${cls||''}">${val}</div></div>`;
+      }
+      const kickClass = (r.kickVsRmsDb > 12 || r.kickVsRmsDb < 3) ? 'warn' : 'ok';
+      summaryEl.innerHTML =
+        box('Hits Detected', r.hitCount) +
+        box('Level vs Mix RMS', `+${r.kickVsRmsDb.toFixed(1)} dB`, kickClass) +
+        box('Transient Decay (isolated)', r.kickBandDecay!==null ? `${r.kickBandDecay.toFixed(0)} ms` : '—') +
+        box('Click/Attack Decay', r.clickBandDecay!==null ? `${r.clickBandDecay.toFixed(0)} ms` : '—') +
+        box('Bass-Range Decay (60–250Hz)', r.bassRangeDecay!==null ? `${r.bassRangeDecay.toFixed(0)} ms` : '—') +
+        box('Transient-to-Mid Ratio', r.kickToMidDb!==null ? `${r.kickToMidDb.toFixed(1)} dB` : '—');
+
+      const items = [];
+      if (r.kickVsRmsDb > 12) {
+        items.push({status:'danger', icon:'✕', title:'Transient is dominating the mix',
+          body:`Detected hits peak ${r.kickVsRmsDb.toFixed(1)}dB above the overall mix RMS. A healthy range is usually +6 to +9dB — this is significantly hotter, likely burying other elements every time it hits.`});
+      } else if (r.kickVsRmsDb > 9) {
+        items.push({status:'warn', icon:'!', title:'Transient runs a bit hot',
+          body:`+${r.kickVsRmsDb.toFixed(1)}dB above mix RMS, a touch above the typical +6-9dB healthy range. Worth a small level pull if it feels like it's overpowering the mix.`});
+      } else if (r.kickVsRmsDb < 3) {
+        items.push({status:'warn', icon:'!', title:'Transient may be underpowered',
+          body:`Only +${r.kickVsRmsDb.toFixed(1)}dB above mix RMS. If this is meant to be a driving kick/snare hit, it may be getting lost rather than anchoring the groove.`});
+      } else {
+        items.push({status:'ok', icon:'✓', title:'Transient level looks healthy',
+          body:`Sitting +${r.kickVsRmsDb.toFixed(1)}dB above mix RMS, a solid, present level without overpowering everything else.`});
+      }
+
+      if (r.kickBandDecay !== null && r.bassRangeDecay !== null) {
+        const spread = r.bassRangeDecay - r.kickBandDecay;
+        if (spread > 40) {
+          items.push({status:'warn', icon:'!', title:'Lingering low end looks like bass sustain, not the transient itself',
+            body:`The isolated transient (50–90Hz) decays in ~${r.kickBandDecay.toFixed(0)}ms, but the broader bass range (60–250Hz) stays elevated for ~${r.bassRangeDecay.toFixed(0)}ms. That ${spread.toFixed(0)}ms gap suggests a sustained bass note is what's making the low end feel congested after each hit — try sidechain-ducking the bass to the transient rather than adjusting the transient's own envelope.`});
+        } else if (r.kickBandDecay > 150) {
+          items.push({status:'warn', icon:'!', title:"Transient's own tail is ringing long",
+            body:`Isolated decay is ~${r.kickBandDecay.toFixed(0)}ms, and the broader bass range tracks closely with it, so this looks like the transient's own envelope, not bass overlap. Try a shorter compressor release or a tighter amp envelope on this element.`});
+        } else {
+          items.push({status:'ok', icon:'✓', title:'Transient decay looks tight',
+            body:`Isolated decay of ~${r.kickBandDecay.toFixed(0)}ms with no significant bass-range lag behind it — this element is clearing out cleanly between hits.`});
+        }
+      }
+
+      if (r.kickToMidDb !== null) {
+        if (r.kickToMidDb > 28) {
+          items.push({status:'warn', icon:'!', title:'Transient may be masking the midrange on impact',
+            body:`At the moment of each hit, low-end energy runs ${r.kickToMidDb.toFixed(1)}dB above the midrange. That's a big gap — other instruments are likely getting swamped every time this hits.`});
+        } else {
+          items.push({status:'ok', icon:'✓', title:'Transient/midrange balance at hit moments looks reasonable',
+            body:`${r.kickToMidDb.toFixed(1)}dB gap between low-end and midrange content at hit moments — not excessive masking.`});
+        }
+      }
+
+      diagEl.innerHTML = items.map(it => `
+        <div class="diagnosis-item status-${it.status}">
+          <div class="diagnosis-icon">${it.icon}</div>
+          <div><div class="diagnosis-title">${it.title}</div><div class="diagnosis-body">${it.body}</div></div>
+        </div>
+      `).join('');
+
+      saveToHistory({
+        name: currentFileName,
+        date: Date.now(),
+        lufs: integratedLufs, truePeak: lastTruePeakDb, crest: lastCrestVal, lra: lastLraVal,
+        transient: r,
+        diagnosis: lastDiagnosisResult,
+      });
+      if (referenceStats) renderReferenceCompareTable();
+    }, 30);
+  }
+
   function runMixDiagnosis(buffer, integratedLufsVal, truePeakDbVal, crestVal, lraVal) {
     const list = document.getElementById('diagnosisList');
     if (!list) return;
@@ -1513,6 +2604,8 @@
       const subBassGap = sub - bass;
 
       const corr = wholeTrackCorrelation(buffer);
+
+      lastDiagnosisResult = { mudPresenceGap, subBassGap, corr };
 
       const items = [];
 
@@ -1586,6 +2679,37 @@
         }
       }
 
+      // Over-limiting / brickwall detector: low crest AND low LRA together is the real tell
+      if (isFinite(crestVal) && isFinite(lraVal)) {
+        if (crestVal < 7 && lraVal < 4) {
+          items.push({ status: 'danger', icon: '✕', title: 'Likely over-limited / brickwalled',
+            body: `Crest factor ${crestVal.toFixed(1)} dB combined with a loudness range of only ${lraVal.toFixed(1)} LU is the classic signature of pushing a limiter too hard. The track has probably lost most of its transient punch and dynamic movement. Try backing the limiter's input gain off by 1–2dB and re-checking whether it still hits your loudness target.` });
+        }
+      }
+
+      // DC offset check
+      let dcSum = 0;
+      for (let i = 0; i < mono.length; i++) dcSum += mono[i];
+      const dcOffset = dcSum / mono.length;
+      if (Math.abs(dcOffset) > 0.003) {
+        items.push({ status: 'warn', icon: '!', title: 'DC offset detected',
+          body: `The waveform sits ${(dcOffset*100).toFixed(2)}% off-center (${dcOffset > 0 ? 'positive' : 'negative'} bias). Usually comes from an audio interface, plugin, or a bad edit/fade. It wastes a small amount of headroom and can occasionally show up as a click at file boundaries — a DC offset removal filter or high-pass at ~5Hz on the master bus will clear it.` });
+      }
+
+      // Clipping / inter-sample overs check
+      let clippedSamples = 0;
+      const clipThresh = 0.999;
+      for (let c = 0; c < buffer.numberOfChannels; c++) {
+        const ch = buffer.getChannelData(c);
+        for (let i = 0; i < ch.length; i++) if (Math.abs(ch[i]) >= clipThresh) clippedSamples++;
+      }
+      const clipPct = (clippedSamples / (mono.length * buffer.numberOfChannels)) * 100;
+      if (clippedSamples > 0) {
+        const severity = clipPct > 0.01 ? 'danger' : 'warn';
+        items.push({ status: severity, icon: severity==='danger'?'✕':'!', title: 'Sample-level clipping detected',
+          body: `${clippedSamples.toLocaleString()} sample${clippedSamples===1?'':'s'} (${clipPct.toFixed(4)}%) hit or exceeded full scale. Even a few clipped samples usually means the file was rendered too hot before it got here. Worth re-exporting your bounce with a couple dB more headroom, since this is often audible as harsh digital distortion on transients.` });
+      }
+
       list.innerHTML = items.map(it => `
         <div class="diagnosis-item status-${it.status}">
           <div class="diagnosis-icon">${it.icon}</div>
@@ -1652,6 +2776,11 @@
       drawLufsTimeline();
 
       runMixDiagnosis(audioBuffer, lufs, truePeakDb, crest, lra);
+      lastCrestVal = crest;
+      lastLraVal = lra;
+      renderTransientAnalysis(audioBuffer);
+      renderSpectrogram(audioBuffer);
+      renderStereoFieldMap(audioBuffer);
     }, 30);
   }
 
@@ -1957,23 +3086,62 @@
     analyserL.fftSize = 2048;
     analyserR.fftSize = 2048;
 
-    chainNodes = { normGain, eqBands, compressor, makeupGain, splitter, analyserL, analyserR };
+    // Mono fold-down stage: crossfaded between stereo bypass and a folded L+R sum,
+    // toggled via gain rather than reconnecting (avoids audible clicks on toggle)
+    const foldSplitter = audioCtx.createChannelSplitter(2);
+    const foldMerger = audioCtx.createChannelMerger(2);
+    const foldGainL = audioCtx.createGain(); foldGainL.gain.value = 0.5;
+    const foldGainR = audioCtx.createGain(); foldGainR.gain.value = 0.5;
+    const monoWetGain = audioCtx.createGain(); monoWetGain.gain.value = 0;
+    const stereoDryGain = audioCtx.createGain(); stereoDryGain.gain.value = 1;
+    const postFold = audioCtx.createGain();
+
+    chainNodes = { normGain, eqBands, compressor, makeupGain, splitter, analyserL, analyserR,
+      foldSplitter, foldMerger, foldGainL, foldGainR, monoWetGain, stereoDryGain, postFold };
     applyAbMode('original');
     drawEqCurve();
   }
 
   function buildChain(source) {
-    const { normGain, eqBands, compressor, makeupGain, splitter, analyserL, analyserR } = chainNodes;
+    const { normGain, eqBands, compressor, makeupGain, splitter, analyserL, analyserR,
+      foldSplitter, foldMerger, foldGainL, foldGainR, monoWetGain, stereoDryGain, postFold } = chainNodes;
     source.connect(normGain);
     let node = normGain;
     for (const band of eqBands) { node.connect(band.node); node = band.node; }
     node.connect(compressor);
     compressor.connect(makeupGain);
-    makeupGain.connect(analyserNode);
+
+    // stereo dry path
+    makeupGain.connect(stereoDryGain);
+    stereoDryGain.connect(postFold);
+
+    // mono folded path (runs in parallel, silent unless mono fold is enabled)
+    makeupGain.connect(foldSplitter);
+    foldSplitter.connect(foldGainL, 0);
+    foldSplitter.connect(foldGainR, audioBuffer.numberOfChannels > 1 ? 1 : 0);
+    foldGainL.connect(foldMerger, 0, 0);
+    foldGainL.connect(foldMerger, 0, 1);
+    foldGainR.connect(foldMerger, 0, 0);
+    foldGainR.connect(foldMerger, 0, 1);
+    foldMerger.connect(monoWetGain);
+    monoWetGain.connect(postFold);
+
+    postFold.connect(analyserNode);
     analyserNode.connect(audioCtx.destination);
-    makeupGain.connect(splitter);
+    postFold.connect(splitter);
     splitter.connect(analyserL, 0);
     splitter.connect(analyserR, audioBuffer.numberOfChannels > 1 ? 1 : 0);
+  }
+
+  let monoFoldEnabled = false;
+  function setMonoFold(enabled) {
+    monoFoldEnabled = enabled;
+    if (!chainNodes || !chainNodes.monoWetGain) return;
+    const now = audioCtx.currentTime;
+    chainNodes.monoWetGain.gain.setTargetAtTime(enabled ? 1 : 0, now, 0.01);
+    chainNodes.stereoDryGain.gain.setTargetAtTime(enabled ? 0 : 1, now, 0.01);
+    const btn = document.getElementById('monoFoldBtn');
+    if (btn) btn.classList.toggle('active', enabled);
   }
 
   function applyAbMode(mode) {
@@ -2022,6 +3190,30 @@
   });
 
   document.getElementById('playBtn').addEventListener('click', togglePlay);
+
+  const monoFoldBtnEl = document.getElementById('monoFoldBtn');
+  if (monoFoldBtnEl) monoFoldBtnEl.addEventListener('click', () => setMonoFold(!monoFoldEnabled));
+
+  // Keyboard shortcuts: space = play/pause, left/right = seek 5s, M = mono fold
+  document.addEventListener('keydown', (e) => {
+    if (!audioBuffer) return;
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+    if (e.code === 'Space') {
+      e.preventDefault();
+      togglePlay();
+    } else if (e.code === 'ArrowRight') {
+      e.preventDefault();
+      const cur = isPlaying ? (audioCtx.currentTime - playStartTime) : playOffset;
+      seekTo(Math.min(audioBuffer.duration, cur + 5));
+    } else if (e.code === 'ArrowLeft') {
+      e.preventDefault();
+      const cur = isPlaying ? (audioCtx.currentTime - playStartTime) : playOffset;
+      seekTo(Math.max(0, cur - 5));
+    } else if (e.key === 'm' || e.key === 'M') {
+      setMonoFold(!monoFoldEnabled);
+    }
+  });
 
   function togglePlay() {
     const btn = document.getElementById('playBtn');
@@ -2407,11 +3599,12 @@
       fitCanvas(spectrumCanvas, true);
       fitCanvas(eqCanvas, true);
       fitCanvas(lufsTimelineCanvas, true);
-      drawWaveform(); drawSampleView(); drawEqCurve(); drawLufsTimeline();
+      drawWaveform(); drawSampleView(); drawEqCurve(); drawLufsTimeline(); drawSpectrogram(); drawStereoFieldMap();
       if (integratedLufs !== null) drawArcGauge('lufsGaugeCanvas', integratedLufs, -30, 0, -14, 'LUFS', 1);
       if (lastTruePeakDb !== null) drawArcGauge('tpGaugeCanvas', lastTruePeakDb, -12, 1, -1, 'dBTP', 1);
     }
   });
+  renderHistoryList();
 })();
 </script>
 
