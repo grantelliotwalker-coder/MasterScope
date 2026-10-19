@@ -793,6 +793,7 @@
       <h2>Version History &amp; Compare</h2>
       <p class="info-text" style="margin-top:0">Every file you analyze is automatically logged here (metrics only, stored locally in your browser — no audio is saved). Select two versions to see exactly what changed between them, the same way we've been comparing versions manually.</p>
       <div class="controls-row">
+        <button class="tool-btn" id="exportPdfBtn">Export PDF Report (with graphs)</button>
         <button class="tool-btn" id="exportReportBtn">Export Report (current file)</button>
         <button class="tool-btn" id="exportHistoryJsonBtn">Export History (JSON)</button>
         <button class="tool-btn" id="importHistoryJsonBtn">Import History (JSON)</button>
@@ -841,7 +842,7 @@
     </div>
 
     <div class="panel" id="panel-spectrum">
-      <h2>Frequency Spectrum (live playback analysis)</h2>
+      <h2>Frequency Spectrum (whole-track average · live during playback)</h2>
       <div class="controls-row">
         <button class="tool-btn" id="playBtn">▶ Play</button>
         <button class="tool-btn" id="monoFoldBtn" title="Fold to mono to check phone/club/Bluetooth compatibility">Mono Check</button>
@@ -872,7 +873,7 @@
           <div class="corr-value" id="corrValue">—</div>
           <div class="corr-bar-track"><div class="corr-bar-fill" id="corrBarFill" style="left:50%"></div></div>
           <div class="corr-labels"><span>−1 (out of phase)</span><span>0</span><span>+1 (mono)</span></div>
-          <p class="info-text">The scope shows L/R as a Lissajous pattern: a vertical line means perfectly mono/correlated, a wide circle means very wide or phase-incoherent stereo. Correlation near −1 is a real problem, it means content will cancel out in mono playback (phones, clubs, some Bluetooth speakers).</p>
+          <p class="info-text">The scope shows L/R as a Lissajous pattern: a vertical line means perfectly mono/correlated, a wide circle means very wide or phase-incoherent stereo. Correlation near −1 is a real problem, it means content will cancel out in mono playback (phones, clubs, some Bluetooth speakers). When paused, the scope and readout show the whole track; during playback they show the live signal.</p>
         </div>
       </div>
     </div>
@@ -984,6 +985,7 @@
     themeToggle.textContent = isDark ? '🌙 Dark Mode' : '☀ Light Mode';
     if (audioBuffer) {
       drawWaveform(); drawSampleView(); drawEqCurve(); drawLufsTimeline(); drawSpectrogram(); drawStereoFieldMap();
+      drawStaticScopes();
       if (integratedLufs !== null) drawArcGauge('lufsGaugeCanvas', integratedLufs, -30, 0, -14, 'LUFS', 1);
       if (lastTruePeakDb !== null) drawArcGauge('tpGaugeCanvas', lastTruePeakDb, -12, 1, -1, 'dBTP', 1);
     }
@@ -1050,6 +1052,14 @@
   const canvasSizeCache = new WeakMap();
 
   async function handleFile(file) {
+    if (isPlaying && sourceNode) {
+      sourceNode.onended = null;
+      try { sourceNode.stop(); } catch (e) {}
+      isPlaying = false;
+      cancelAnimationFrame(animFrame);
+      document.getElementById('playBtn').textContent = '▶ Play';
+    }
+    playOffset = 0;
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const arrayBuffer = await file.arrayBuffer();
     let decoded;
@@ -1070,6 +1080,8 @@
     document.getElementById('landingSection').classList.add('hidden');
     uploadedFileName.textContent = fileLike.name;
     currentFileName = fileLike.name;
+    staticSpectrum = null;
+    staticVectorscope = null;
     renderFileInfo(fileLike);
     renderLoudness();
     drawWaveform();
@@ -1308,6 +1320,7 @@
     lines.push('='.repeat(40));
     lines.push(`File: ${currentFileName || 'Untitled'}`);
     lines.push(`Generated: ${now.toLocaleString()}`);
+    lines.push(`Sample rate: ${audioBuffer.sampleRate} Hz · Channels: ${audioBuffer.numberOfChannels} · Duration: ${Math.floor(audioBuffer.duration/60)}:${Math.floor(audioBuffer.duration%60).toString().padStart(2,'0')}`);
     lines.push('');
     lines.push('LOUDNESS & DYNAMICS');
     lines.push('-'.repeat(40));
@@ -1330,6 +1343,7 @@
       lines.push(`Hits Detected: ${lastTransientResult.hitCount}`);
       lines.push(`Level vs Mix RMS: +${lastTransientResult.kickVsRmsDb.toFixed(1)} dB`);
       if (lastTransientResult.kickBandDecay !== null) lines.push(`Isolated Transient Decay: ${lastTransientResult.kickBandDecay.toFixed(0)} ms`);
+      if (lastTransientResult.clickBandDecay !== null) lines.push(`Click/Attack Decay: ${lastTransientResult.clickBandDecay.toFixed(0)} ms`);
       if (lastTransientResult.bassRangeDecay !== null) lines.push(`Bass-Range Decay (60-250Hz): ${lastTransientResult.bassRangeDecay.toFixed(0)} ms`);
       if (lastTransientResult.kickToMidDb !== null) lines.push(`Transient-to-Mid Ratio: ${lastTransientResult.kickToMidDb.toFixed(1)} dB`);
       lines.push('');
@@ -1392,6 +1406,84 @@
     URL.revokeObjectURL(url);
   }
 
+  // ---- PDF report export (print-to-PDF, includes snapshots of every graph) ----
+  function canvasToImage(canvas) {
+    if (!canvas || !canvas.width || !canvas.height) return null;
+    const out = document.createElement('canvas');
+    out.width = canvas.width; out.height = canvas.height;
+    const octx = out.getContext('2d');
+    octx.fillStyle = css('--bg-panel-2') || '#1a1d27'; // gauges are transparent, give them a backdrop
+    octx.fillRect(0, 0, out.width, out.height);
+    octx.drawImage(canvas, 0, 0);
+    return out.toDataURL('image/png');
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  }
+
+  function exportPdfReport() {
+    const text = buildReportText();
+    if (!text) { alert('Analyze a file first.'); return; }
+    const win = window.open('', '_blank');
+    if (!win) { alert('Pop-up blocked. Allow pop-ups for this page to export the PDF.'); return; }
+
+    // make sure the spectrum + vectorscope show the whole-track view, not a stale live frame
+    drawStaticScopes();
+
+    const platformLines = [...document.querySelectorAll('#platformGrid .platform-box')].map(b =>
+      `${b.querySelector('.pname')?.textContent}: ${b.querySelector('.padjust')?.textContent.trim()} (${b.querySelector('.presult')?.textContent})`
+    ).join('\n');
+
+    const refTable = document.getElementById('referenceCompareTable');
+    const refHtml = (referenceStats && refTable) ? (refTable.querySelector('table')?.outerHTML || '') : '';
+
+    const dur = audioBuffer.duration;
+    const durStr = `${Math.floor(dur/60)}:${Math.floor(dur%60).toString().padStart(2,'0')}`;
+    const eqState = eqBands.map((b,i) =>
+      `Band ${i+1} (${b.type}): ${b.node.frequency.value.toFixed(0)} Hz, ${b.node.gain.value.toFixed(1)} dB, Q ${b.node.Q.value.toFixed(2)}`).join('\n');
+
+    const graphs = [
+      ['lufsGaugeCanvas', 'Integrated loudness gauge. Scale −30 to 0 LUFS, tick mark at the −14 LUFS target.'],
+      ['tpGaugeCanvas', 'True peak gauge. Scale −12 to +1 dBTP, tick mark at −1 dBTP.'],
+      ['lufsTimelineCanvas', `Loudness timeline, 0:00 to ${durStr}. Y axis −40 (bottom) to 0 LUFS (top), gridlines at −30/−20/−14/−10. Green = momentary (400 ms), amber = short-term (3 s), dashed = integrated.`],
+      ['spectrumCanvas', 'Whole-track average spectrum (Welch, 4096-pt FFT, mono sum). X axis 20 Hz to 20 kHz, log scale, 128 bands. Bar height = level relative to the loudest band over a 60 dB range. Colour green (low) to red (high).'],
+      ['spectrogramCanvas', `Spectrogram, 0:00 to ${durStr} left to right. Y axis 20 Hz (bottom) to 20 kHz (top), log scale. Colour = level over a 70 dB window: dark blue (quiet) → cyan → green → yellow → red → white (loudest).`],
+      ['vectorscopeCanvas', `Vectorscope of ~30,000 points sampled across the whole track. Vertical line = mono, horizontal = out of phase, wide blob = wide stereo. Whole-track correlation: ${staticVectorscope ? staticVectorscope.corr.toFixed(2) : 'n/a'}.`],
+      ['stereoFieldCanvas', 'Stereo field map. X axis 20 Hz to 20 kHz, log scale. Bar height = stereo width (side energy share, scaled ×1.6). Green = centred/mono, amber = wide. Opacity = energy in that band.'],
+      ['waveformCanvas', `Full waveform (left channel), 0:00 to ${durStr}. Pink boxes = detected quiet sections, amber box = current selection, orange line = playhead.`],
+      ['eqCanvas', 'Parametric EQ curve. X axis 20 Hz to 20 kHz (gridlines 100 Hz / 1 kHz / 10 kHz). Y axis ±12 dB (gridlines ±6 dB).'],
+      ['sampleCanvas', 'Sample-level zoom of the current selection (blank if nothing is selected).'],
+    ];
+    const figs = graphs.map(([id, caption]) => {
+      const src = canvasToImage(document.getElementById(id));
+      return src ? `<figure><img src="${src}"><figcaption>${escapeHtml(caption)}</figcaption></figure>` : '';
+    }).join('');
+
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8">
+      <title>${escapeHtml((currentFileName||'master').replace(/\.[^.]+$/,''))} MasterScope Report</title>
+      <style>
+        body { font-family: -apple-system, Segoe UI, sans-serif; color: #111; margin: 24px; }
+        h1 { font-size: 20px; margin: 0 0 4px; } h2 { font-size: 14px; margin: 22px 0 8px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+        pre { font-family: Consolas, Menlo, monospace; font-size: 11px; white-space: pre-wrap; line-height: 1.45; }
+        figure { margin: 0 0 18px; break-inside: avoid; } img { max-width: 100%; border-radius: 4px; display: block; }
+        figcaption { font-size: 11px; color: #444; margin-top: 4px; }
+        table { border-collapse: collapse; font-size: 11px; } td, th { border: 1px solid #ccc; padding: 4px 8px; text-align: left; }
+      </style></head><body>
+      <h1>MasterScope Report</h1>
+      <pre>${escapeHtml(text)}</pre>
+      <h2>Streaming Platform Preview</h2><pre>${escapeHtml(platformLines)}</pre>
+      <h2>Current EQ Settings (A/B mode: ${escapeHtml(abMode)})</h2><pre>${escapeHtml(eqState)}</pre>
+      ${refHtml ? `<h2>Reference Compare</h2>${refHtml}` : ''}
+      <h2>Graphs</h2>${figs}
+      </body></html>`);
+    win.document.close();
+
+    const imgs = [...win.document.images];
+    Promise.all(imgs.map(i => i.decode ? i.decode().catch(() => {}) : Promise.resolve()))
+      .then(() => { win.focus(); win.print(); });
+  }
+
   function importHistoryJson(file) {
     const reader = new FileReader();
     reader.onload = () => {
@@ -1412,6 +1504,7 @@
     reader.readAsText(file);
   }
 
+  document.getElementById('exportPdfBtn')?.addEventListener('click', exportPdfReport);
   document.getElementById('exportReportBtn')?.addEventListener('click', exportReport);
   document.getElementById('exportHistoryJsonBtn')?.addEventListener('click', exportHistoryJson);
   document.getElementById('importHistoryJsonBtn')?.addEventListener('click', () => document.getElementById('importHistoryFileInput').click());
@@ -3119,6 +3212,7 @@
       renderTransientAnalysis(audioBuffer);
       renderSpectrogram(audioBuffer);
       renderStereoFieldMap(audioBuffer);
+      renderStaticScopes(audioBuffer);
     }, 30);
   }
 
@@ -3572,12 +3666,17 @@
   function togglePlay() {
     const btn = document.getElementById('playBtn');
     if (isPlaying) {
+      // pause: keep the current position instead of letting onended reset it to 0
+      playOffset = Math.min(audioBuffer.duration, audioCtx.currentTime - playStartTime);
+      sourceNode.onended = null;
       sourceNode.stop();
       isPlaying = false;
       btn.textContent = '▶ Play';
       cancelAnimationFrame(animFrame);
+      drawStaticScopes();
       return;
     }
+    if (playOffset >= audioBuffer.duration - 0.05) playOffset = 0;
     sourceNode = audioCtx.createBufferSource();
     sourceNode.buffer = audioBuffer;
     buildChain(sourceNode);
@@ -3589,6 +3688,9 @@
       isPlaying = false;
       btn.textContent = '▶ Play';
       playOffset = 0;
+      cancelAnimationFrame(animFrame);
+      drawStaticScopes();
+      compositeWaveform();
     };
     drawSpectrumLoop();
   }
@@ -3877,12 +3979,110 @@
 
     const denom = Math.sqrt(sumL2 * sumR2) + 1e-12;
     const corr = Math.max(-1, Math.min(1, sumLR / denom));
+    updateCorrReadout(corr);
+  }
+
+  // ---- Static whole-track spectrum + vectorscope (computed at upload, shown when not playing) ----
+  let staticSpectrum = null;     // { db: Float32Array, fs, chunkSize }
+  let staticVectorscope = null;  // { xs: Float32Array, ys: Float32Array, corr }
+
+  function computeStaticScopes(buffer) {
+    const mono = new Float32Array(buffer.length);
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+      const ch = buffer.getChannelData(c);
+      for (let i = 0; i < ch.length; i++) mono[i] += ch[i] / buffer.numberOfChannels;
+    }
+    const chunkSize = 4096;
+    const mag = welchAverageSpectrum(mono, chunkSize, 120);
+    const db = new Float32Array(mag.length);
+    for (let k = 0; k < mag.length; k++) db[k] = 20 * Math.log10(mag[k] || 1e-9);
+    staticSpectrum = { db, fs: buffer.sampleRate, chunkSize };
+
+    const L = buffer.getChannelData(0);
+    const R = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : L;
+    const maxPoints = 30000;
+    const step = Math.max(1, Math.floor(L.length / maxPoints));
+    const n = Math.floor(L.length / step);
+    const xs = new Float32Array(n), ys = new Float32Array(n);
+    for (let j = 0, i = 0; j < n; j++, i += step) {
+      xs[j] = (L[i] - R[i]) / Math.SQRT2;
+      ys[j] = (L[i] + R[i]) / Math.SQRT2;
+    }
+    staticVectorscope = { xs, ys, corr: buffer.numberOfChannels > 1 ? wholeTrackCorrelation(buffer) : 1 };
+  }
+
+  function updateCorrReadout(corr) {
+    corr = Math.max(-1, Math.min(1, corr));
     document.getElementById('corrValue').textContent = corr.toFixed(2);
-    document.getElementById('corrBarFill').style.left = `${((corr + 1) / 2) * 100}%`;
     const fillEl = document.getElementById('corrBarFill');
-    if (corr < -0.2) fillEl.style.background = 'var(--danger)';
-    else if (corr < 0.3) fillEl.style.background = 'var(--warn)';
-    else fillEl.style.background = 'var(--accent)';
+    fillEl.style.left = `${((corr + 1) / 2) * 100}%`;
+    fillEl.style.background = corr < -0.2 ? 'var(--danger)' : (corr < 0.3 ? 'var(--warn)' : 'var(--accent)');
+  }
+
+  function drawStaticSpectrum() {
+    if (!staticSpectrum || !spectrumCanvas) return;
+    const { ctx, w, h } = fitCanvas(spectrumCanvas, true);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = css('--bg-panel-2');
+    ctx.fillRect(0, 0, w, h);
+
+    const { db, fs, chunkSize } = staticSpectrum;
+    const binHz = fs / chunkSize;
+    const fMin = 20, fMax = Math.min(20000, fs / 2);
+    const barCount = 128, barW = w / barCount;
+    const vals = [];
+    let max = -Infinity;
+    for (let i = 0; i < barCount; i++) {
+      const f0 = fMin * Math.pow(fMax / fMin, i / barCount);
+      const f1 = fMin * Math.pow(fMax / fMin, (i + 1) / barCount);
+      const kLo = Math.max(1, Math.floor(f0 / binHz));
+      const kHi = Math.max(kLo, Math.min(db.length - 1, Math.ceil(f1 / binHz) - 1));
+      let sum = 0;
+      for (let k = kLo; k <= kHi; k++) sum += db[k];
+      const v = sum / (kHi - kLo + 1);
+      vals.push(v);
+      if (v > max) max = v;
+    }
+    const range = 60; // dB shown below the loudest band
+    vals.forEach((v, i) => {
+      const t = Math.max(0, Math.min(1, (v - (max - range)) / range));
+      ctx.fillStyle = `hsl(${140 - t * 140}, 80%, 55%)`;
+      ctx.fillRect(i * barW, h - t * h, barW - 1, t * h);
+    });
+    ctx.fillStyle = css('--text-dim');
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.fillText('WHOLE-TRACK AVERAGE · press Play for live view', 6, 13);
+  }
+
+  function drawStaticVectorscope() {
+    if (!staticVectorscope || !vectorscopeCanvas) return;
+    const { ctx, w, h } = fitCanvas(vectorscopeCanvas, true);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = css('--bg-panel-2');
+    ctx.fillRect(0, 0, w, h);
+    const cx = w / 2, cy = h / 2, scale = Math.min(w, h) / 2.4;
+    ctx.strokeStyle = css('--border');
+    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, h); ctx.moveTo(0, cy); ctx.lineTo(w, cy); ctx.stroke();
+
+    const { xs, ys, corr } = staticVectorscope;
+    ctx.fillStyle = css('--accent2');
+    ctx.globalAlpha = 0.25;
+    for (let j = 0; j < xs.length; j++) ctx.fillRect(cx + xs[j] * scale, cy - ys[j] * scale, 1.2, 1.2);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = css('--text-dim');
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.fillText('WHOLE TRACK', 6, 13);
+    updateCorrReadout(corr);
+  }
+
+  function drawStaticScopes() {
+    if (isPlaying) return;
+    drawStaticSpectrum();
+    drawStaticVectorscope();
+  }
+
+  function renderStaticScopes(buffer) {
+    setTimeout(() => { computeStaticScopes(buffer); drawStaticScopes(); }, 30);
   }
 
   // ---- Loudness History Timeline ----
@@ -3954,6 +4154,7 @@
       fitCanvas(eqCanvas, true);
       fitCanvas(lufsTimelineCanvas, true);
       drawWaveform(); drawSampleView(); drawEqCurve(); drawLufsTimeline(); drawSpectrogram(); drawStereoFieldMap();
+      drawStaticScopes();
       if (integratedLufs !== null) drawArcGauge('lufsGaugeCanvas', integratedLufs, -30, 0, -14, 'LUFS', 1);
       if (lastTruePeakDb !== null) drawArcGauge('tpGaugeCanvas', lastTruePeakDb, -12, 1, -1, 'dBTP', 1);
     }
