@@ -212,6 +212,20 @@
   .feature p { margin: 0 0 10px; color: var(--text-dim); font-size: 13px; }
   .feature ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
   .feature li { font-size: 11.5px; padding: 3px 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); }
+  .feature li.has-tip { cursor: help; transition: border-color .15s, color .15s, background .15s; }
+  .feature li.has-tip:hover, .feature li.has-tip:focus-visible { border-color: var(--accent); color: var(--text); background: var(--accent-soft); }
+  .tip {
+    position: absolute; z-index: 80; max-width: 280px; padding: 10px 12px; border-radius: 8px;
+    background: var(--text); color: var(--bg); font-size: 12.5px; line-height: 1.5; font-weight: 450;
+    box-shadow: 0 6px 24px rgba(0,0,0,.25); pointer-events: none;
+    opacity: 0; transform: translateY(4px); transition: opacity .12s, transform .12s; visibility: hidden;
+  }
+  .tip.show { opacity: 1; transform: translateY(0); visibility: visible; }
+  .tip::after {
+    content: ''; position: absolute; left: var(--ax, 50%); bottom: -5px; width: 10px; height: 10px;
+    background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px;
+  }
+  .tip.below::after { bottom: auto; top: -5px; }
   .privacy { text-align: center; color: var(--text-faint); font-size: 12.5px; margin: 28px 0 8px; }
 
   /* ---------- Progress ---------- */
@@ -1805,18 +1819,90 @@ const DSP = (() => {
     compare: '<path d="M8 3v18M16 3v18M3 8h5M16 16h5"/>',
   };
   const FEATURES = [
-    ['loud', '−14 readiness', 'Exactly how far your track is from a competitive −14 LUFS master, what is causing the peaks that hold it back, and the steps to fix it.', ['Peak budget', 'Peak sources', 'True peak', 'Platform preview']],
+    ['loud', '−14 readiness', 'Exactly how far your track is from a competitive −14 LUFS master, what is causing the peaks that hold it back, and the steps to fix it.', ['Integrated LUFS', 'True peak', 'PLR budget', 'LRA', 'Peak sources', 'Platform preview']],
     ['tone', 'Tone', 'See where your mix sits from sub to air, compared with pink noise and with a reference track if you load one.', ['Tonal balance', 'Spectrum', 'Spectrogram']],
     ['stereo', 'Stereo', 'Check width and mono compatibility before phones, Bluetooth speakers and club systems do it for you.', ['Vectorscope', 'Correlation', 'Width by frequency']],
     ['dyn', 'Dynamics', 'How much your peaks stand out, how much sections vary, and whether the low end clears between hits.', ['PLR', 'Crest factor', 'Kick & bass separation']],
     ['tools', 'Master to −14', 'Hear your mix finished at −14 LUFS with a soft clipper and true-peak limiter, and compare it at matched loudness before touching your session.', ['One-click master', 'Live EQ', 'Matched A/B', 'Region gain']],
     ['compare', 'Compare', 'Level-matched comparison with a reference track, plus a history of every version you analyse.', ['Reference', 'Version history', 'PDF export']],
   ];
+  // Plain-English explanations shown when hovering, focusing or tapping a pill
+  const TIPS = {
+    'Integrated LUFS': 'The average perceived loudness of the whole track. Streaming services turn every song to about −14 LUFS, so this tells you how far yours will be turned up or down.',
+    'True peak': 'The highest level the waveform reaches, including peaks that fall between samples. Keeping it at or below −1 dBTP stops lossy streaming formats from distorting.',
+    'PLR budget': 'At −14 LUFS with peaks at −1 dBTP, peaks can stand at most 13 dB above the average loudness. MasterScope shows how much of that budget your track uses.',
+    'LRA': 'Loudness range: how much the loudness changes between the quiet and loud parts of the song, in LU. Low values mean a consistent track; high values mean big contrasts between sections.',
+    'Peak sources': 'Works out what is making your loudest peaks (drum hits, kick and bass overlapping, bass notes or other parts), so you know where to fix them.',
+    'Platform preview': 'Shows how much Spotify, Apple Music, YouTube and others will turn your track up or down, and where its peaks land afterwards.',
+    'Tonal balance': 'Your average level in each octave from sub to air, compared with pink noise and with a reference track if you load one.',
+    'Spectrum': 'A detailed frequency graph of the whole track, or live while it plays, so you can spot resonances, build-ups and gaps.',
+    'Spectrogram': 'Frequency over time as a heat map. Shows exactly when and where mud, harshness or ringing bass happens in the song.',
+    'Vectorscope': 'Plots the left channel against the right. A tall, narrow shape is close to mono, a wide shape is wide stereo, and sideways spread warns of phase problems.',
+    'Correlation': 'Phase correlation: +1 means both channels are identical (mono), 0 means unrelated, and below 0 means parts of the mix cancel out on mono speakers.',
+    'Width by frequency': 'How much of each frequency range sits in the stereo sides. Bass usually belongs near the centre; highs can be wide.',
+    'PLR': 'Peak-to-loudness ratio: how far the loudest peaks stand above the average loudness. Lower means denser and more limited; competitive releases usually sit around 8–12 dB.',
+    'Crest factor': 'The gap between the highest sample and the average (RMS) level. Like PLR, a rough measure of how punchy or squashed the track is.',
+    'Kick & bass separation': 'Checks whether each kick stands clear or lands on a bass note that is still ringing. Overlap blurs the low end and uses up headroom.',
+    'One-click master': 'Renders your track through a soft clipper and true-peak limiter, landing on exactly −14 LUFS and −1 dBTP, so you can hear it finished.',
+    'Live EQ': 'A 6-band EQ in the playback path. Try fixes and hear them instantly without changing your file.',
+    'Matched A/B': 'Compare your mix and the master at exactly the same loudness, so louder never fools your ears.',
+    'Region gain': 'Select part of the track and preview turning it up or down, the way you would automate it in your DAW.',
+    'Reference': 'Load a released track to compare against. Both play at the same loudness, and MasterScope lists where yours differs most.',
+    'Version history': 'Every file you analyse is saved in this browser (numbers only), so you can compare mixes and see what changed.',
+    'PDF export': 'A designed, multi-page report with every measurement and graph, to keep or share with collaborators.',
+  };
   $('features').innerHTML = FEATURES.map(([ic, title, desc, tags]) => `
     <div class="feature">
       <div class="f-head"><div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[ic]}</svg></div><h3>${title}</h3></div>
-      <p>${desc}</p><ul>${tags.map(t => `<li>${t}</li>`).join('')}</ul>
+      <p>${desc}</p><ul>${tags.map(t => `<li${TIPS[t] ? ` class="has-tip" tabindex="0" data-tip="${esc(TIPS[t])}"` : ''}>${t}</li>`).join('')}</ul>
     </div>`).join('');
+
+  // One shared tooltip, positioned above (or below) the pill and kept on screen
+  (function tooltips() {
+    const tip = document.createElement('div');
+    tip.className = 'tip'; tip.id = 'tip'; tip.setAttribute('role', 'tooltip');
+    document.body.appendChild(tip);
+    let current = null;
+    function show(el) {
+      current = el;
+      tip.textContent = el.dataset.tip;
+      el.setAttribute('aria-describedby', 'tip');
+      tip.classList.add('show');
+      const r = el.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight, m = 8;
+      let left = r.left + r.width / 2 - tw / 2;
+      left = Math.max(m, Math.min(window.innerWidth - tw - m, left));
+      const below = r.top - th - 10 < m;
+      const top = below ? r.bottom + 10 : r.top - th - 10;
+      tip.style.left = left + window.scrollX + 'px';
+      tip.style.top = top + window.scrollY + 'px';
+      tip.classList.toggle('below', below);
+      tip.style.setProperty('--ax', (r.left + r.width / 2 - left) + 'px');
+    }
+    function hide() {
+      if (current) current.removeAttribute('aria-describedby');
+      current = null; tip.classList.remove('show');
+    }
+    const pill = e => e.target.closest && e.target.closest('.has-tip');
+    let lastTouch = 0; // browsers fire emulated mouse events after a tap; ignore them
+    const recentTouch = () => Date.now() - lastTouch < 1000;
+    document.addEventListener('mouseover', e => { if (recentTouch()) return; const el = pill(e); if (el && el !== current) show(el); });
+    document.addEventListener('mouseout', e => { if (recentTouch()) return; const el = pill(e); if (el && !el.contains(e.relatedTarget)) hide(); });
+    document.addEventListener('focusin', e => { if (recentTouch()) return; const el = pill(e); if (el) show(el); });
+    document.addEventListener('focusout', e => { if (pill(e) && !recentTouch()) hide(); });
+    // touch: tap a pill to toggle, tap anywhere else to close
+    // (focus and emulated mouse events also fire on a tap, so remember the state at touch-down)
+    let wasOpen = false;
+    document.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') { lastTouch = Date.now(); const el = pill(e); wasOpen = !!el && el === current; } });
+    document.addEventListener('pointerup', e => {
+      if (e.pointerType !== 'touch') return;
+      lastTouch = Date.now();
+      const el = pill(e);
+      if (el) { if (wasOpen) { hide(); el.blur(); } else show(el); } else hide();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') hide(); });
+    window.addEventListener('scroll', () => { if (current) show(current); }, { passive: true });
+    window.addEventListener('resize', hide);
+  })();
 
   // ===================================================================
   // Opening files
