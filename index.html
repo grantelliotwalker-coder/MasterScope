@@ -1551,7 +1551,10 @@ const DSP = (() => {
     if (isFinite(m.lufs) && isFinite(m.plr)) {
       const R = readiness(m);
       const pk = m.peaks ? ` ${SRC_FIX[m.peaks.dominant]}` : '';
-      if (R.peakCut > 0.05) add('loudness', R.peakCut > 2 ? 'danger' : 'warn', 'Peaks are too tall to reach −14',
+      if (R.peakCut > 0.05 && m.peaks && m.peaks.pctAbove < 0.1 && m.truePeak > -1.3) add('loudness', 'warn', 'Just short of −14',
+        `Peaks stand ${f(m.plr)} dB above the integrated loudness, ${R.peakCut.toFixed(1)} dB more than the ${PLR_BUDGET} dB a −14 master allows under −1 dBTP. Only ${m.peaks.pctAbove < 0.01 ? 'under 0.01%' : m.peaks.pctAbove.toFixed(2) + '%'} of the audio is in that top ${R.peakCut.toFixed(1)} dB, so raise your master limiter's input by ${(TARGET_LUFS - m.lufs).toFixed(1)} dB with the ceiling at −1 dBTP and it will land on −14 with no audible change.` +
+        (R.shortfall > 0.2 ? ` As it stands, peak-limited services such as Spotify play it ${R.shortfall.toFixed(1)} dB quieter than tracks mastered to −14.` : ''));
+      else if (R.peakCut > 0.05) add('loudness', R.peakCut > 2 ? 'danger' : 'warn', 'Peaks are too tall to reach −14',
         `Peaks stand ${f(m.plr)} dB above the integrated loudness, but −14 LUFS under a −1 dBTP ceiling leaves room for only ${PLR_BUDGET} dB. Take about ${R.peakCut.toFixed(1)} dB off the peaks, then raise the level into the limiter until it reads −14.${pk}` +
         (R.shortfall > 0.2 ? ` As it stands, peak-limited services such as Spotify play it ${R.shortfall.toFixed(1)} dB quieter than tracks mastered to −14.` : ''));
       else if (R.atTarget) add('loudness', 'ok', 'On target for −14',
@@ -1564,7 +1567,7 @@ const DSP = (() => {
     if (isFinite(m.truePeak)) {
       if (m.truePeak > -0.1) add('loudness', 'danger', 'No true-peak headroom',
         `True peak is ${f(m.truePeak)} dBTP. Lossy encoding (AAC, Ogg, MP3) can push this into audible clipping. Set the limiter ceiling to −1 dBTP.`);
-      else if (m.truePeak > -1) add('loudness', 'warn', 'Tight true-peak headroom',
+      else if (m.truePeak > CEILING_DB + 0.05) add('loudness', 'warn', 'Tight true-peak headroom',
         `True peak is ${f(m.truePeak)} dBTP. −1 dBTP is the usual ceiling for streaming delivery.`);
       else add('loudness', 'ok', 'True-peak headroom is safe',
         `True peak is ${f(m.truePeak)} dBTP, below the −1 dBTP streaming guideline.`);
@@ -1644,7 +1647,7 @@ const DSP = (() => {
       else add('stereo', 'ok', 'Mono-safe',
         `Phase correlation is ${f(m.corr, 2)}, with no sign of cancellation in mono.`);
     }
-    if (isFinite(m.lowWidth) && (m.lowWidth > 12 || m.lowPeakWidth > 20)) add('stereo', 'warn', 'Stereo content in the bass',
+    if (isFinite(m.lowWidth) && (m.lowWidth > 12 || m.lowPeakWidth > 25)) add('stereo', 'warn', 'Stereo content in the bass',
       `Between 60 and 200 Hz, ${m.lowWidth.toFixed(0)}% of the energy is in the sides, widest around ${m.lowPeakFreq} Hz (${m.lowPeakWidth.toFixed(0)}%). Wide bass loses weight on mono systems and can sound loose. Make the low end mono below about 150 Hz, or narrow whichever bass, keys or reverb sits there.`);
     else if (isFinite(m.bassWidth) && m.bassWidth > 15) add('stereo', 'warn', 'Stereo content in the bass',
       `${m.bassWidth.toFixed(0)}% of the energy below 200 Hz is in the sides. Wide bass loses weight in mono. Consider making it mono below about 150 Hz.`);
@@ -2130,7 +2133,7 @@ const DSP = (() => {
   function tiltStatus(t) { return t < -4.5 || t > 1.5 ? 'danger' : (t < -3 || t > 0.5 ? 'warn' : 'ok'); }
   function corrStatus(c) { return c < -0.1 ? 'danger' : c < 0.25 ? 'warn' : 'ok'; }
 
-  function lowWidthStatus(m) { return (m.lowWidth > 12 || m.lowPeakWidth > 20) ? 'warn' : 'ok'; }
+  function lowWidthStatus(m) { return (m.lowWidth > 12 || m.lowPeakWidth > 25) ? 'warn' : 'ok'; }
   function widthBelow60() {
     const sf = S.sf; if (!sf) return NaN;
     let s = 0, t = 0;
@@ -3759,7 +3762,7 @@ const DSP = (() => {
       const pk = m.truePeak + a;
       return `<tr><td>${n}</td><td class="n">${fmt(target, 0)}</td><td class="n">${fmtSigned(a)} dB</td><td class="n ${pk > -1 ? 'bad' : ''}">${fmt(pk)}</td><td class="muted">${capped ? 'Raised only as far as peaks allow' : esc(note)}</td></tr>`;
     }).join('');
-    const tpS = m.truePeak > -0.1 ? 'danger' : m.truePeak > -1 ? 'warn' : 'ok';
+    const tpS = m.truePeak > -0.1 ? 'danger' : m.truePeak > -1 + 0.05 ? 'warn' : 'ok';
     const kickSep = t && t.kickRiseDb !== null && t.kickRiseDb >= 6;
     pages.push({ section: 'Loudness & dynamics', html: `
       <h2>Loudness &amp; dynamics</h2>
