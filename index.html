@@ -2315,6 +2315,7 @@ const DSP = (() => {
   }
 
   function readinessSub(R, m) {
+    if (R.trimOnly) return `Peaks are ${fmt(m.truePeak)} dBTP and the level is ${fmt(m.lufs)} LUFS. A ${(m.lufs + 14).toFixed(1)} dB trim at the very end of the chain fixes both and keeps your density.`;
     if (R.peakCut > 0.05 || (!R.atTarget && m.lufs < -14)) return R.shortfall > 0.05 ? `Right now it plays ${R.shortfall.toFixed(1)} dB quieter than tracks mastered to −14 on services that won't push peaks past −1 dBTP, such as Spotify.` : 'Peaks have room; only the level needs to come up.';
     if (m.lufs > -13.5) return `Services will turn it down ${(m.lufs + 14).toFixed(1)} dB, so the extra loudness is lost and only the limiting remains.`;
     return R.density === 'open' ? 'It fits −14, but it is more open than most competitive releases.' : R.density === 'squashed' ? 'Peaks are heavily limited for a −14 master.' : 'It will play at full level next to other releases.';
