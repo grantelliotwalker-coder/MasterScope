@@ -225,6 +225,7 @@
   /* ---------- Metric tiles ---------- */
   .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
   .tiles.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .tiles.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tile .label .lt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .tile {
     background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
@@ -337,6 +338,61 @@
   .freq-chips span { font-size: 12px; padding: 4px 9px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); }
   .freq-chips b { color: var(--text); font-weight: 600; font-family: var(--mono); margin-right: 4px; }
 
+  /* ---------- −14 readiness ---------- */
+  .ready-head { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 10px; border: 1px solid; }
+  .ready-head.ok { background: color-mix(in srgb, var(--ok) 10%, transparent); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+  .ready-head.warn { background: color-mix(in srgb, var(--warn) 10%, transparent); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+  .ready-head.danger { background: color-mix(in srgb, var(--danger) 10%, transparent); border-color: color-mix(in srgb, var(--danger) 35%, transparent); }
+  .ready-head .ri { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; }
+  .ready-head.ok .ri { background: var(--ok); } .ready-head.warn .ri { background: var(--warn); } .ready-head.danger .ri { background: var(--danger); }
+  .ready-head .ri svg { width: 16px; height: 16px; }
+  .ready-head .rh1 { font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
+  .ready-head .rh2 { color: var(--text-dim); font-size: 13px; }
+  .budget { margin: 20px 0 6px; }
+  .budget .b-label { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--text-dim); margin-bottom: 30px; }
+  .budget.has-ref .b-label { margin-bottom: 46px; }
+  .budget .b-track { position: relative; height: 12px; border-radius: 6px; overflow: visible; display: flex; }
+  .budget .b-zone { height: 100%; }
+  .budget .b-zone:first-child { border-radius: 6px 0 0 6px; } .budget .b-zone:last-child { border-radius: 0 6px 6px 0; }
+  .budget .z-sq { background: color-mix(in srgb, var(--warn) 35%, transparent); }
+  .budget .z-comp { background: color-mix(in srgb, var(--ok) 40%, transparent); }
+  .budget .z-open { background: color-mix(in srgb, var(--info) 30%, transparent); }
+  .budget .z-over { background: color-mix(in srgb, var(--danger) 35%, transparent); }
+  .budget .b-mark { position: absolute; top: -6px; width: 3px; height: 24px; border-radius: 2px; background: var(--text); transform: translateX(-1.5px); }
+  .budget .b-mark.ref { background: var(--ref); }
+  .budget .b-mark span { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; white-space: nowrap; font-family: var(--mono); }
+  .budget .b-limit { position: absolute; top: -4px; bottom: -4px; width: 0; border-left: 2px dashed var(--danger); }
+  .budget .b-ticks { position: relative; height: 16px; margin-top: 4px; font-size: 11px; color: var(--text-faint); font-family: var(--mono); }
+  .budget .b-ticks span { position: absolute; transform: translateX(-50%); }
+  .budget .b-zones-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--text-dim); margin-top: 6px; }
+  .budget .b-zones-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .steps-list { list-style: none; padding: 0; margin: 18px 0 0; counter-reset: st; display: flex; flex-direction: column; gap: 10px; }
+  .steps-list li { counter-increment: st; display: grid; grid-template-columns: 26px 1fr; gap: 10px; font-size: 13.5px; }
+  .steps-list li::before { content: counter(st); width: 24px; height: 24px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 650; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+  .steps-list li b { font-weight: 600; }
+  .steps-list li span { color: var(--text-dim); }
+  .src-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; margin: 10px 0 8px; background: var(--surface-3); }
+  .src-bar div { height: 100%; }
+  .src-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12.5px; color: var(--text-dim); }
+  .src-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .src-legend b { color: var(--text); font-family: var(--mono); font-weight: 600; margin-left: 4px; }
+  .pd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .pd-grid h3, .mini-h { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); margin: 0 0 8px; font-weight: 650; }
+  .mini-h { margin-top: 18px; }
+  .pd-text { font-size: 13px; color: var(--text-dim); margin: 8px 0 0; }
+  .diffs { display: flex; flex-direction: column; gap: 8px; }
+  .diff { display: grid; grid-template-columns: 24px 1fr; gap: 10px; padding: 10px 12px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); font-size: 13px; }
+  .diff .dn { width: 22px; height: 22px; border-radius: 50%; background: color-mix(in srgb, var(--ref) 20%, transparent); color: var(--ref); font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+  .diff b { display: block; font-weight: 600; }
+  .diff span { color: var(--text-dim); }
+  .master-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text-dim); font-weight: 550; }
+  .field select { height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); padding: 0 10px; font-size: 13px; font-weight: 500; }
+  .master-stats { font-size: 12.5px; color: var(--text-dim); margin: 10px 0 0; line-height: 1.6; }
+  .stale { color: var(--warn); font-size: 12.5px; margin-top: 8px; }
+  .seg button.dim { opacity: .45; }
+  .budget .b-mark.ref span { top: -32px; color: var(--ref); }
+
   /* ---------- Transport ---------- */
   .transport {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
@@ -377,7 +433,8 @@
 
   /* ---------- Responsive ---------- */
   @media (max-width: 900px) {
-    .grid-2 { grid-template-columns: 1fr; }
+    .grid-2, .pd-grid { grid-template-columns: 1fr; }
+    .master-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .help { grid-template-columns: 1fr; gap: 10px; }
     .scope-row { grid-template-columns: 1fr; }
@@ -458,9 +515,9 @@
   <!-- ================= Landing ================= -->
   <section id="landing">
     <div class="hero">
-      <div class="eyebrow">Mix &amp; master analysis</div>
-      <h1>Know exactly what's in your master.</h1>
-      <p>Drop in a mix or master to get loudness metering to the broadcast standard, tonal balance, stereo and dynamics analysis, and plain-English notes on what to work on.</p>
+      <div class="eyebrow">Mix &amp; master analysis for streaming</div>
+      <h1>Make your master compete at −14.</h1>
+      <p>Spotify, Apple Music and YouTube play everything at about the same loudness. MasterScope shows what's stopping your mix from sounding as big and polished as the competition at −14 LUFS, and lets you hear the fix.</p>
     </div>
     <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose an audio file to analyse">
       <div class="dz-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
@@ -470,8 +527,8 @@
     </div>
     <div class="steps">
       <div><b>1</b>Open your track</div>
-      <div><b>2</b>Read the Overview</div>
-      <div><b>3</b>Dig into each tab and listen</div>
+      <div><b>2</b>See what stands between it and −14</div>
+      <div><b>3</b>Hear it mastered, then fix your mix</div>
     </div>
 
     <div class="section-title">What you get</div>
@@ -495,6 +552,10 @@
     <!-- Overview -->
     <div class="tab-pane active" data-pane="overview">
       <div class="stack">
+        <section class="panel" data-help="readiness">
+          <div class="panel-head"><h2>−14 readiness</h2></div>
+          <div id="readiness"></div>
+        </section>
         <section class="panel" data-help="summary">
           <div class="panel-head"><h2>Summary</h2></div>
           <div class="tiles big cols-4" id="summaryTiles"></div>
@@ -525,6 +586,10 @@
             <div class="gauge"><canvas id="tpGauge"></canvas><div class="cap">True peak</div></div>
           </div>
           <div class="tiles cols-4" id="loudTiles"></div>
+        </section>
+        <section class="panel" data-help="peaksDensity">
+          <div class="panel-head"><h2>Peaks &amp; density</h2></div>
+          <div id="peaksDensity"></div>
         </section>
         <section class="panel" data-help="timeline">
           <div class="panel-head"><h2>Loudness over time</h2></div>
@@ -638,13 +703,19 @@
           <canvas id="eqCanvas"></canvas>
           <div class="readout" id="eqReadout">Drag a point to change frequency and gain. Scroll on a point to change its width (Q).</div>
         </section>
-        <section class="panel" data-help="ab">
-          <div class="panel-head"><h2>A/B at matched loudness</h2></div>
-          <p class="status-line" id="abInfo"></p>
-          <div class="controls" style="margin-top:12px">
-            <button class="btn sm" id="downloadEnhancedBtn">Download Enhanced WAV</button>
-            <span class="status-line" id="downloadStatus"></span>
+        <section class="panel" data-help="master" id="masterPanel">
+          <div class="panel-head"><h2>Master to −14</h2><span class="sub">Hear your mix finished at −14 LUFS, −1 dBTP</span></div>
+          <div class="master-grid">
+            <label class="field"><span>EQ</span><select id="mEq"><option value="on">Use the EQ above</option><option value="off">Bypass</option></select></label>
+            <label class="field"><span>Glue compression</span><select id="mGlue"><option value="off">Off</option><option value="gentle">Gentle (1.5:1)</option><option value="medium">Medium (2:1)</option></select></label>
+            <label class="field"><span>Soft clipper</span><select id="mClip"><option value="off">Off</option><option value="gentle" selected>Gentle</option><option value="medium">Firm</option></select></label>
+            <label class="field"><span>Ceiling</span><select id="mCeil"><option value="-1">−1.0 dBTP</option><option value="-1.2">−1.2 dBTP</option><option value="-1.5">−1.5 dBTP</option><option value="-2">−2.0 dBTP</option></select></label>
           </div>
+          <div class="controls" style="margin-top:14px">
+            <button class="btn primary" id="masterBtn">Render master</button>
+            <span class="status-line" id="masterStatus"></span>
+          </div>
+          <div id="masterResult"></div>
         </section>
         <section class="panel" data-help="region">
           <div class="panel-head"><h2>Region gain preview</h2>
@@ -704,7 +775,10 @@
               </div>
               <span class="status-line">Both play at −14 LUFS. Switching keeps your place.</span>
             </div>
-            <div class="table-wrap" id="refTable" style="margin-top:12px"></div>
+            <h3 class="mini-h">Where you differ most</h3>
+            <div id="refDiffs" class="diffs"></div>
+            <h3 class="mini-h">All measurements</h3>
+            <div class="table-wrap" id="refTable"></div>
           </div>
         </section>
         <section class="panel" data-help="history">
@@ -733,7 +807,7 @@
     <div class="seg" role="group" aria-label="Playback mode" id="abSeg">
       <button data-mode="original" aria-pressed="true" title="As uploaded">Original</button>
       <button data-mode="normalized" aria-pressed="false" title="Turned to −14 LUFS">−14 LUFS</button>
-      <button data-mode="enhanced" aria-pressed="false" title="−14 LUFS with your EQ and gentle compression">Enhanced</button>
+      <button data-mode="mastered" aria-pressed="false" title="Your render from Tools → Master to −14">Mastered</button>
     </div>
   </div>
   <button class="btn sm toggle" id="monoBtn" aria-pressed="false" title="Sum to mono (M)">Mono</button>
@@ -1247,6 +1321,178 @@ const DSP = (() => {
     };
   }
 
+  // ---------- −14 readiness ----------
+  // At −14 LUFS with a −1 dBTP ceiling, peaks can stand at most 13 dB above the
+  // integrated loudness. PLR above that budget means the track can't reach −14.
+  const TARGET_LUFS = -14, CEILING_DB = -1, PLR_BUDGET = TARGET_LUFS * -1 + CEILING_DB; // 13 dB
+
+  function readiness(m) {
+    const peakCut = Math.max(0, m.plr - PLR_BUDGET);
+    const raise = m.lufs < TARGET_LUFS ? Math.max(0, Math.min(TARGET_LUFS - m.lufs, CEILING_DB - m.truePeak)) : 0;
+    const playbackLufs = m.lufs > TARGET_LUFS ? TARGET_LUFS : m.lufs + raise; // on a normaliser that never limits
+    const atTarget = Math.abs(m.lufs - TARGET_LUFS) <= 0.5;
+    const tpOk = m.truePeak <= CEILING_DB + 0.05;
+    const density = m.plr < 8 ? 'squashed' : m.plr <= 12 ? 'competitive' : m.plr <= PLR_BUDGET ? 'open' : 'too-dynamic';
+    let status, headline;
+    if (peakCut > 0.05) { status = peakCut > 2 ? 'danger' : 'warn'; headline = `Needs ${peakCut.toFixed(1)} dB of peak control to reach −14`; }
+    else if (!tpOk) { status = 'warn'; headline = `Peaks are above −1 dBTP`; }
+    else if (!atTarget) { status = 'warn'; headline = m.lufs < TARGET_LUFS ? `Turn up ${(TARGET_LUFS - m.lufs).toFixed(1)} dB to reach −14` : `${(m.lufs - TARGET_LUFS).toFixed(1)} dB louder than −14`; }
+    else { status = 'ok'; headline = density === 'open' ? 'Ready for −14, with open dynamics' : density === 'squashed' ? 'At −14, but heavily limited' : 'Ready for −14'; }
+    return { peakCut, raise, playbackLufs, shortfall: TARGET_LUFS - playbackLufs, atTarget, tpOk, density, status, headline,
+             budget: PLR_BUDGET, target: TARGET_LUFS, ceiling: CEILING_DB };
+  }
+
+  // ---------- What causes the loudest peaks ----------
+  function lowpassCoefs(fs, f0) {
+    const w0 = 2 * Math.PI * f0 / fs, c = Math.cos(w0), al = Math.sin(w0) / (2 * Math.SQRT1_2), a0 = 1 + al;
+    return { b0: (1 - c) / 2 / a0, b1: (1 - c) / a0, b2: (1 - c) / 2 / a0, a1: -2 * c / a0, a2: (1 - al) / a0 };
+  }
+  function peakSources(buffer, mono, hitTimesSec, needDb) {
+    const fs = buffer.sampleRate, n = buffer.length, nCh = buffer.numberOfChannels;
+    const ch = []; for (let c = 0; c < nCh; c++) ch.push(buffer.getChannelData(c));
+    const absMax = i => { let a = 0; for (let c = 0; c < nCh; c++) { const v = Math.abs(ch[c][i]); if (v > a) a = v; } return a; };
+    let peak = 0; for (let i = 0; i < n; i++) { const a = absMax(i); if (a > peak) peak = a; }
+    if (!peak) return null;
+    const thr = peak * Math.pow(10, -3 / 20), sep = Math.round(0.05 * fs), look = Math.round(0.01 * fs);
+    let events = [];
+    for (let i = 0; i < n; i++) {
+      if (absMax(i) <= thr) continue;
+      let best = i, bv = 0;
+      for (let j = i, e = Math.min(n, i + look); j < e; j++) { const v = absMax(j); if (v > bv) { bv = v; best = j; } }
+      events.push({ idx: best, val: bv });
+      i = best + sep;
+    }
+    if (events.length > 3000) events = events.sort((a, b) => b.val - a.val).slice(0, 3000);
+    const lp = lowpassCoefs(fs, 150), low = applyBiquad(applyBiquad(mono, lp), lp);
+    const hits = (hitTimesSec || []).slice().sort((a, b) => a - b);
+    const nearHit = t => {
+      let lo = 0, hi = hits.length - 1;
+      while (lo <= hi) { const mid = (lo + hi) >> 1; if (hits[mid] < t) lo = mid + 1; else hi = mid - 1; }
+      return [hits[lo - 1], hits[lo]].some(h => h !== undefined && Math.abs(h - t) <= 0.04);
+    };
+    const w = Math.round(0.003 * fs), counts = { hits: 0, kickbass: 0, low: 0, other: 0 };
+    events.forEach(ev => {
+      let la = 0, ma = 0;
+      for (let j = Math.max(0, ev.idx - w), e = Math.min(n, ev.idx + w); j < e; j++) {
+        const l = Math.abs(low[j]), m = Math.abs(mono[j]); if (l > la) la = l; if (m > ma) ma = m;
+      }
+      const lowDriven = la / (ma + 1e-9) > 0.55, atHit = nearHit(ev.idx / fs);
+      counts[atHit ? (lowDriven ? 'kickbass' : 'hits') : (lowDriven ? 'low' : 'other')]++;
+    });
+    const total = events.length || 1;
+    const shares = {}; Object.keys(counts).forEach(k => shares[k] = counts[k] / total);
+    const dominant = Object.keys(shares).sort((a, b) => shares[b] - shares[a])[0];
+    // how much of the track would a limiter/clipper actually touch to remove the needed dB
+    const cut = Math.max(0.5, needDb || 0), thrCut = peak * Math.pow(10, -cut / 20);
+    let above = 0; for (let i = 0; i < n; i++) if (absMax(i) > thrCut) above++;
+    return { counts, shares, dominant, events: events.length, cutDb: cut, pctAbove: above / n * 100,
+             eventsPerMin: events.length / (n / fs / 60) };
+  }
+
+  // ---------- Mastering: soft clipper + true-peak limiter ----------
+  function softClip(chans, thrLin) {
+    const k = thrLin * 0.7, r = thrLin - k;
+    let touched = 0, maxRedDb = 0;
+    for (const x of chans) for (let i = 0; i < x.length; i++) {
+      const a = Math.abs(x[i]);
+      if (a > k) {
+        const y = k + r * Math.tanh((a - k) / r);
+        if (a > y * 1.0116) { touched++; const d = 20 * Math.log10(a / y); if (d > maxRedDb) maxRedDb = d; }
+        x[i] = x[i] < 0 ? -y : y;
+      }
+    }
+    return { touchedPct: touched / (chans.length * chans[0].length) * 100, maxRedDb };
+  }
+
+  function tpEnvelope(chans, gate) {
+    const n = chans[0].length, env = new Float32Array(n);
+    for (const x of chans) {
+      for (let i = 0; i < n; i++) {
+        let a = Math.abs(x[i]);
+        const b = i + 1 < n ? Math.abs(x[i + 1]) : 0;
+        if ((a > gate || b > gate) && i >= TP_HALF - 1 && i < n - TP_HALF) {
+          const base = i - (TP_HALF - 1);
+          for (let p = 0; p < 3; p++) {
+            const taps = TP_PHASES[p]; let v = 0;
+            for (let j = 0; j < taps.length; j++) v += x[base + j] * taps[j];
+            v = Math.abs(v); if (v > a) a = v;
+          }
+        }
+        if (a > env[i]) env[i] = a;
+      }
+    }
+    return env;
+  }
+
+  // Look-ahead true-peak limiter (offline, so it can look both ways).
+  function limitTruePeak(chans, fs, ceilLin, releaseMs = 80) {
+    const n = chans[0].length, L = Math.max(1, Math.round(0.0015 * fs));
+    const env = tpEnvelope(chans, ceilLin * 0.5);
+    const req = new Float32Array(n);
+    for (let i = 0; i < n; i++) req[i] = env[i] > ceilLin ? ceilLin / env[i] : 1;
+    // minimum over ±L, then a moving average over ±L: smooth, and never above what any sample needs
+    const mn = new Float32Array(n), dq = new Int32Array(n);
+    let h = 0, t = 0, j = 0;
+    for (let i = 0; i < n; i++) {
+      const hi = Math.min(n - 1, i + L);
+      while (j <= hi) { while (t > h && req[dq[t - 1]] >= req[j]) t--; dq[t++] = j; j++; }
+      while (dq[h] < i - L) h++;
+      mn[i] = req[dq[h]];
+    }
+    const pre = new Float64Array(n + 1);
+    for (let i = 0; i < n; i++) pre[i + 1] = pre[i] + mn[i];
+    const rel = Math.exp(-1 / (releaseMs / 1000 * fs));
+    let g = 1, sumGr = 0, maxGr = 0, limited = 0;
+    for (let i = 0; i < n; i++) {
+      const lo = Math.max(0, i - L), hi = Math.min(n, i + L + 1);
+      const target = (pre[hi] - pre[lo]) / (hi - lo);
+      g = target < g ? target : target - (target - g) * rel;
+      if (g < 0.9988) { limited++; const gr = -20 * Math.log10(g); sumGr += gr; if (gr > maxGr) maxGr = gr; }
+      for (const x of chans) x[i] *= g;
+    }
+    return { limitedPct: limited / n * 100, avgGrDb: limited ? sumGr / limited : 0, maxGrDb: maxGr };
+  }
+
+  const CLIP_THRESH_DB = { off: null, gentle: 2, medium: 0.8 };
+  // One mastering pass at a given input gain. Returns new channel arrays and stats.
+  function processMaster(src, fs, gainDb, ceilingDb, clipMode) {
+    const g = Math.pow(10, gainDb / 20), ceil = Math.pow(10, ceilingDb / 20);
+    const chans = src.map(x => { const y = new Float32Array(x.length); for (let i = 0; i < x.length; i++) y[i] = x[i] * g; return y; });
+    let clip = { touchedPct: 0, maxRedDb: 0 };
+    if (CLIP_THRESH_DB[clipMode] !== null && CLIP_THRESH_DB[clipMode] !== undefined) clip = softClip(chans, ceil * Math.pow(10, CLIP_THRESH_DB[clipMode] / 20));
+    const lim = limitTruePeak(chans, fs, ceil);
+    return { chans, clip, lim };
+  }
+  const asBuffer = (chans, fs) => ({ sampleRate: fs, numberOfChannels: chans.length, length: chans[0].length, getChannelData: c => chans[c] });
+
+  // ---------- Ranked differences from a reference ----------
+  const OCT_NAMES = ['deep sub (31 Hz)', 'low bass (63 Hz)', 'bass (125 Hz)', 'low mids (250 Hz)', 'body (500 Hz)', 'mids (1 kHz)', 'upper mids (2 kHz)', 'presence (4 kHz)', 'brilliance (8 kHz)', 'air (16 kHz)'];
+  const OCT_LESS = ['less deep sub', 'less low-end weight', 'less bass warmth', 'thinner low mids', 'less body', 'less midrange', 'less upper-mid energy', 'less presence and bite', 'less brilliance', 'less air'];
+  const OCT_MORE = ['more deep sub, which uses headroom', 'a heavier low end', 'more bass', 'thicker, possibly muddy low mids', 'more body, possibly boxy', 'more midrange, possibly honky', 'more upper mids, possibly harsh', 'more presence, possibly harsh', 'more brilliance', 'more air'];
+  function referenceDiffs(mine, ref) {
+    const out = [];
+    const f = (v, d = 1) => (v < 0 ? '−' : '') + Math.abs(v).toFixed(d);
+    const push = (key, label, d, thr, text) => { if (isFinite(d) && Math.abs(d) >= thr) out.push({ key, label, diff: d, score: Math.abs(d) / thr, text }); };
+    const dp = mine.plr - ref.plr;
+    push('density', 'Density', dp, 1.5, dp > 0
+      ? `Your track is ${f(dp)} dB more dynamic (PLR ${f(mine.plr)} vs ${f(ref.plr)} dB). At −14 it will sound less dense than the reference; about ${f(dp)} dB more peak control would match it.`
+      : `Your track is ${f(-dp)} dB more limited (PLR ${f(mine.plr)} vs ${f(ref.plr)} dB). It may sound flatter than the reference; easing the limiter by about ${f(-dp)} dB would match it.`);
+    const dt = mine.tilt - ref.tilt;
+    push('tilt', 'Overall balance', dt, 0.6, `Your overall balance is ${dt < 0 ? 'darker' : 'brighter'} than the reference (tilt ${f(mine.tilt)} vs ${f(ref.tilt)} dB per octave).`);
+    for (let i = 0; i < 10; i++) {
+      const d = mine.octaveRel[i] - ref.octaveRel[i], thr = (i === 0 || i === 9) ? 4 : 2;
+      push('oct' + i, OCT_NAMES[i][0].toUpperCase() + OCT_NAMES[i].slice(1), d, thr,
+        `In the ${OCT_NAMES[i]} octave your track is ${f(Math.abs(d))} dB ${d < 0 ? 'below' : 'above'} the reference: ${d < 0 ? OCT_LESS[i] : OCT_MORE[i]}.`);
+    }
+    const dl = mine.lra - ref.lra;
+    push('lra', 'Section contrast', dl, 2, `Your loudness range is ${f(Math.abs(dl))} LU ${dl > 0 ? 'wider' : 'narrower'} than the reference (${f(mine.lra)} vs ${f(ref.lra)} LU), so sections ${dl > 0 ? 'vary more' : 'vary less'} in level.`);
+    const dw = mine.width - ref.width;
+    push('width', 'Stereo width', dw, 6, `Your mix is ${dw > 0 ? 'wider' : 'narrower'} overall (${mine.width.toFixed(0)}% vs ${ref.width.toFixed(0)}% side energy).`);
+    const dlw = mine.lowWidth - ref.lowWidth;
+    push('lowWidth', 'Bass width', dlw, 6, `Your 60–200 Hz range is ${dlw > 0 ? 'wider' : 'narrower'} than the reference (${mine.lowWidth.toFixed(0)}% vs ${ref.lowWidth.toFixed(0)}%).`);
+    return out.sort((a, b) => b.score - a.score);
+  }
+
   // ---------- Full analysis used for reference tracks / processed previews ----------
   function summary(buffer) {
     const mono = mixToMono(buffer);
@@ -1272,15 +1518,25 @@ const DSP = (() => {
     const f = (v, d = 1) => (v < 0 ? '−' : '') + Math.abs(v).toFixed(d);
     const add = (cat, status, title, body) => out.push({ cat, status, title, body });
 
-    // Loudness / delivery
-    if (isFinite(m.lufs)) {
-      const diff = m.lufs + 14;
-      if (diff > 5) add('loudness', 'warn', 'Much louder than streaming targets',
-        `Integrated loudness is ${f(m.lufs)} LUFS. Spotify, YouTube and Tidal will turn this down by about ${f(diff)} dB, so the extra loudness buys nothing there and has probably cost some punch.`);
-      else if (diff < -6) add('loudness', 'warn', 'Quieter than streaming targets',
-        `Integrated loudness is ${f(m.lufs)} LUFS. Platforms that normalise up will raise it by about ${f(-diff)} dB, and some (Spotify with limiting off, YouTube) won't turn it up at all.`);
-      else add('loudness', 'ok', 'Loudness suits streaming',
-        `At ${f(m.lufs)} LUFS, normalisation will change this file by only a few dB on the major platforms.`);
+    // Loudness: judged against a −14 LUFS master with a −1 dBTP ceiling
+    const SRC_FIX = {
+      hits: 'Most of them are drum hits, so gentle clipping or fast limiting on the drum bus (or a soft clipper before the master limiter) is the cleanest way to take them off.',
+      kickbass: 'Most of them are kick hits landing on sustained bass, so sidechaining the bass to the kick lowers them and tightens the low end at the same time.',
+      low: 'Most of them come from bass or sub notes between hits, so compressing or saturating the bass, or taming the deepest sub, will free the most room.',
+      other: 'Most of them come from sustained parts rather than drums (often vocals or leads), so clip-gain or compress the loudest part before the master limiter.',
+    };
+    if (isFinite(m.lufs) && isFinite(m.plr)) {
+      const R = readiness(m);
+      const pk = m.peaks ? ` ${SRC_FIX[m.peaks.dominant]}` : '';
+      if (R.peakCut > 0.05) add('loudness', R.peakCut > 2 ? 'danger' : 'warn', 'Peaks are too tall to reach −14',
+        `Peaks stand ${f(m.plr)} dB above the integrated loudness, but −14 LUFS under a −1 dBTP ceiling leaves room for only ${PLR_BUDGET} dB. Take about ${R.peakCut.toFixed(1)} dB off the peaks, then raise the level into the limiter until it reads −14.${pk}` +
+        (R.shortfall > 0.2 ? ` As it stands, peak-limited services such as Spotify play it ${R.shortfall.toFixed(1)} dB quieter than tracks mastered to −14.` : ''));
+      else if (R.atTarget) add('loudness', 'ok', 'On target for −14',
+        `Integrated loudness is ${f(m.lufs)} LUFS, within half a dB of the −14 target, so services will play it at full level without changing its sound.`);
+      else if (m.lufs < TARGET_LUFS) add('loudness', 'warn', 'Below −14',
+        `Integrated loudness is ${f(m.lufs)} LUFS. Your peaks leave room to raise it by ${(TARGET_LUFS - m.lufs).toFixed(1)} dB and still stay under −1 dBTP, so turn up the limiter input.`);
+      else add('loudness', m.lufs > -11 ? 'warn' : 'info', 'Louder than −14',
+        `Integrated loudness is ${f(m.lufs)} LUFS, so services will turn it down ${(m.lufs - TARGET_LUFS).toFixed(1)} dB. It will play at −14 like everything else, but with the extra limiting baked in. Mastering to −14 would let you keep about ${(m.lufs - TARGET_LUFS).toFixed(1)} dB more punch.`);
     }
     if (isFinite(m.truePeak)) {
       if (m.truePeak > -0.1) add('loudness', 'danger', 'No true-peak headroom',
@@ -1297,12 +1553,19 @@ const DSP = (() => {
 
     // Dynamics
     if (isFinite(m.plr)) {
-      if (m.plr < 7) add('dynamics', 'warn', 'Heavily limited',
-        `Peak-to-loudness ratio is ${f(m.plr)} dB. Below about 7 dB, transients are usually being flattened. If it sounds flat, back the limiter off 1–2 dB.`);
-      else if (m.plr > 16) add('dynamics', 'info', 'Very dynamic master',
-        `Peak-to-loudness ratio is ${f(m.plr)} dB. Fine for acoustic or cinematic material; most pop and electronic releases sit around 8–12 dB.`);
-      else add('dynamics', 'ok', 'Dynamics look healthy',
-        `Peak-to-loudness ratio is ${f(m.plr)} dB, a typical range for modern releases.`);
+      if (m.plr < 8) add('dynamics', 'warn', 'Heavily limited',
+        `Peak-to-loudness ratio is ${f(m.plr)} dB. Below about 8 dB the drums usually lose their snap. At −14 a denser master isn't any louder, so easing the limiter 1–2 dB costs nothing.`);
+      else if (m.plr <= 12) add('dynamics', 'ok', 'Competitive density',
+        `Peak-to-loudness ratio is ${f(m.plr)} dB, in the 8–12 dB range typical of competitive releases at −14.`);
+      else if (m.plr <= PLR_BUDGET) add('dynamics', 'info', 'Open dynamics',
+        `Peak-to-loudness ratio is ${f(m.plr)} dB. It fits −14, but most competitive releases sit around 9–12 dB, so they will sound denser next to it. Another 1–2 dB of peak control would close the gap, at the cost of some transient snap.`);
+      else add('dynamics', 'info', 'Too dynamic for a −14 master',
+        `Peak-to-loudness ratio is ${f(m.plr)} dB, more than the ${PLR_BUDGET} dB a −14 LUFS master has under a −1 dBTP ceiling. See the Loudness tab for what is causing the peaks.`);
+    }
+    if (m.peaks) {
+      const s = m.peaks.shares, pc = v => Math.round(v * 100) + '%';
+      add('dynamics', 'info', 'Where the peaks come from',
+        `Of the loudest moments, ${pc(s.hits)} are drum hits, ${pc(s.kickbass)} are kick hits stacking with bass, ${pc(s.low)} are bass or sub notes and ${pc(s.other)} are other sustained parts.`);
     }
     if (isFinite(m.lra) && m.lra > 12) add('dynamics', 'info', 'Wide loudness range',
       `Loudness range is ${f(m.lra)} LU, so quiet and loud sections differ a lot. Check the Loudness timeline to see where.`);
@@ -1373,7 +1636,7 @@ const DSP = (() => {
   return {
     applyBiquad, kWeightChannel, fft, mixToMono, loudness, truePeak, levels, tonal, logBars,
     averagePsd, bandPower, correlation, stereoField, vectorscopePoints, spectrogram, transients,
-    summary, findings, OCTAVE_CENTRES,
+    summary, findings, OCTAVE_CENTRES, readiness, peakSources, processMaster, asBuffer, referenceDiffs, TARGET_LUFS, CEILING_DB, PLR_BUDGET,
   };
 })();
 
@@ -1396,7 +1659,6 @@ const DSP = (() => {
   let audioCtx = null, chain = null, sourceNode = null;
   let isPlaying = false, playStartTime = 0, playOffset = 0, raf = 0;
   let abMode = 'original', monoOn = false;
-  let enhancedMakeup = 1, enhancedState = 'idle';
   let previewSource = null, previewWhich = null, previewStart = 0, previewOffset = 0;
   let liveTop = -Infinity;
   let exportDpr = 0; // set to 2 while rendering charts for the PDF report
@@ -1441,6 +1703,12 @@ const DSP = (() => {
   // Help text (what / how to read / what good looks like)
   // ===================================================================
   const HELP = {
+    readiness: ['How close this track is to a competitive master at −14 LUFS with a −1 dBTP true-peak ceiling, and the steps to get there.',
+      'The bar shows the peak-to-loudness ratio (PLR). At −14 LUFS with peaks at −1 dBTP the most it can be is 13 dB, so anything right of the dashed line can\u2019t reach −14. Competitive releases usually sit around 8–12 dB.',
+      'A green verdict with your marker in the competitive zone. The steps are ordered: fix what stops the track reaching −14 first, then work on density and tone.'],
+    peaksDensity: ['What decides how loud this track can be at −14: how far its peaks stand above its body (PLR), and what is making those peaks.',
+      'Each of the loudest peaks is classified by whether it lands on a detected drum hit and whether it is mostly low-frequency energy. "Audio affected" is how much of the track sits in the top few dB that would need to come off.',
+      'Competitive density (PLR 8–12) with peaks coming mostly from drum hits, which are the easiest to control cleanly.'],
     summary: ['The headline numbers for this file, each with a short verdict.',
       'Green is within a typical range, amber is worth a listen, red is likely a problem. Grey is informational.',
       'For streaming: about −14 LUFS integrated, true peak at or below −1 dBTP, and positive phase correlation.'],
@@ -1483,12 +1751,12 @@ const DSP = (() => {
     transients: ['Finds the strongest repeated hits (usually kick and snare) and measures how they sit in the mix.',
       'Rise is how far each hit jumps above what was already playing in that band. Settle time is how long the band takes to return to its level from before the hit. When the rise is small, something sustains underneath (often bass), and the hit can’t be measured on its own.',
       'Hits that rise clearly above the mix, with low end settling before the next hit.'],
-    eq: ['A 6-band EQ in the playback path. It changes what you hear, the live spectrum and the Enhanced mode. It never changes your file.',
-      'Drag a point to set its frequency and gain. Scroll over a point on desktop to make it narrower or wider. "Load suggested curve" sets moves based on this track’s findings.',
+    eq: ['A 6-band EQ in the playback path. It changes what you hear and the live spectrum, and Master to −14 can include it. It never changes your file.',
+      'Drag a point to set its frequency and gain. Scroll over a point on desktop to make it narrower or wider. "Load suggested curve" sets moves based on this track\u2019s findings.',
       'Use it to audition fixes before making them in your DAW.'],
-    ab: ['Plays the track three ways at matched loudness, so louder doesn’t fool your ears. Choose the mode in the player bar.',
-      'Original is the file as it is. −14 LUFS turns it to the streaming target. Enhanced is −14 LUFS plus the EQ above and gentle 3:1 compression, calibrated to land on exactly −14 LUFS.',
-      'If Enhanced sounds better at the same loudness, those EQ and compression moves are worth trying in your mix.'],
+    master: ['A finished master of your track at −14 LUFS: optional EQ and glue compression, a soft clipper, then a true-peak limiter, re-measured until it lands on exactly −14.0 LUFS under your chosen ceiling.',
+      'Compare "Mastered" with "−14 LUFS" in the player: both play at the same loudness, so any difference is density and tone, not volume. The notes show how hard the clipper and limiter had to work.',
+      'If the master sounds clearly fuller and the limiter only works lightly, your mix is in good shape. If the limiter works hard, fix the peaks in the mix first; it will sound better than any limiter can make it.'],
     region: ['Preview a level change on part of the track, the way you’d automate it in a DAW.',
       'Drag across the waveform to select a section, set the gain, then measure the change. "Find quiet sections" looks for passages noticeably quieter than the rest, ignoring the intro and outro.',
       'If boosting quiet sections and trimming back to the original loudness raises PLR, the limiter has less work to do.'],
@@ -1537,11 +1805,11 @@ const DSP = (() => {
     compare: '<path d="M8 3v18M16 3v18M3 8h5M16 16h5"/>',
   };
   const FEATURES = [
-    ['loud', 'Loudness', 'Broadcast-standard loudness and true-peak metering, a loudness timeline, and how each streaming service will adjust your track.', ['Integrated LUFS', 'True peak', 'LRA', 'Platform preview']],
+    ['loud', '−14 readiness', 'Exactly how far your track is from a competitive −14 LUFS master, what is causing the peaks that hold it back, and the steps to fix it.', ['Peak budget', 'Peak sources', 'True peak', 'Platform preview']],
     ['tone', 'Tone', 'See where your mix sits from sub to air, compared with pink noise and with a reference track if you load one.', ['Tonal balance', 'Spectrum', 'Spectrogram']],
     ['stereo', 'Stereo', 'Check width and mono compatibility before phones, Bluetooth speakers and club systems do it for you.', ['Vectorscope', 'Correlation', 'Width by frequency']],
     ['dyn', 'Dynamics', 'How much your peaks stand out, how much sections vary, and whether the low end clears between hits.', ['PLR', 'Crest factor', 'Kick & bass separation']],
-    ['tools', 'Tools', 'Audition fixes before you touch your session: EQ in the playback path, loudness-matched A/B, and region gain previews.', ['Live EQ', 'Matched A/B', 'Region gain', 'Sample zoom']],
+    ['tools', 'Master to −14', 'Hear your mix finished at −14 LUFS with a soft clipper and true-peak limiter, and compare it at matched loudness before touching your session.', ['One-click master', 'Live EQ', 'Matched A/B', 'Region gain']],
     ['compare', 'Compare', 'Level-matched comparison with a reference track, plus a history of every version you analyse.', ['Reference', 'Version history', 'PDF export']],
   ];
   $('features').innerHTML = FEATURES.map(([ic, title, desc, tags]) => `
@@ -1676,6 +1944,7 @@ const DSP = (() => {
       ['Analysing the stereo image', () => { S.sf = DSP.stereoField(buffer); S.corr = DSP.correlation(buffer); S.vs = DSP.vectorscopePoints(buffer, 30000); }],
       ['Building the spectrogram', () => { S.spec = DSP.spectrogram(S.mono, fs, buffer.duration, 640, 4096); S.specImage = null; }],
       ['Detecting hits and transients', () => { S.trans = DSP.transients(S.mono, fs); }],
+      ['Tracing the loudest peaks', () => { const plr = S.tp.truePeakDb - S.loud.integrated; S.peaks = DSP.peakSources(buffer, S.mono, S.trans ? S.trans.hitTimesSec : null, Math.max(0, plr - DSP.PLR_BUDGET)); }],
     ];
     for (let i = 0; i < steps.length; i++) {
       setProgress(0.1 + 0.85 * i / steps.length, steps[i][0] + '…');
@@ -1686,7 +1955,7 @@ const DSP = (() => {
 
     S.buffer = buffer; S.fileName = name; S.fileInfo = info;
     S.selection = null; S.quietRegions = []; S.adjusted = null;
-    playOffset = 0; enhancedState = 'idle'; enhancedMakeup = 1;
+    playOffset = 0; S.mastered = null; if (abMode === 'mastered') abMode = 'normalized';
     if (S.ref) S.ref.bars = refBarsFor(S.ref);
 
     const L = S.loud, T = S.tone, lv = S.levels, sf = S.sf;
@@ -1698,7 +1967,7 @@ const DSP = (() => {
       corr: S.corr, width: sf ? sf.overallWidth : NaN, bassWidth: sf ? sf.bassWidth : NaN,
       lowWidth: sf ? sf.lowWidth : NaN, lowPeakWidth: sf ? sf.lowPeakWidth : NaN, lowPeakFreq: sf ? sf.lowPeakFreq : 0,
       clippedSamples: lv.clippedSamples, clipPct: lv.clipPct, dcOffset: lv.dcOffset,
-      transient: S.trans,
+      transient: S.trans, peaks: S.peaks,
     };
     S.findings = DSP.findings(S.metrics);
     if (S.fileInfo && S.fileInfo.lossy) S.findings.push({ cat: 'loudness', status: 'info', title: 'Lossy source file',
@@ -1710,7 +1979,6 @@ const DSP = (() => {
     showView('app');
     setTab(S.activeTab || 'overview');
     saveHistory();
-    calibrateEnhanced();
   }
 
   // ===================================================================
@@ -1777,16 +2045,17 @@ const DSP = (() => {
   // Headline numbers shared by the Overview tab and the PDF report
   function summaryItems() {
     const m = S.metrics;
-    const lufsSt = Math.abs(m.lufs + 14) <= 5 ? 'ok' : 'warn';
-    const tpSt = m.truePeak > -0.1 ? 'danger' : m.truePeak > -1 ? 'warn' : 'ok';
-    const plrSt = m.plr < 7 ? 'warn' : m.plr > 16 ? 'info' : 'ok';
+    const R = DSP.readiness(m);
+    const lufsSt = R.atTarget ? 'ok' : 'warn';
+    const tpSt = m.truePeak > -0.1 ? 'danger' : m.truePeak > -1 + 0.05 ? 'warn' : 'ok';
+    const plrSt = { squashed: 'warn', competitive: 'ok', open: 'info', 'too-dynamic': 'warn' }[R.density];
     const tSt = tiltStatus(m.tilt);
     const cSt = corrStatus(m.corr);
     const mono = !isFinite(m.width);
     return [
-      { label: 'Integrated loudness', short: 'Loudness', value: fmt(m.lufs), unit: 'LUFS', status: lufsSt, verdict: lufsSt === 'ok' ? 'Suits streaming' : (m.lufs > -14 ? 'Will be turned down' : 'Will be turned up') },
+      { label: 'Integrated loudness', short: 'Loudness', value: fmt(m.lufs), unit: 'LUFS', status: lufsSt, verdict: R.atTarget ? 'On target for −14' : m.lufs < -14 ? `${(-14 - m.lufs).toFixed(1)} dB below −14` : `${(m.lufs + 14).toFixed(1)} dB above −14` },
       { label: 'True peak', value: fmt(m.truePeak), unit: 'dBTP', status: tpSt, verdict: tpSt === 'ok' ? 'Safe headroom' : tpSt === 'warn' ? 'Above −1 dBTP' : 'No headroom' },
-      { label: 'Peak-to-loudness', value: fmt(m.plr), unit: 'dB', status: plrSt, verdict: plrSt === 'ok' ? 'Healthy dynamics' : plrSt === 'warn' ? 'Heavily limited' : 'Very dynamic' },
+      { label: 'Peak-to-loudness', value: fmt(m.plr), unit: 'dB', status: plrSt, verdict: { squashed: 'Heavily limited', competitive: 'Competitive density', open: 'Open (12–13 dB)', 'too-dynamic': `Over the ${DSP.PLR_BUDGET} dB budget` }[R.density] },
       { label: 'Loudness range', value: fmt(m.lra), unit: 'LU', status: m.lra > 12 ? 'info' : 'ok', verdict: m.lra > 12 ? 'Large section changes' : 'Consistent sections' },
       { label: 'Tonal tilt', value: fmtSigned(m.tilt), unit: 'dB/oct', status: tSt, verdict: m.tilt < -4.5 ? 'Very dark' : m.tilt < -3 ? 'Dark-leaning' : m.tilt > 1.5 ? 'Very bright' : m.tilt > 0.5 ? 'Bright-leaning' : 'Typical balance' },
       { label: 'Phase correlation', short: 'Correlation', value: fmtSigned(m.corr, 2), unit: '', status: cSt, verdict: cSt === 'ok' ? 'Mono-safe' : cSt === 'warn' ? 'Very wide' : 'Cancels in mono' },
@@ -1883,11 +2152,230 @@ const DSP = (() => {
       tile('Low vs mids at hits', fmtSigned(t.lowVsMidDb), 'dB', t.lowVsMidDb > 24 ? 'warn' : null);
   }
 
+  // ===================================================================
+  // −14 readiness, peaks & density
+  // ===================================================================
+  const SRC_META = {
+    hits: ['Drum hits', 'var(--accent)'],
+    kickbass: ['Kick + bass stacking', 'var(--warn)'],
+    low: ['Bass / sub notes', 'var(--danger)'],
+    other: ['Other parts', 'var(--info)'],
+  };
+  const SRC_ADVICE = {
+    hits: 'Most come from drum hits, so gentle clipping or fast limiting on the drum bus (or the soft clipper in Master to −14) takes them off cleanly.',
+    kickbass: 'Most are kick hits landing on sustained bass. Sidechaining the bass to the kick lowers them and tightens the low end at the same time.',
+    low: 'Most come from bass or sub notes between hits, so compress or saturate the bass, or tame the deepest sub.',
+    other: 'Most come from sustained parts rather than drums, so clip-gain or compress the loudest part (often a vocal or lead).',
+  };
+  const fmtPct = v => !isFinite(v) ? '—' : v < 0.01 ? '<0.01%' : v.toFixed(v < 0.1 ? 3 : v < 1 ? 2 : 1) + '%';
+
+  function budgetHtml(plr, refPlr) {
+    const lo = 4, hi = 18, pos = v => (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo) * 100;
+    const z = (a, b, cls) => `<div class="b-zone ${cls}" style="width:${pos(b) - pos(a)}%"></div>`;
+    return `<div class="budget${isFinite(refPlr) ? ' has-ref' : ''}">
+      <div class="b-label"><span>Peak-to-loudness ratio (PLR)</span><span>−14 LUFS at −1 dBTP leaves room for ${DSP.PLR_BUDGET} dB</span></div>
+      <div class="b-track">${z(lo, 8, 'z-sq')}${z(8, 12, 'z-comp')}${z(12, 13, 'z-open')}${z(13, hi, 'z-over')}
+        <div class="b-limit" style="left:${pos(13)}%"></div>
+        ${isFinite(refPlr) ? `<div class="b-mark ref" style="left:${pos(refPlr)}%"><span>Reference ${fmt(refPlr)}</span></div>` : ''}
+        <div class="b-mark" style="left:${pos(plr)}%"><span>${fmt(plr)} dB</span></div>
+      </div>
+      <div class="b-ticks">${[4, 6, 8, 10, 12, 14, 16, 18].map(v => `<span style="left:${pos(v)}%">${v}</span>`).join('')}</div>
+      <div class="b-zones-legend"><span><i class="z-sq"></i>Squashed (under 8)</span><span><i class="z-comp"></i>Competitive (8–12)</span><span><i class="z-open"></i>Open (12–13)</span><span><i class="z-over"></i>Can't reach −14 (over 13)</span></div>
+    </div>`;
+  }
+
+  function readinessSteps(R, m) {
+    const steps = [], p = S.peaks;
+    if (R.peakCut > 0.05) {
+      steps.push(`<b>Take about ${R.peakCut.toFixed(1)} dB off the peaks.</b> <span>${p ? SRC_ADVICE[p.dominant] + ` Only ${fmtPct(p.pctAbove)} of the audio sits in the top ${p.cutDb.toFixed(1)} dB, so it is a small change.` : ''}</span>`);
+      steps.push(`<b>Then raise the level into your limiter until it reads −14.0 LUFS at −1.0 dBTP.</b> <span>About ${fmtSigned(-14 - m.lufs)} dB from where it is now.</span>`);
+    } else if (!R.tpOk) {
+      steps.push(`<b>Set the limiter ceiling to −1.0 dBTP.</b> <span>True peak is ${fmt(m.truePeak)} dBTP now. Re-check the loudness afterwards.</span>`);
+    } else if (!R.atTarget) {
+      steps.push(m.lufs < -14
+        ? `<b>Raise the limiter input by ${(-14 - m.lufs).toFixed(1)} dB.</b> <span>Your peaks have room, so it will reach −14 LUFS without going over −1 dBTP.</span>`
+        : `<b>Master to −14 instead of ${fmt(m.lufs)} LUFS.</b> <span>Services turn it down ${(m.lufs + 14).toFixed(1)} dB anyway, so easing the limiter keeps more punch at no cost.</span>`);
+    } else {
+      steps.push(`<b>Level and peaks are on target.</b> <span>${fmt(m.lufs)} LUFS at ${fmt(m.truePeak)} dBTP.</span>`);
+    }
+    const after = Math.min(m.plr, DSP.PLR_BUDGET);
+    if (after > 12) steps.push(`<b>For a denser, more competitive sound, aim for a PLR of 10–12 dB.</b> <span>That is another ${(after - 12).toFixed(1)}–${(after - 10).toFixed(1)} dB of peak control. Listen as you go: it trades some transient snap for fullness.</span>`);
+    else if (m.plr < 8) steps.push(`<b>Ease the limiting.</b> <span>At a PLR of ${fmt(m.plr)} dB the master is denser than it needs to be at −14; backing off 1–2 dB brings back punch at no loudness cost.</span>`);
+    if (S.ref && S.refDiffs && S.refDiffs.length) steps.push(`<b>Close the gap to your reference.</b> <span>${esc(S.refDiffs[0].text)}</span>`);
+    else if (!S.ref) steps.push(`<b>Compare with a reference.</b> <span>Load a released track in your genre on the Compare tab to see where your mix differs at equal loudness.</span>`);
+    return steps;
+  }
+
+  function readinessSub(R, m) {
+    if (R.peakCut > 0.05 || (!R.atTarget && m.lufs < -14)) return R.shortfall > 0.05 ? `Right now it plays ${R.shortfall.toFixed(1)} dB quieter than tracks mastered to −14 on services that won't push peaks past −1 dBTP, such as Spotify.` : 'Peaks have room; only the level needs to come up.';
+    if (m.lufs > -13.5) return `Services will turn it down ${(m.lufs + 14).toFixed(1)} dB, so the extra loudness is lost and only the limiting remains.`;
+    return R.density === 'open' ? 'It fits −14, but it is more open than most competitive releases.' : R.density === 'squashed' ? 'Peaks are heavily limited for a −14 master.' : 'It will play at full level next to other releases.';
+  }
+
+  function renderReadiness() {
+    const m = S.metrics, R = DSP.readiness(m);
+    S.readiness = R;
+    $('readiness').innerHTML = `
+      <div class="ready-head ${R.status}"><div class="ri">${STATUS_ICON[R.status]}</div><div><div class="rh1">${esc(R.headline)}</div><div class="rh2">${esc(readinessSub(R, m))}</div></div></div>
+      ${budgetHtml(m.plr, S.ref ? S.ref.sum.plr : NaN)}
+      <ol class="steps-list">${readinessSteps(R, m).map(s => `<li><div>${s}</div></li>`).join('')}</ol>
+      <div class="controls" style="margin-top:16px"><button class="btn primary sm" id="goMasterBtn">Hear it mastered to −14 →</button></div>`;
+    $('goMasterBtn').addEventListener('click', () => { setTab('tools'); setTimeout(() => $('masterPanel').scrollIntoView({ behavior: 'smooth', block: 'start' }), 60); });
+  }
+
+  function srcBarHtml(p) {
+    const keys = Object.keys(SRC_META);
+    return `<div class="src-bar">${keys.map(k => p.shares[k] > 0 ? `<div style="width:${p.shares[k] * 100}%;background:${SRC_META[k][1]}" title="${SRC_META[k][0]} ${Math.round(p.shares[k] * 100)}%"></div>` : '').join('')}</div>
+      <div class="src-legend">${keys.map(k => `<span><i style="background:${SRC_META[k][1]}"></i>${SRC_META[k][0]}<b>${Math.round(p.shares[k] * 100)}%</b></span>`).join('')}</div>`;
+  }
+
+  function renderPeaksDensity() {
+    const m = S.metrics, R = S.readiness, p = S.peaks;
+    $('peaksDensity').innerHTML = `
+      ${budgetHtml(m.plr, S.ref ? S.ref.sum.plr : NaN)}
+      <div class="pd-grid" style="margin-top:22px">
+        <div><h3>Where the loudest peaks come from</h3>${p ? srcBarHtml(p) + `<p class="pd-text">${p.events.toLocaleString()} peaks within 3 dB of the maximum, about ${Math.round(p.eventsPerMin)} a minute. ${SRC_ADVICE[p.dominant]}</p>` : '<p class="pd-text">No peaks found.</p>'}</div>
+        <div><h3>What reaching −14 takes</h3><div class="tiles cols-2">
+          ${tile('Peak control needed', R.peakCut > 0.05 ? R.peakCut.toFixed(1) : '0.0', 'dB', R.peakCut > 0.05 ? 'warn' : 'ok', 'to fit under −1 dBTP')}
+          ${tile('Audio affected', p ? fmtPct(p.pctAbove) : '—', '', null, p ? `in the top ${p.cutDb.toFixed(1)} dB` : '')}
+          ${tile('Plays at now', fmt(R.playbackLufs), 'LUFS', R.shortfall > 0.2 ? 'warn' : 'ok', 'on peak-limited services')}
+          ${tile('Density', fmt(m.plr), 'dB PLR', R.density === 'competitive' ? 'ok' : R.density === 'open' ? 'info' : 'warn', { squashed: 'Squashed', competitive: 'Competitive', open: 'Open', 'too-dynamic': 'Over budget' }[R.density])}
+        </div></div>
+      </div>`;
+  }
+
+  function computeRefDiffs() {
+    if (!S.ref || !S.metrics) { S.refDiffs = null; return; }
+    const m = S.metrics, r = S.ref.sum;
+    S.refDiffs = DSP.referenceDiffs(
+      { plr: m.plr, tilt: m.tilt, lra: m.lra, width: m.width, lowWidth: m.lowWidth, octaveRel: S.tone.octaveRel },
+      { plr: r.plr, tilt: r.tilt, lra: r.lra, width: r.width, lowWidth: r.lowWidth, octaveRel: r.tone.octaveRel });
+  }
+
+  // ===================================================================
+  // Master to −14: EQ + optional glue → soft clipper → true-peak limiter,
+  // re-measured until it lands on −14.0 LUFS
+  // ===================================================================
+  let masterJob = 0;
+  const GLUE = {
+    gentle: { threshold: -20, ratio: 1.5, attack: 0.03, release: 0.2, knee: 8 },
+    medium: { threshold: -22, ratio: 2, attack: 0.02, release: 0.15, knee: 6 },
+  };
+  const masterSettings = () => ({ eq: $('mEq').value === 'on', glue: $('mGlue').value, clip: $('mClip').value, ceiling: +$('mCeil').value });
+  const eqSignature = () => eqBands.map(b => [Math.round(b.node.frequency.value), b.node.gain.value.toFixed(1), b.node.Q.value.toFixed(2)].join('/')).join(';');
+  const eqIsActive = () => eqBands.some(b => Math.abs(b.node.gain.value) > 0.05);
+
+  async function masterPreStage(st) {
+    const b = S.buffer, useEq = st.eq && eqIsActive(), ch = [];
+    if (!useEq && st.glue === 'off') { for (let c = 0; c < b.numberOfChannels; c++) ch.push(b.getChannelData(c)); return ch; }
+    const off = new OfflineAudioContext(b.numberOfChannels, b.length, b.sampleRate);
+    const src = off.createBufferSource(); src.buffer = b;
+    const norm = off.createGain(); norm.gain.value = normLinear();
+    src.connect(norm); let n = norm;
+    if (useEq) eqBands.forEach(x => {
+      const f = off.createBiquadFilter(); f.type = x.type; f.frequency.value = x.node.frequency.value; f.Q.value = x.node.Q.value; f.gain.value = x.node.gain.value;
+      n.connect(f); n = f;
+    });
+    if (st.glue !== 'off') {
+      const g = GLUE[st.glue], c = off.createDynamicsCompressor();
+      c.threshold.value = g.threshold; c.ratio.value = g.ratio; c.attack.value = g.attack; c.release.value = g.release; c.knee.value = g.knee;
+      n.connect(c); n = c;
+    }
+    n.connect(off.destination); src.start(0);
+    const out = await off.startRendering();
+    for (let c = 0; c < out.numberOfChannels; c++) ch.push(out.getChannelData(c));
+    return ch;
+  }
+
+  async function renderMaster() {
+    if (!S.buffer) return;
+    const job = ++masterJob, st = masterSettings(), fs = S.buffer.sampleRate, T = DSP.TARGET_LUFS;
+    const btn = $('masterBtn'), status = t => { $('masterStatus').textContent = t; };
+    btn.disabled = true;
+    if (isPlaying && abMode === 'mastered') pause();
+    try {
+      status('Applying EQ and compression…'); await tick();
+      const pre = await masterPreStage(st);
+      status('Measuring…'); await tick();
+      const preL = DSP.loudness(DSP.asBuffer(pre, fs)).integrated;
+      if (!isFinite(preL)) throw new Error('not enough signal to measure');
+      let G = T - preL, res = null, L = NaN;
+      for (let it = 0; it < 6; it++) {
+        status(`Limiting to −14 LUFS (pass ${it + 1})…`); await tick();
+        if (job !== masterJob) return;
+        res = DSP.processMaster(pre, fs, G, st.ceiling, st.clip);
+        const ob = DSP.asBuffer(res.chans, fs);
+        const tp = DSP.truePeak(ob).truePeakDb;
+        if (tp > st.ceiling + 0.01) {
+          const k = Math.pow(10, (st.ceiling - 0.01 - tp) / 20);
+          res.chans.forEach(x => { for (let i = 0; i < x.length; i++) x[i] *= k; });
+        }
+        L = DSP.loudness(ob).integrated;
+        if (Math.abs(L - T) <= 0.05) break;
+        G += T - L;
+      }
+      if (job !== masterJob) return;
+      status('Checking the result…'); await tick();
+      const ob = DSP.asBuffer(res.chans, fs), loud = DSP.loudness(ob), tpr = DSP.truePeak(ob).truePeakDb;
+      const ab = new AudioBuffer({ length: S.buffer.length, numberOfChannels: S.buffer.numberOfChannels, sampleRate: fs });
+      res.chans.forEach((x, c) => ab.copyToChannel(x, c));
+      S.mastered = {
+        buffer: ab, settings: st, eqSig: eqSignature(), eqUsed: st.eq && eqIsActive(),
+        stats: { lufs: loud.integrated, truePeak: tpr, plr: tpr - loud.integrated, lra: loud.lra, maxShortTerm: loud.maxShortTerm },
+        clip: res.clip, lim: res.lim,
+      };
+      status('');
+      renderMasterResult(); updateMasteredButton();
+      toast('Master ready. Choose “Mastered” in the player to hear it.');
+    } catch (e) { status('Render failed: ' + e.message); }
+    btn.disabled = false;
+  }
+  $('masterBtn').addEventListener('click', renderMaster);
+
+  function masterProcessText(M) {
+    const parts = [];
+    if (M.settings.clip !== 'off') parts.push(M.clip.touchedPct > 0.0005 ? `The soft clipper shaved up to ${M.clip.maxRedDb.toFixed(1)} dB from ${fmtPct(M.clip.touchedPct)} of samples.` : 'The soft clipper barely touched the audio.');
+    parts.push(M.lim.limitedPct > 0.01 ? `The limiter was working ${fmtPct(M.lim.limitedPct)} of the time, averaging ${M.lim.avgGrDb.toFixed(1)} dB of reduction (peak ${M.lim.maxGrDb.toFixed(1)} dB).` : 'The limiter was barely needed.');
+    const chain = [M.eqUsed ? 'your EQ curve' : null, M.settings.glue !== 'off' ? `${M.settings.glue} glue compression` : null, M.settings.clip !== 'off' ? `${M.settings.clip === 'medium' ? 'firm' : 'gentle'} soft clipping` : null, `a true-peak limiter at ${fmt(M.settings.ceiling)} dBTP`].filter(Boolean);
+    return `Chain: ${chain.join(', ')}. ` + parts.join(' ');
+  }
+
+  function renderMasterResult() {
+    const M = S.mastered, el = $('masterResult');
+    if (!M) {
+      el.innerHTML = '<p class="note">Renders your track through the options above, a soft clipper and a true-peak limiter, adjusting the drive until it lands on exactly −14.0 LUFS. Your file is never changed. Then compare it in the player against your mix turned to −14.</p>';
+      return;
+    }
+    const m = S.metrics, s = M.stats;
+    const rows = [['Integrated loudness', m.lufs, s.lufs, 'LUFS'], ['True peak', m.truePeak, s.truePeak, 'dBTP'], ['Peak-to-loudness', m.plr, s.plr, 'dB'],
+      ['Loudness range', m.lra, s.lra, 'LU'], ['Max short-term', m.maxShortTerm, s.maxShortTerm, 'LUFS']];
+    const heavy = M.lim.maxGrDb > 4 || M.lim.avgGrDb > 2.5 || M.clip.maxRedDb > 3;
+    const stale = M.eqUsed !== (M.settings.eq && eqIsActive()) || (M.eqUsed && M.eqSig !== eqSignature());
+    el.innerHTML = `<div class="table-wrap"><table class="data" style="margin-top:16px"><thead><tr><th>Measurement</th><th>Your file</th><th>Mastered</th><th>Change</th></tr></thead><tbody>
+      ${rows.map(([n, a, b, u]) => `<tr><td>${n}</td><td>${fmt(a)} ${u}</td><td>${fmt(b)} ${u}</td><td class="delta neutral">${fmtSigned(b - a)}</td></tr>`).join('')}</tbody></table></div>
+      <p class="master-stats">${esc(masterProcessText(M))}</p>
+      ${heavy ? '<p class="stale">The clipper or limiter is working hard. The cleaner fix is to tame the peaks in your mix first; see Peaks &amp; density on the Loudness tab.</p>' : ''}
+      ${stale ? '<p class="stale">The EQ has changed since this render. Render again to hear the new curve.</p>' : ''}
+      <div class="controls" style="margin-top:12px">
+        <button class="btn sm" id="masterListenBtn">▶ Mastered</button>
+        <button class="btn sm" id="masterCompareBtn">▶ Your mix at −14</button>
+        <button class="btn sm" id="masterDlBtn">Download 24-bit WAV</button>
+      </div>`;
+    $('masterListenBtn').onclick = () => { applyMode('mastered'); if (!isPlaying) play(); };
+    $('masterCompareBtn').onclick = () => { applyMode('normalized'); if (!isPlaying) play(); };
+    $('masterDlBtn').onclick = () => download(audioBufferToWav(M.buffer, 24), `${baseName()}_master_-14LUFS.wav`);
+  }
+  function updateMasteredButton() {
+    const b = document.querySelector('#abSeg [data-mode="mastered"]');
+    b.classList.toggle('dim', !S.mastered);
+    b.title = S.mastered ? 'Your render from Master to −14' : 'Render a master in Tools → Master to −14 first';
+  }
+
   function renderAll() {
     renderFileInfo(); renderSummary(); renderFindings(); renderLoudnessTiles(); renderPlatforms();
     renderToneTiles(); renderStereoTiles(); renderDynamics(); renderRegionInfo(); renderQuietList();
     $('regionTable').innerHTML = ''; $('zoomPanel').classList.add('hidden');
-    renderRefContent(); renderHistory(); updateAbInfo(); updateTransport(0);
+    computeRefDiffs(); renderRefContent(); renderHistory(); renderReadiness(); renderPeaksDensity(); renderMasterResult(); updateMasteredButton(); updateTransport(0);
     invalidateCaches();
   }
 
@@ -2408,18 +2896,21 @@ const DSP = (() => {
     applyMode(abMode, true);
   }
   function normLinear() { const l = S.metrics && S.metrics.lufs; return isFinite(l) ? Math.pow(10, (-14 - l) / 20) : 1; }
-  function modeGain() { return abMode === 'original' ? 1 : normLinear() * (abMode === 'enhanced' ? enhancedMakeup : 1); }
+  function modeGain() { return abMode === 'original' ? 1 : normLinear(); }
   function applyMode(mode, instant) {
+    if (mode === 'mastered' && !S.mastered) {
+      toast('Render a master first: Tools → Master to −14.');
+      setTab('tools'); setTimeout(() => $('masterPanel').scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+      return;
+    }
+    const swapSource = isPlaying && ((abMode === 'mastered') !== (mode === 'mastered'));
     abMode = mode;
     document.querySelectorAll('#abSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
     if (!chain) return;
     const t = audioCtx.currentTime, tc = instant ? 0.001 : 0.04;
-    const set = (p, v) => { p.cancelScheduledValues(t); p.setTargetAtTime(v, t, tc); };
-    set(chain.normGain.gain, mode === 'original' ? 1 : normLinear());
-    set(chain.comp.threshold, mode === 'enhanced' ? -18 : 0);
-    set(chain.comp.ratio, mode === 'enhanced' ? 3 : 1);
-    set(chain.makeup.gain, mode === 'enhanced' ? enhancedMakeup : 1);
-    updateAbInfo();
+    chain.normGain.gain.cancelScheduledValues(t);
+    chain.normGain.gain.setTargetAtTime(mode === 'original' ? 1 : normLinear(), t, tc);
+    if (swapSource) seekTo(currentPos(), true);
   }
   document.querySelectorAll('#abSeg button').forEach(b => b.addEventListener('click', () => applyMode(b.dataset.mode)));
   function setMono(on) {
@@ -2430,17 +2921,6 @@ const DSP = (() => {
   }
   $('monoBtn').addEventListener('click', () => setMono(!monoOn));
 
-  function updateAbInfo() {
-    const el = $('abInfo'); if (!el || !S.metrics) return;
-    const adj = -14 - S.metrics.lufs;
-    const eqActive = eqBands.some(b => Math.abs(b.node.gain.value) > 0.05);
-    const parts = [`Now playing: <b>${abMode === 'original' ? 'Original' : abMode === 'normalized' ? '−14 LUFS' : 'Enhanced'}</b>.`];
-    parts.push(`−14 LUFS mode applies ${fmtSigned(adj)} dB.`);
-    if (enhancedState === 'calculating') parts.push('Calibrating Enhanced to land on −14 LUFS…');
-    else if (enhancedState === 'done') parts.push(`Enhanced adds 3:1 compression${eqActive ? ' and your EQ curve' : ' (the EQ is flat, so try “Load suggested curve”)'}, with ${fmtSigned(20 * Math.log10(enhancedMakeup))} dB of make-up gain to land on −14 LUFS.`);
-    el.innerHTML = parts.join(' ');
-  }
-
   function currentPos() { return isPlaying ? Math.min(S.buffer.duration, audioCtx.currentTime - playStartTime) : playOffset; }
 
   async function play() {
@@ -2449,8 +2929,10 @@ const DSP = (() => {
     if (audioCtx.state === 'suspended') await audioCtx.resume();
     if (playOffset >= S.buffer.duration - 0.05) playOffset = 0;
     sourceNode = audioCtx.createBufferSource();
-    sourceNode.buffer = S.buffer;
-    sourceNode.connect(chain.normGain);
+    const useMaster = abMode === 'mastered' && S.mastered;
+    sourceNode.buffer = useMaster ? S.mastered.buffer : S.buffer;
+    // the master already has its own EQ and level, so it skips the playback EQ
+    sourceNode.connect(useMaster ? chain.makeup : chain.normGain);
     sourceNode.start(0, playOffset);
     playStartTime = audioCtx.currentTime - playOffset;
     isPlaying = true; liveTop = -Infinity;
@@ -2540,42 +3022,6 @@ const DSP = (() => {
     else if (/^[1-7]$/.test(e.key)) setTab(TABS[+e.key - 1]);
   });
 
-  // ===================================================================
-  // Enhanced calibration + render
-  // ===================================================================
-  function buildOfflineChain(off, withMakeup) {
-    const src = off.createBufferSource(); src.buffer = S.buffer;
-    const norm = off.createGain(); norm.gain.value = normLinear();
-    let n = norm; src.connect(norm);
-    eqBands.forEach(b => {
-      const f = off.createBiquadFilter(); f.type = b.type; f.frequency.value = b.node.frequency.value; f.Q.value = b.node.Q.value; f.gain.value = b.node.gain.value;
-      n.connect(f); n = f;
-    });
-    const comp = off.createDynamicsCompressor();
-    comp.threshold.value = -18; comp.ratio.value = 3; comp.knee.value = 6; comp.attack.value = 0.003; comp.release.value = 0.15;
-    n.connect(comp);
-    const mk = off.createGain(); mk.gain.value = withMakeup ? enhancedMakeup : 1;
-    comp.connect(mk); mk.connect(off.destination);
-    src.start(0);
-    return off;
-  }
-  let calibToken = 0;
-  async function calibrateEnhanced() {
-    if (!S.buffer || !isFinite(S.metrics.lufs)) return;
-    const token = ++calibToken;
-    enhancedState = 'calculating'; updateAbInfo();
-    try {
-      const off = new OfflineAudioContext(S.buffer.numberOfChannels, S.buffer.length, S.buffer.sampleRate);
-      const rendered = await buildOfflineChain(off, false).startRendering();
-      if (token !== calibToken) return;
-      const l = DSP.loudness(rendered).integrated;
-      enhancedMakeup = isFinite(l) ? Math.pow(10, (-14 - l) / 20) : 1;
-      enhancedState = 'done';
-      if (abMode === 'enhanced') applyMode('enhanced');
-    } catch (e) { enhancedState = 'idle'; }
-    updateAbInfo();
-  }
-
   function audioBufferToWav(buffer, bits = 24) {
     const nCh = buffer.numberOfChannels, sr = buffer.sampleRate, n = buffer.length, bps = bits / 8, block = nCh * bps;
     const ab = new ArrayBuffer(44 + n * block), v = new DataView(ab);
@@ -2600,21 +3046,6 @@ const DSP = (() => {
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   }
   const baseName = () => (S.fileName || 'master').replace(/\.[^.]+$/, '');
-  $('downloadEnhancedBtn').addEventListener('click', async () => {
-    if (!S.buffer) return;
-    const btn = $('downloadEnhancedBtn'), st = $('downloadStatus');
-    btn.disabled = true; st.textContent = 'Rendering…';
-    try {
-      if (enhancedState !== 'done') await calibrateEnhanced();
-      const off = new OfflineAudioContext(S.buffer.numberOfChannels, S.buffer.length, S.buffer.sampleRate);
-      const out = await buildOfflineChain(off, true).startRendering();
-      const tp = DSP.truePeak(out).truePeakDb;
-      download(audioBufferToWav(out, 24), `${baseName()}_enhanced.wav`);
-      st.textContent = `Saved (24-bit). True peak ${fmt(tp)} dBTP${tp > -1 ? ' – add a limiter before using this for delivery' : ''}.`;
-    } catch (e) { st.textContent = 'Render failed: ' + e.message; }
-    btn.disabled = false;
-  });
-
   // ===================================================================
   // EQ editor
   // ===================================================================
@@ -2695,7 +3126,7 @@ const DSP = (() => {
     eqReadout(best); drawEq(); clearTimeout(eqWheelT); eqWheelT = setTimeout(eqChanged, 400);
   }, { passive: false });
   let eqWheelT = 0;
-  function eqChanged() { updateAbInfo(); if (enhancedState !== 'idle') calibrateEnhanced(); }
+  function eqChanged() { if (S.mastered) renderMasterResult(); }
   function resetEq() {
     eqBands.forEach((b, i) => { b.node.frequency.value = EQ_DEFS[i].freq; b.node.Q.value = EQ_DEFS[i].q; b.node.gain.value = 0; });
   }
@@ -2721,8 +3152,8 @@ const DSP = (() => {
     resetEq();
     const s = suggestedCurve();
     eqBands.forEach((b, i) => { b.node.gain.value = s.g[i]; });
-    drawEq(); $('eqReadout').textContent = 'Suggested: ' + s.why.join('; ') + '. Switch to Enhanced in the player to hear it at matched loudness.';
-    eqChanged(); if (enhancedState === 'idle') calibrateEnhanced();
+    drawEq(); $('eqReadout').textContent = 'Suggested: ' + s.why.join('; ') + '. You are hearing it now; Master to −14 below can include it.';
+    eqChanged();
   });
 
   // ===================================================================
@@ -2946,13 +3377,13 @@ const DSP = (() => {
       const sum = DSP.summary(buf);
       S.ref = { buffer: buf, name: f.name, sum };
       S.ref.bars = refBarsFor(S.ref);
-      renderRefContent(); renderToneTiles();
+      computeRefDiffs(); renderRefContent(); renderToneTiles(); renderReadiness(); renderPeaksDensity();
       toast('Reference loaded. Its tonal curve is now on the Tone tab.');
     } catch (e) {
       $('refEmpty').textContent = 'That file couldn’t be decoded. Try WAV, AIFF, FLAC or MP3.';
     }
   });
-  $('refClearBtn').addEventListener('click', () => { if (previewWhich === 'ref' || previewWhich === 'mine') stopPreview(); S.ref = null; renderRefContent(); renderToneTiles(); });
+  $('refClearBtn').addEventListener('click', () => { if (previewWhich === 'ref' || previewWhich === 'mine') stopPreview(); S.ref = null; computeRefDiffs(); renderRefContent(); renderToneTiles(); renderReadiness(); renderPeaksDensity(); });
   function comparePos() { return (previewWhich === 'mine' || previewWhich === 'ref') ? previewPos() : currentPos(); }
   $('refPlayMine').addEventListener('click', () => { if (!S.ref) return; startPreview('mine', S.buffer, normLinear(), comparePos()); });
   $('refPlayRef').addEventListener('click', () => {
@@ -2969,6 +3400,9 @@ const DSP = (() => {
     $('refClearBtn').classList.toggle('hidden', !has);
     if (!has || !S.metrics) return;
     $('refName').textContent = S.ref.name;
+    $('refDiffs').innerHTML = S.refDiffs && S.refDiffs.length
+      ? S.refDiffs.slice(0, 6).map((d, i) => `<div class="diff"><div class="dn">${i + 1}</div><div><b>${esc(d.label)}</b><span>${esc(d.text)}</span></div></div>`).join('')
+      : '<div class="empty">Your track is close to the reference on every measure.</div>';
     const m = S.metrics, r = S.ref.sum;
     const rows = [
       ['Integrated loudness', m.lufs, r.lufs, 'LUFS', 1], ['True peak', m.truePeak, r.truePeak, 'dBTP', 1],
@@ -3181,23 +3615,43 @@ const DSP = (() => {
     // ---- Pages ----
     const pages = [];
 
-    // 1. Summary
-    const shownIssues = issues.slice(0, 5);
+    // 1. Summary: −14 readiness first
+    const R = DSP.readiness(m), refPlr = S.ref ? S.ref.sum.plr : NaN;
     pages.push({ section: 'Summary', html: `
       <div class="title">
-        <div class="kicker">Mix &amp; master report</div>
+        <div class="kicker">Mix &amp; master report · −14 LUFS</div>
         <h1>${esc(baseName())}</h1>
         <div class="meta">${esc(metaLine)} · Analysed ${esc(dateStr)}</div>
       </div>
-      <div class="verdict ${headStatus}">
-        <div class="vi">${STATUS_ICON[headStatus]}</div>
-        <div><div class="vh">${esc(headline)}</div><div class="vs">${esc(headSub)}</div></div>
+      <div class="verdict ${R.status}">
+        <div class="vi">${STATUS_ICON[R.status]}</div>
+        <div><div class="vh">${esc(R.headline)}</div><div class="vs">${esc(readinessSub(R, m))}</div></div>
       </div>
+      ${budgetHtml(m.plr, refPlr)}
+      <h3>Steps to a competitive −14 master</h3>
+      <ol class="rsteps">${readinessSteps(R, m).map(s => `<li>${s}</li>`).join('')}</ol>
+      <h3>Scorecard</h3>
       <div class="tiles">${summaryItems().map(x => `<div class="tile"><div class="tl"><span class="dot ${x.status}"></span>${esc(x.label)}</div><div class="tv">${x.value}<small>${x.unit}</small></div><div class="td">${esc(x.verdict)}</div></div>`).join('')}</div>
-      <div class="gauges">${fig(img.lufsGauge, 'Integrated loudness · target tick at −14 LUFS', 'g')}${fig(img.tpGauge, 'True peak · target tick at −1 dBTP', 'g')}</div>
-      <h3>What to work on</h3>
-      ${shownIssues.length ? shownIssues.map(findingHtmlR).join('') : '<p class="muted">Nothing stood out. See the findings page for every check that passed.</p>'}
-      ${issues.length > shownIssues.length ? `<p class="muted">+ ${issues.length - shownIssues.length} more on the Findings page.</p>` : ''}
+    ` });
+
+    // 2. Priorities: issues + what is making the peaks
+    const p = S.peaks;
+    pages.push({ section: 'Priorities', html: `
+      <h2>What to work on</h2>
+      <p class="lead">${issues.length ? `${nDanger ? `${nDanger} to fix and ` : ''}${nWarn} to review, most important first.` : 'Nothing stood out. Every check is within a typical range.'}</p>
+      ${issues.map(findingHtmlR).join('')}
+      <h2 style="margin-top:9mm">Peaks &amp; density</h2>
+      <p class="lead">How loud a track can sound at −14 depends on how far its peaks stand above its body, and what is making those peaks.</p>
+      <div class="cols">
+        <div><h3 style="margin-top:0">Where the loudest peaks come from</h3>${p ? srcBarHtml(p) + `<p class="small" style="margin-top:3mm">${p.events.toLocaleString()} peaks within 3 dB of the maximum (about ${Math.round(p.eventsPerMin)} a minute). ${esc(SRC_ADVICE[p.dominant])}</p>` : '<p class="muted">No peaks found.</p>'}</div>
+        <div><h3 style="margin-top:0">What reaching −14 takes</h3><table>
+          ${row('Peak control needed', `${R.peakCut > 0.05 ? R.peakCut.toFixed(1) : '0.0'} dB`, R.peakCut > 0.05 ? 'warn' : 'ok')}
+          ${row(`Audio in the top ${p ? p.cutDb.toFixed(1) : '—'} dB`, p ? fmtPct(p.pctAbove) : '—', '')}
+          ${row('Plays at now (peak-limited services)', `${fmt(R.playbackLufs)} LUFS`, R.shortfall > 0.2 ? 'warn' : 'ok')}
+          ${row('Density (PLR)', `${fmt(m.plr)} dB`, R.density === 'competitive' ? 'ok' : R.density === 'open' ? 'info' : 'warn')}
+          ${isFinite(refPlr) ? row('Reference density (PLR)', `${fmt(refPlr)} dB`, '') : ''}
+        </table></div>
+      </div>
     ` });
 
     // 2. Loudness & dynamics
@@ -3293,9 +3747,28 @@ const DSP = (() => {
       ];
       pages.push({ section: 'Reference', html: `
         <h2>Reference comparison</h2>
-        <p class="lead">Compared with <b>${esc(S.ref.name)}</b>. Its tonal curve is overlaid on the Tone page.</p>
+        <p class="lead">Compared with <b>${esc(S.ref.name)}</b>, both judged at equal loudness. Its tonal curve is overlaid on the Tone page.</p>
+        <h3>Where you differ most</h3>
+        ${S.refDiffs && S.refDiffs.length ? `<div class="rdiffs">${S.refDiffs.slice(0, 6).map((d, i) => `<div class="rdiff"><div class="dn">${i + 1}</div><div><b>${esc(d.label)}</b><div class="fb">${esc(d.text)}</div></div></div>`).join('')}</div>` : '<p class="muted">Your track is close to the reference on every measure.</p>'}
+        <h3>All measurements</h3>
         <table class="ref"><tr><th>Measurement</th><th class="n">This track</th><th class="n">Reference</th><th class="n">Difference</th></tr>
         ${rr.map(([n, a, c, u, d]) => `<tr><td>${n}</td><td class="n">${fmt(a, d)} ${u}</td><td class="n">${fmt(c, d)} ${u}</td><td class="n">${isFinite(a) && isFinite(c) ? fmtSigned(a - c, d) : '—'}</td></tr>`).join('')}</table>
+      ` });
+    }
+
+    // 5b. Master render (optional)
+    if (S.mastered) {
+      const M = S.mastered, s = M.stats;
+      const mr = [['Integrated loudness', m.lufs, s.lufs, 'LUFS'], ['True peak', m.truePeak, s.truePeak, 'dBTP'], ['Peak-to-loudness ratio', m.plr, s.plr, 'dB'],
+        ['Loudness range', m.lra, s.lra, 'LU'], ['Max short-term', m.maxShortTerm, s.maxShortTerm, 'LUFS']];
+      pages.push({ section: 'Master to −14', html: `
+        <h2>Master to −14 preview</h2>
+        <p class="lead">A preview master rendered by MasterScope, calibrated to −14.0 LUFS under a ${fmt(M.settings.ceiling)} dBTP ceiling. Compare it at equal loudness with the mix to judge density and tone, not volume.</p>
+        <table class="ref"><tr><th>Measurement</th><th class="n">Your file</th><th class="n">Preview master</th><th class="n">Change</th></tr>
+        ${mr.map(([n, x, y, u]) => `<tr><td>${n}</td><td class="n">${fmt(x)} ${u}</td><td class="n">${fmt(y)} ${u}</td><td class="n">${fmtSigned(y - x)}</td></tr>`).join('')}</table>
+        <h3>Processing</h3>
+        <p class="small">${esc(masterProcessText(M))}</p>
+        ${(M.lim.maxGrDb > 4 || M.lim.avgGrDb > 2.5 || M.clip.maxRedDb > 3) ? '<p class="small"><b>The clipper or limiter worked hard.</b> Taming the peaks in the mix itself will sound cleaner than this preview.</p>' : ''}
       ` });
     }
 
@@ -3431,6 +3904,35 @@ table.ref td, table.ref th { padding: 2.2mm 2mm; }
 .allf + h2 ~ .f .cat { display: none; }
 .allf + h2 ~ .f { padding: 2mm 0; }
 dl.gloss { margin: 0; }
+:root { --accent: #3d5afe; --warn: #c47a0a; --danger: #d43c4a; --ok: #12a26a; --info: #8b93a7; --ref: #c47a0a; --text: #161a22; }
+.budget { margin: 6mm 0 2mm; }
+.budget.has-ref .b-label { margin-bottom: 11mm; }
+.b-label { display: flex; justify-content: space-between; font-size: 7.6pt; color: #5b6272; margin-bottom: 7mm; }
+.b-track { position: relative; height: 3mm; display: flex; }
+.b-zone { height: 100%; } .b-zone:first-child { border-radius: 1.5mm 0 0 1.5mm; } .b-zone:last-child { border-radius: 0 1.5mm 1.5mm 0; }
+.z-sq { background: #f3dcae; } .z-comp { background: #bfe8d3; } .z-open { background: #dfe2e8; } .z-over { background: #f4c7cc; }
+.b-mark { position: absolute; top: -1.6mm; width: 0.8mm; height: 6.2mm; border-radius: 0.4mm; background: #161a22; transform: translateX(-0.4mm); }
+.b-mark.ref { background: #c47a0a; }
+.b-mark span { position: absolute; top: -4.6mm; left: 50%; transform: translateX(-50%); font: 600 7.4pt 'JetBrains Mono', ui-monospace, monospace; white-space: nowrap; }
+.b-mark.ref span { top: -8.4mm; color: #c47a0a; }
+.b-limit { position: absolute; top: -1mm; bottom: -1mm; border-left: 0.5mm dashed #d43c4a; }
+.b-ticks { position: relative; height: 4mm; margin-top: 1.2mm; font: 6.8pt 'JetBrains Mono', ui-monospace, monospace; color: #8a91a1; }
+.b-ticks span { position: absolute; transform: translateX(-50%); }
+.b-zones-legend { display: flex; flex-wrap: wrap; gap: 1mm 5mm; font-size: 7.2pt; color: #5b6272; margin-top: 1mm; }
+.b-zones-legend i { display: inline-block; width: 2.4mm; height: 2.4mm; border-radius: 0.6mm; margin-right: 1.4mm; vertical-align: -0.3mm; }
+ol.rsteps { margin: 0; padding: 0; list-style: none; counter-reset: s; }
+ol.rsteps li { counter-increment: s; position: relative; padding: 1.6mm 0 1.6mm 8mm; font-size: 8.8pt; border-bottom: 0.3mm solid #eef0f4; }
+ol.rsteps li:last-child { border-bottom: 0; }
+ol.rsteps li::before { content: counter(s); position: absolute; left: 0; top: 1.6mm; width: 5mm; height: 5mm; border-radius: 50%; background: #e8ecff; color: #3d5afe; font-weight: 700; font-size: 7.5pt; display: flex; align-items: center; justify-content: center; }
+ol.rsteps li b { font-weight: 600; } ol.rsteps li span { color: #3e4554; }
+.src-bar { display: flex; height: 3.2mm; border-radius: 1.6mm; overflow: hidden; background: #eceef2; margin: 1mm 0 2.5mm; }
+.src-bar div { height: 100%; }
+.src-legend { display: flex; flex-wrap: wrap; gap: 1.2mm 4mm; font-size: 7.6pt; color: #5b6272; }
+.src-legend i { display: inline-block; width: 2.4mm; height: 2.4mm; border-radius: 0.6mm; margin-right: 1.2mm; vertical-align: -0.3mm; }
+.src-legend b { color: #161a22; font-family: 'JetBrains Mono', ui-monospace, monospace; margin-left: 1mm; }
+.rdiff { display: grid; grid-template-columns: 7mm 1fr; gap: 2mm; padding: 2.4mm 0; border-bottom: 0.3mm solid #eef0f4; break-inside: avoid; }
+.rdiff .dn { width: 5mm; height: 5mm; border-radius: 50%; background: #fdf1dc; color: #a86707; font-weight: 700; font-size: 7.5pt; display: flex; align-items: center; justify-content: center; }
+.rdiff b { font-size: 9pt; }
 dl.gloss dt { font-weight: 650; font-size: 9pt; margin-top: 3mm; }
 dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
 `;
