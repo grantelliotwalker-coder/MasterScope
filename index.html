@@ -147,6 +147,9 @@
   main { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding: 24px; }
   .tab-pane { display: none; }
   .tab-pane.active, html.exporting .tab-pane { display: block; }
+  /* while capturing charts for the report: lay every tab out off-screen at a fixed width */
+  html.exporting #app { display: block !important; position: absolute; left: -20000px; top: 0; width: 1100px; }
+  html.exporting #zoomPanel { display: none !important; }
   .pane-intro { color: var(--text-dim); margin: 0 0 16px; max-width: 760px; }
   .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
   .grid-2 > .panel { margin-top: 0; }
@@ -494,7 +497,7 @@
       <div class="stack">
         <section class="panel" data-help="summary">
           <div class="panel-head"><h2>Summary</h2></div>
-          <div class="tiles big" id="summaryTiles"></div>
+          <div class="tiles big cols-4" id="summaryTiles"></div>
         </section>
         <section class="panel" data-help="actions">
           <div class="panel-head"><h2>What to work on</h2></div>
@@ -1011,7 +1014,9 @@ const DSP = (() => {
   function tonal(mono, fs) {
     const fftSize = 8192, psd = averagePsd(mono, fftSize, 160), binHz = fs / fftSize, nyq = fs / 2;
     const octaveDb = OCTAVE_CENTRES.map(c => {
-      const f0 = c / Math.SQRT2, f1 = Math.min(nyq * 0.999, c * Math.SQRT2);
+      // top band stops at 18 kHz: almost no music has content above it, and including
+      // the empty region would make every track look darker than it sounds
+      const f0 = c / Math.SQRT2, f1 = Math.min(nyq * 0.999, c * Math.SQRT2, 18000);
       return f1 > f0 ? perOctaveDb(psd, binHz, f0, f1) : -Infinity;
     });
     const refIdx = [2, 3, 4, 5, 6, 7]; // 125 Hz .. 4 kHz
@@ -1092,8 +1097,21 @@ const DSP = (() => {
         if (freqBins[k] < 200) { bs += widthPct[k] * total; bw += total; }
       }
     }
+    // The low bass range on its own (60–200 Hz), plus its widest third-octave.
+    // A mono sub can hide stereo content here if everything below 200 Hz is averaged.
+    const widthBetween = (f0, f1) => {
+      let s = 0, t = 0;
+      for (let k = 1; k < half; k++) if (freqBins[k] >= f0 && freqBins[k] < f1) { const e = mid[k] + side[k]; s += widthPct[k] * e; t += e; }
+      return t > 0 ? s / t : 0;
+    };
+    let lowPeakWidth = 0, lowPeakFreq = 0;
+    [63, 80, 100, 125, 160].forEach(c => {
+      const w = widthBetween(c / Math.pow(2, 1 / 6), c * Math.pow(2, 1 / 6));
+      if (w > lowPeakWidth) { lowPeakWidth = w; lowPeakFreq = c; }
+    });
     return { freqBins, widthPct, energyDb, maxEnergyDb, fs,
-             overallWidth: wt > 0 ? ws / wt : 0, bassWidth: bw > 0 ? bs / bw : 0 };
+             overallWidth: wt > 0 ? ws / wt : 0, bassWidth: bw > 0 ? bs / bw : 0,
+             lowWidth: widthBetween(60, 200), lowPeakWidth, lowPeakFreq };
   }
 
   function vectorscopePoints(buffer, maxPoints) {
@@ -1242,6 +1260,7 @@ const DSP = (() => {
       plr: tp.truePeakDb - loud.integrated,
       tilt: tone.tilt, lowMidPresenceGap: tone.lowMidPresenceGap, subBassGap: tone.subBassGap,
       corr: correlation(buffer), width: sf ? sf.overallWidth : 0, bassWidth: sf ? sf.bassWidth : 0,
+      lowWidth: sf ? sf.lowWidth : 0, lowPeakWidth: sf ? sf.lowPeakWidth : 0, lowPeakFreq: sf ? sf.lowPeakFreq : 0,
       tone,
     };
   }
@@ -1335,12 +1354,16 @@ const DSP = (() => {
       if (m.corr < -0.1) add('stereo', 'danger', 'Mono compatibility risk',
         `Phase correlation is ${f(m.corr, 2)}. Parts of the mix cancel when summed to mono (phones, Bluetooth speakers, clubs). Check wideners and polarity.`);
       else if (m.corr < 0.25) add('stereo', 'warn', 'Very wide stereo image',
-        `Phase correlation is ${f(m.corr, 2)}. Listen with Mono Check to make sure nothing important disappears.`);
+        `Phase correlation is ${f(m.corr, 2)}. Listen with the Mono button to make sure nothing important disappears.`);
       else add('stereo', 'ok', 'Mono-safe',
         `Phase correlation is ${f(m.corr, 2)}, with no sign of cancellation in mono.`);
     }
-    if (isFinite(m.bassWidth) && m.bassWidth > 15) add('stereo', 'warn', 'Stereo content in the bass',
-      `${m.bassWidth.toFixed(0)}% of the energy below 200 Hz is in the sides. Wide bass loses weight in mono and makes vinyl cutting harder. Consider narrowing below ~120 Hz.`);
+    if (isFinite(m.lowWidth) && (m.lowWidth > 12 || m.lowPeakWidth > 20)) add('stereo', 'warn', 'Stereo content in the bass',
+      `Between 60 and 200 Hz, ${m.lowWidth.toFixed(0)}% of the energy is in the sides, widest around ${m.lowPeakFreq} Hz (${m.lowPeakWidth.toFixed(0)}%). Wide bass loses weight on mono systems and can sound loose. Make the low end mono below about 150 Hz, or narrow whichever bass, keys or reverb sits there.`);
+    else if (isFinite(m.bassWidth) && m.bassWidth > 15) add('stereo', 'warn', 'Stereo content in the bass',
+      `${m.bassWidth.toFixed(0)}% of the energy below 200 Hz is in the sides. Wide bass loses weight in mono. Consider making it mono below about 150 Hz.`);
+    else if (isFinite(m.lowWidth)) add('stereo', 'ok', 'Low end is centred',
+      `Only ${m.lowWidth.toFixed(0)}% of the 60–200 Hz energy is in the sides.`);
     if (isFinite(m.width) && m.width < 5) add('stereo', 'info', 'Nearly mono',
       `Only ${m.width.toFixed(0)}% of the energy is in the sides. If you want a bigger image, add width to pads, doubles or reverbs above ~300 Hz.`);
 
@@ -1376,6 +1399,7 @@ const DSP = (() => {
   let enhancedMakeup = 1, enhancedState = 'idle';
   let previewSource = null, previewWhich = null, previewStart = 0, previewOffset = 0;
   let liveTop = -Infinity;
+  let exportDpr = 0; // set to 2 while rendering charts for the PDF report
 
   const $ = id => document.getElementById(id);
   const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
@@ -1672,6 +1696,7 @@ const DSP = (() => {
       plr: S.tp.truePeakDb - L.integrated,
       tilt: T.tilt, lowMidPresenceGap: T.lowMidPresenceGap, subBassGap: T.subBassGap, lowMidBump: T.lowMidBump, airGap: T.airGap,
       corr: S.corr, width: sf ? sf.overallWidth : NaN, bassWidth: sf ? sf.bassWidth : NaN,
+      lowWidth: sf ? sf.lowWidth : NaN, lowPeakWidth: sf ? sf.lowPeakWidth : NaN, lowPeakFreq: sf ? sf.lowPeakFreq : 0,
       clippedSamples: lv.clippedSamples, clipPct: lv.clipPct, dcOffset: lv.dcOffset,
       transient: S.trans,
     };
@@ -1742,22 +1767,35 @@ const DSP = (() => {
   function tiltStatus(t) { return t < -4.5 || t > 1.5 ? 'danger' : (t < -3 || t > 0.5 ? 'warn' : 'ok'); }
   function corrStatus(c) { return c < -0.1 ? 'danger' : c < 0.25 ? 'warn' : 'ok'; }
 
-  function renderSummary() {
+  function lowWidthStatus(m) { return (m.lowWidth > 12 || m.lowPeakWidth > 20) ? 'warn' : 'ok'; }
+  function widthBelow60() {
+    const sf = S.sf; if (!sf) return NaN;
+    let s = 0, t = 0;
+    for (let k = 1; k < sf.freqBins.length && sf.freqBins[k] < 60; k++) { const e = Math.pow(10, sf.energyDb[k] / 10); s += sf.widthPct[k] * e; t += e; }
+    return t > 0 ? s / t : 0;
+  }
+  // Headline numbers shared by the Overview tab and the PDF report
+  function summaryItems() {
     const m = S.metrics;
     const lufsSt = Math.abs(m.lufs + 14) <= 5 ? 'ok' : 'warn';
     const tpSt = m.truePeak > -0.1 ? 'danger' : m.truePeak > -1 ? 'warn' : 'ok';
     const plrSt = m.plr < 7 ? 'warn' : m.plr > 16 ? 'info' : 'ok';
     const tSt = tiltStatus(m.tilt);
     const cSt = corrStatus(m.corr);
-    const wSt = m.bassWidth > 15 ? 'warn' : 'info';
-    $('summaryTiles').innerHTML =
-      tile('Loudness', fmt(m.lufs), 'LUFS', lufsSt, lufsSt === 'ok' ? 'Suits streaming' : (m.lufs > -14 ? 'Will be turned down' : 'Will be turned up')) +
-      tile('True peak', fmt(m.truePeak), 'dBTP', tpSt, tpSt === 'ok' ? 'Safe headroom' : tpSt === 'warn' ? 'Tight headroom' : 'No headroom') +
-      tile('Peak-to-loudness', fmt(m.plr), 'dB', plrSt, plrSt === 'ok' ? 'Healthy dynamics' : plrSt === 'warn' ? 'Heavily limited' : 'Very dynamic') +
-      tile('Loudness range', fmt(m.lra), 'LU', m.lra > 12 ? 'info' : 'ok', m.lra > 12 ? 'Large section changes' : 'Consistent sections') +
-      tile('Tonal tilt', fmtSigned(m.tilt), 'dB/oct', tSt, m.tilt < -4.5 ? 'Very dark' : m.tilt < -3 ? 'Dark-leaning' : m.tilt > 1.5 ? 'Very bright' : m.tilt > 0.5 ? 'Bright-leaning' : 'Typical balance') +
-      tile('Phase correlation', fmtSigned(m.corr, 2), '', cSt, cSt === 'ok' ? 'Mono-safe' : cSt === 'warn' ? 'Very wide' : 'Cancels in mono') +
-      (isFinite(m.width) ? tile('Stereo width', m.width.toFixed(0), '%', wSt, `Below 200 Hz: ${m.bassWidth.toFixed(0)}%`) : tile('Stereo width', '—', '', 'info', 'Mono file'));
+    const mono = !isFinite(m.width);
+    return [
+      { label: 'Integrated loudness', short: 'Loudness', value: fmt(m.lufs), unit: 'LUFS', status: lufsSt, verdict: lufsSt === 'ok' ? 'Suits streaming' : (m.lufs > -14 ? 'Will be turned down' : 'Will be turned up') },
+      { label: 'True peak', value: fmt(m.truePeak), unit: 'dBTP', status: tpSt, verdict: tpSt === 'ok' ? 'Safe headroom' : tpSt === 'warn' ? 'Above −1 dBTP' : 'No headroom' },
+      { label: 'Peak-to-loudness', value: fmt(m.plr), unit: 'dB', status: plrSt, verdict: plrSt === 'ok' ? 'Healthy dynamics' : plrSt === 'warn' ? 'Heavily limited' : 'Very dynamic' },
+      { label: 'Loudness range', value: fmt(m.lra), unit: 'LU', status: m.lra > 12 ? 'info' : 'ok', verdict: m.lra > 12 ? 'Large section changes' : 'Consistent sections' },
+      { label: 'Tonal tilt', value: fmtSigned(m.tilt), unit: 'dB/oct', status: tSt, verdict: m.tilt < -4.5 ? 'Very dark' : m.tilt < -3 ? 'Dark-leaning' : m.tilt > 1.5 ? 'Very bright' : m.tilt > 0.5 ? 'Bright-leaning' : 'Typical balance' },
+      { label: 'Phase correlation', short: 'Correlation', value: fmtSigned(m.corr, 2), unit: '', status: cSt, verdict: cSt === 'ok' ? 'Mono-safe' : cSt === 'warn' ? 'Very wide' : 'Cancels in mono' },
+      { label: 'Stereo width', value: mono ? '—' : m.width.toFixed(0), unit: mono ? '' : '%', status: 'info', verdict: mono ? 'Mono file' : 'Energy in the sides' },
+      { label: 'Bass width 60–200 Hz', short: 'Bass width', value: mono ? '—' : m.lowWidth.toFixed(0), unit: mono ? '' : '%', status: mono ? 'info' : lowWidthStatus(m), verdict: mono ? 'Mono file' : lowWidthStatus(m) === 'ok' ? 'Centred low end' : `Wide around ${m.lowPeakFreq} Hz` },
+    ];
+  }
+  function renderSummary() {
+    $('summaryTiles').innerHTML = summaryItems().map(t => tile(t.label, t.value, t.unit, t.status, t.verdict)).join('');
   }
 
   function renderFileInfo() {
@@ -1821,7 +1859,7 @@ const DSP = (() => {
   function renderStereoTiles() {
     const m = S.metrics;
     $('stereoTiles').innerHTML = isFinite(m.width)
-      ? tile('Overall width', m.width.toFixed(0), '%') + tile('Width below 200 Hz', m.bassWidth.toFixed(0), '%', m.bassWidth > 15 ? 'warn' : 'ok')
+      ? tile('Overall width', m.width.toFixed(0), '%') + tile('Width 60–200 Hz', m.lowWidth.toFixed(0), '%', lowWidthStatus(m), `Widest around ${m.lowPeakFreq} Hz (${m.lowPeakWidth.toFixed(0)}%)`) + tile('Width below 60 Hz', widthBelow60().toFixed(0), '%')
       : '<div class="empty">Mono file: there is no stereo image to measure.</div>';
   }
 
@@ -1889,7 +1927,7 @@ const DSP = (() => {
     if (typeof canvas === 'string') canvas = $(canvas);
     const w = canvas.clientWidth, h = canvas.clientHeight;
     if (!w || !h) return null;
-    const dpr = window.devicePixelRatio || 1, W = Math.round(w * dpr), H = Math.round(h * dpr);
+    const dpr = exportDpr || window.devicePixelRatio || 1, W = Math.round(w * dpr), H = Math.round(h * dpr);
     if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
     const ctx = canvas.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -2317,7 +2355,7 @@ const DSP = (() => {
       const alpha = Math.max(0.12, Math.min(1, 1 + enDb / 50));
       ctx.globalAlpha = alpha;
       const f = 20 * Math.pow(fMax / 20, (i + 0.5) / nb);
-      ctx.fillStyle = (f < 200 && width[i] > 15) ? warn : accent;
+      ctx.fillStyle = (f >= 50 && f < 200 && width[i] > 12) ? warn : accent;
       const yy = y(width[i]);
       ctx.fillRect(P.l + i * bw + 0.5, yy, Math.max(1, bw - 1), P.t + H - yy);
     }
@@ -2937,7 +2975,7 @@ const DSP = (() => {
       ['Peak-to-loudness (PLR)', m.plr, r.plr, 'dB', 1], ['Loudness range', m.lra, r.lra, 'LU', 1], ['Crest factor', m.crest, r.crest, 'dB', 1],
       ['Tonal tilt', m.tilt, r.tilt, 'dB/oct', 1], ['Presence vs low mids', m.lowMidPresenceGap, r.lowMidPresenceGap, 'dB', 1],
       ['Sub vs bass', m.subBassGap, r.subBassGap, 'dB', 1], ['Phase correlation', m.corr, r.corr, '', 2],
-      ['Stereo width', m.width, r.width, '%', 0], ['Width below 200 Hz', m.bassWidth, r.bassWidth, '%', 0],
+      ['Stereo width', m.width, r.width, '%', 0], ['Bass width 60–200 Hz', m.lowWidth, r.lowWidth, '%', 0],
     ];
     $('refTable').innerHTML = `<table class="data"><thead><tr><th>Metric</th><th>Yours</th><th>Reference</th><th>Difference</th></tr></thead><tbody>` +
       rows.map(([n, a, b, u, d]) => `<tr><td>${n}</td><td>${fmt(a, d)} ${u}</td><td>${fmt(b, d)} ${u}</td><td class="delta neutral">${isFinite(a) && isFinite(b) ? fmtSigned(a - b, d) : '—'}</td></tr>`).join('') +
@@ -2957,7 +2995,7 @@ const DSP = (() => {
       v: 2, id: 'v' + Date.now() + Math.random().toString(36).slice(2, 6), name: S.fileName, date: Date.now(),
       lufs: m.lufs, truePeak: m.truePeak, plr: m.plr, lra: m.lra, crest: m.crest,
       tilt: m.tilt, lowMidPresenceGap: m.lowMidPresenceGap, subBassGap: m.subBassGap, lowMidBump: m.lowMidBump,
-      corr: m.corr, width: m.width, bassWidth: m.bassWidth,
+      corr: m.corr, width: m.width, bassWidth: m.bassWidth, lowWidth: m.lowWidth,
       hitVsRms: t ? t.hitVsRmsDb : null, kickRise: t ? t.kickRiseDb : null,
     };
     const list = loadHist(); list.push(entry); while (list.length > HMAX) list.shift(); saveHist(list);
@@ -2973,7 +3011,7 @@ const DSP = (() => {
     ['Sub vs bass', 'subBassGap', 'dB', 1, () => 'neutral'],
     ['Phase correlation', 'corr', '', 2, (a, b) => { const ok = v => v >= 0.25; return ok(b) && !ok(a) ? 'good' : !ok(b) && ok(a) ? 'bad' : 'neutral'; }],
     ['Stereo width', 'width', '%', 0, () => 'neutral'],
-    ['Width below 200 Hz', 'bassWidth', '%', 0, (a, b) => b < a - 2 && a > 10 ? 'good' : b > a + 2 && b > 10 ? 'bad' : 'neutral'],
+    ['Bass width 60–200 Hz', 'lowWidth', '%', 0, (a, b) => b < a - 2 && a > 10 ? 'good' : b > a + 2 && b > 10 ? 'bad' : 'neutral'],
     ['Hit level above mix', 'hitVsRms', 'dB', 1, () => 'neutral'],
     ['Kick-band rise', 'kickRise', 'dB', 1, (a, b) => b > a + 1 && a < 6 ? 'good' : b < a - 1 && b < 6 ? 'bad' : 'neutral'],
   ];
@@ -3050,7 +3088,7 @@ const DSP = (() => {
     line('Presence vs low mids', `${fmtSigned(m.lowMidPresenceGap)} dB`); line('Sub vs bass', `${fmtSigned(m.subBassGap)} dB`); line('Air vs mids', `${fmtSigned(m.airGap)} dB`);
     line('Octave bands (Hz: dB)', DSP.OCTAVE_CENTRES.map((c, k) => `${c}: ${fmtSigned(S.tone.octaveRel[k])}`).join(', '));
     L.push('', 'STEREO', '-'.repeat(50));
-    line('Phase correlation', fmtSigned(m.corr, 2)); line('Stereo width', isFinite(m.width) ? m.width.toFixed(0) + '%' : '—'); line('Width below 200 Hz', isFinite(m.bassWidth) ? m.bassWidth.toFixed(0) + '%' : '—');
+    line('Phase correlation', fmtSigned(m.corr, 2)); line('Stereo width', isFinite(m.width) ? m.width.toFixed(0) + '%' : '—'); line('Bass width 60–200 Hz', isFinite(m.lowWidth) ? `${m.lowWidth.toFixed(0)}% (widest ${m.lowPeakWidth.toFixed(0)}% at ${m.lowPeakFreq} Hz)` : '—');
     if (t) {
       L.push('', 'HITS & TRANSIENTS', '-'.repeat(50));
       line('Hits detected', t.hitCount); line('Hit level above mix', `${fmtSigned(t.hitVsRmsDb)} dB`);
@@ -3074,50 +3112,347 @@ const DSP = (() => {
   }
   $('exportTxtBtn').addEventListener('click', () => { if (S.buffer) download(new Blob([reportText()], { type: 'text/plain' }), `${baseName()}_report.txt`); });
 
-  function canvasImage(id) {
+  // ===================================================================
+  // PDF report: fixed A4 pages, light-theme charts at 2x resolution
+  // ===================================================================
+  function captureCanvas(id, bg) {
     const cv = $(id); if (!cv || !cv.width || !cv.height) return null;
     const out = document.createElement('canvas'); out.width = cv.width; out.height = cv.height;
-    const o = out.getContext('2d'); o.fillStyle = css('--surface-2'); o.fillRect(0, 0, out.width, out.height); o.drawImage(cv, 0, 0);
+    const o = out.getContext('2d');
+    o.fillStyle = bg || css('--surface-2'); o.fillRect(0, 0, out.width, out.height); o.drawImage(cv, 0, 0);
     return out.toDataURL('image/png');
   }
+
+  function captureChartsForReport() {
+    const root = document.documentElement;
+    const prevTheme = root.getAttribute('data-theme'), scrollY = window.scrollY;
+    root.setAttribute('data-theme', 'light');
+    root.classList.add('exporting');
+    exportDpr = 2;
+    invalidateCaches();
+    redrawAllForExport();
+    const ids = ['lufsGauge', 'tpGauge', 'timelineCanvas', 'tonalCanvas', 'spectrumCanvas', 'spectrogramCanvas', 'vectorscopeCanvas', 'stereoFieldCanvas', 'wfOverview'];
+    const img = {};
+    ids.forEach(id => { img[id] = captureCanvas(id, id.endsWith('Gauge') ? '#ffffff' : null); });
+    exportDpr = 0;
+    root.classList.remove('exporting');
+    root.setAttribute('data-theme', prevTheme);
+    invalidateCaches();
+    redrawActive();
+    window.scrollTo(0, scrollY);
+    return img;
+  }
+
+  const GLOSSARY = [
+    ['Integrated loudness (LUFS)', 'The perceived loudness of the whole track, measured to ITU-R BS.1770-4 with gating so silence doesn’t pull it down. Streaming services normalise to roughly −14 to −16 LUFS.'],
+    ['True peak (dBTP)', 'The highest level including peaks that fall between samples, found by 4× oversampling. Lossy encoding can raise peaks, so −1 dBTP is the usual ceiling for streaming delivery.'],
+    ['Peak-to-loudness ratio (PLR)', 'True peak minus integrated loudness. It shows how far the peaks stand above the body of the track: lower values mean heavier limiting.'],
+    ['Loudness range (LRA, LU)', 'How much loudness varies between sections, from the 10th to the 95th percentile of 3-second loudness (EBU Tech 3342).'],
+    ['Short-term / momentary loudness', 'Loudness over a sliding 3-second or 0.4-second window. Their maximums show how loud the loudest passages and moments get.'],
+    ['Crest factor', 'Sample peak minus RMS level across both channels. A rough companion to PLR.'],
+    ['Tonal balance and tilt', 'Average level per octave compared with pink noise, which reads as flat. Tilt is the overall slope from 63 Hz to 8 kHz in dB per octave. Most releases sit around 0 to −3, but genre matters, so a reference is the best guide.'],
+    ['Phase correlation', 'How alike the left and right channels are: +1 is mono, 0 is unrelated, and below 0 means content cancels when summed to mono.'],
+    ['Stereo width', 'The share of energy in the side (left-minus-right) signal. 0% is mono. Bass is usually kept close to 0%.'],
+    ['Kick rise and settle time', 'Rise is how far each detected hit jumps above what was already playing in the 50–90 Hz range. Settle time is how long that band takes to return to its pre-hit level. A small rise means something sustains under the kick.'],
+  ];
+
+  const STATUS_LABEL = { ok: 'Good', warn: 'Review', danger: 'Fix', info: 'Note' };
+
+  function buildReportHtml(img) {
+    const m = S.metrics, t = S.trans, b = S.buffer, info = S.fileInfo || {};
+    const sorted = S.findings.slice().sort((x, y) => SEV[x.status] - SEV[y.status]);
+    const issues = sorted.filter(f => f.status === 'warn' || f.status === 'danger');
+    const nDanger = issues.filter(f => f.status === 'danger').length, nWarn = issues.length - nDanger;
+    const now = new Date();
+    const dateStr = now.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+    const bits = info.bitDepth ? `${info.bitDepth}-bit${info.float ? ' float' : ''}` : '';
+    const metaLine = [info.format, `${(b.sampleRate / 1000).toFixed(1).replace('.0', '')} kHz`, bits, b.numberOfChannels === 2 ? 'Stereo' : b.numberOfChannels === 1 ? 'Mono' : b.numberOfChannels + ' ch', fmtTime(b.duration)].filter(Boolean).join(' · ');
+
+    let headline, headStatus, headSub;
+    if (nDanger) { headline = `${nDanger} issue${nDanger > 1 ? 's' : ''} to fix${nWarn ? `, ${nWarn} to review` : ''}`; headStatus = 'danger'; }
+    else if (nWarn) { headline = `${nWarn} thing${nWarn > 1 ? 's' : ''} to review`; headStatus = 'warn'; }
+    else { headline = 'No issues found'; headStatus = 'ok'; }
+    headSub = issues.length ? `Most important: ${issues[0].title.toLowerCase()}.` : 'Every measurement is within a typical range. Confirm by listening on several systems and against a reference.';
+
+    const fig = (src, cap, cls) => src ? `<figure class="${cls || ''}"><img src="${src}" alt=""><figcaption>${cap}</figcaption></figure>` : '';
+    const row = (k, v, s) => `<tr><td>${k}</td><td class="n">${v}</td>${s !== undefined ? `<td class="st">${s ? `<span class="pill ${s}">${STATUS_LABEL[s]}</span>` : ''}</td>` : ''}</tr>`;
+    const findingHtmlR = f => `<div class="f ${f.status}"><div class="fi">${STATUS_ICON[f.status]}</div><div><div class="ft">${esc(f.title)} <span class="cat">${CAT_TAB[f.cat]}</span></div><div class="fb">${esc(f.body)}</div></div></div>`;
+
+    // ---- Pages ----
+    const pages = [];
+
+    // 1. Summary
+    const shownIssues = issues.slice(0, 5);
+    pages.push({ section: 'Summary', html: `
+      <div class="title">
+        <div class="kicker">Mix &amp; master report</div>
+        <h1>${esc(baseName())}</h1>
+        <div class="meta">${esc(metaLine)} · Analysed ${esc(dateStr)}</div>
+      </div>
+      <div class="verdict ${headStatus}">
+        <div class="vi">${STATUS_ICON[headStatus]}</div>
+        <div><div class="vh">${esc(headline)}</div><div class="vs">${esc(headSub)}</div></div>
+      </div>
+      <div class="tiles">${summaryItems().map(x => `<div class="tile"><div class="tl"><span class="dot ${x.status}"></span>${esc(x.label)}</div><div class="tv">${x.value}<small>${x.unit}</small></div><div class="td">${esc(x.verdict)}</div></div>`).join('')}</div>
+      <div class="gauges">${fig(img.lufsGauge, 'Integrated loudness · target tick at −14 LUFS', 'g')}${fig(img.tpGauge, 'True peak · target tick at −1 dBTP', 'g')}</div>
+      <h3>What to work on</h3>
+      ${shownIssues.length ? shownIssues.map(findingHtmlR).join('') : '<p class="muted">Nothing stood out. See the findings page for every check that passed.</p>'}
+      ${issues.length > shownIssues.length ? `<p class="muted">+ ${issues.length - shownIssues.length} more on the Findings page.</p>` : ''}
+    ` });
+
+    // 2. Loudness & dynamics
+    const plat = PLATFORMS.map(([n, target, note]) => {
+      let a = target - m.lufs, capped = false;
+      if (n === 'YouTube' && a > 0) a = 0;
+      if (a > 0 && m.truePeak + a > -1) { a = Math.max(0, -1 - m.truePeak); capped = true; }
+      const pk = m.truePeak + a;
+      return `<tr><td>${n}</td><td class="n">${fmt(target, 0)}</td><td class="n">${fmtSigned(a)} dB</td><td class="n ${pk > -1 ? 'bad' : ''}">${fmt(pk)}</td><td class="muted">${capped ? 'Raised only as far as peaks allow' : esc(note)}</td></tr>`;
+    }).join('');
+    const tpS = m.truePeak > -0.1 ? 'danger' : m.truePeak > -1 ? 'warn' : 'ok';
+    const kickSep = t && t.kickRiseDb !== null && t.kickRiseDb >= 6;
+    pages.push({ section: 'Loudness & dynamics', html: `
+      <h2>Loudness &amp; dynamics</h2>
+      ${fig(img.timelineCanvas, `Loudness over time, 0:00–${fmtTime(b.duration)}. Green: momentary (0.4 s). Blue: short-term (3 s). Dashed: integrated (${fmt(m.lufs)} LUFS).`)}
+      <div class="cols">
+        <div><h3>Measurements</h3><table>
+          ${row('Integrated loudness', `${fmt(m.lufs)} LUFS`, Math.abs(m.lufs + 14) <= 5 ? 'ok' : 'warn')}
+          ${row('Max short-term (3 s)', `${fmt(m.maxShortTerm)} LUFS`, '')}
+          ${row('Max momentary (0.4 s)', `${fmt(m.maxMomentary)} LUFS`, '')}
+          ${row('True peak', `${fmt(m.truePeak)} dBTP`, tpS)}
+          ${row('Sample peak', `${fmt(m.samplePeak)} dBFS`, '')}
+          ${row('Loudness range', `${fmt(m.lra)} LU`, m.lra > 12 ? 'info' : 'ok')}
+          ${row('RMS level', `${fmt(m.rms)} dBFS`, '')}
+          ${row('Peak-to-loudness ratio', `${fmt(m.plr)} dB`, m.plr < 7 ? 'warn' : m.plr > 16 ? 'info' : 'ok')}
+          ${row('Crest factor', `${fmt(m.crest)} dB`, '')}
+          ${row('Loudest 3 s vs average', `${fmtSigned(m.maxShortTerm - m.lufs)} LU`, '')}
+        </table></div>
+        <div><h3>Hits &amp; transients</h3>${t ? `<table>
+          ${row('Hits detected', t.hitCount, '')}
+          ${row('Hit level vs mix', `${fmtSigned(t.hitVsRmsDb)} dB`, t.hitVsRmsDb > 13 || t.hitVsRmsDb < 3 ? 'warn' : 'ok')}
+          ${row('Kick rise 50–90 Hz', `${fmt(t.kickRiseDb)} dB`, t.kickRiseDb === null ? '' : kickSep ? 'ok' : 'warn')}
+          ${row('Kick settle time', kickSep && t.kickDecay !== null ? `${t.kickDecay} ms` : 'not separable', '')}
+          ${row('Bass settle 60–250 Hz', t.bassDecay !== null ? `${t.bassDecay} ms` : 'does not settle', '')}
+          ${row('Attack settle 1–3 kHz', t.clickDecay !== null ? `${t.clickDecay} ms` : '—', '')}
+          ${row('Low end vs mids at hits', `${fmtSigned(t.lowVsMidDb)} dB`, t.lowVsMidDb > 24 ? 'warn' : '')}
+        </table>` : '<p class="muted">No clear repeated hits were found.</p>'}</div>
+      </div>
+      <h3>Streaming normalisation</h3>
+      <table class="plat">
+        <tr><th>Service</th><th class="n">Target</th><th class="n">Level change</th><th class="n">Peak after</th><th>Notes</th></tr>${plat}
+      </table>
+      <p class="note">Assumes each service\u2019s default setting, and that quiet tracks are only raised as far as a −1 dBTP peak allows. Listeners can change or switch off normalisation.</p>
+    ` });
+
+    // 3. Tone
+    const refOct = S.ref ? S.ref.sum.tone.octaveRel : null;
+    const octLabels = ['31', '63', '125', '250', '500', '1k', '2k', '4k', '8k', '16k'];
+    pages.push({ section: 'Tone', html: `
+      <h2>Tonal balance</h2>
+      ${fig(img.tonalCanvas, `Average level per octave relative to pink noise (0 dB), normalised to the 125 Hz–4 kHz average.${S.ref ? ` Amber markers: reference (${esc(S.ref.name)}).` : ''}`)}
+      <table class="oct"><tr><th>Octave (Hz)</th>${octLabels.map(l => `<th class="n">${l}</th>`).join('')}</tr>
+        <tr><td>This track (dB)</td>${S.tone.octaveRel.map(v => `<td class="n">${fmtSigned(v)}</td>`).join('')}</tr>
+        ${refOct ? `<tr><td>Reference (dB)</td>${refOct.map(v => `<td class="n">${fmtSigned(v)}</td>`).join('')}</tr>` : ''}
+      </table>
+      <div class="kpis">
+        <div><span>Tilt 63 Hz–8 kHz</span><b>${fmtSigned(m.tilt)} dB/oct</b></div>
+        <div><span>Low-mid bump</span><b>${fmtSigned(m.lowMidBump)} dB</b></div>
+        <div><span>Presence vs low mids</span><b>${fmtSigned(m.lowMidPresenceGap)} dB</b></div>
+        <div><span>Sub vs bass</span><b>${fmtSigned(m.subBassGap)} dB</b></div>
+        <div><span>Air vs mids</span><b>${fmtSigned(m.airGap)} dB</b></div>
+      </div>
+      ${fig(img.spectrumCanvas, `Whole-track average spectrum, drawn so pink noise is flat. 20 Hz–20 kHz, log scale.${S.ref ? ' Dashed amber: reference, aligned on 100 Hz–5 kHz.' : ''}`)}
+      ${fig(img.spectrogramCanvas, `Spectrogram, 0:00–${fmtTime(b.duration)}, 20 Hz–20 kHz (log). Colour shows level over a 72 dB range, from dark blue (quiet) to white (loud).`)}
+    ` });
+
+    // 4. Stereo
+    pages.push({ section: 'Stereo', html: `
+      <h2>Stereo image</h2>
+      <div class="cols scope">
+        <div>${fig(img.vectorscopeCanvas, 'Vectorscope, ~30,000 points across the whole track. Vertical = mono, diagonals = left or right only, horizontal = out of phase.', 'sq')}</div>
+        <div><h3 style="margin-top:0">Measurements</h3><table>
+          ${row('Phase correlation', fmtSigned(m.corr, 2), corrStatus(m.corr))}
+          ${row('Stereo width', isFinite(m.width) ? m.width.toFixed(0) + '%' : '—', '')}
+          ${row('Bass width 60–200 Hz', isFinite(m.lowWidth) ? m.lowWidth.toFixed(0) + '%' : '—', isFinite(m.lowWidth) ? lowWidthStatus(m) : '')}
+          ${row('Widest bass band', isFinite(m.lowWidth) ? `${m.lowPeakWidth.toFixed(0)}% at ${m.lowPeakFreq} Hz` : '—', '')}
+          ${row('Width below 60 Hz', isFinite(m.width) ? widthBelow60().toFixed(0) + '%' : '—', '')}
+        </table>
+        <div class="findings-mini">${sorted.filter(f => f.cat === 'stereo').map(findingHtmlR).join('')}</div></div>
+      </div>
+      ${fig(img.stereoFieldCanvas, 'Stereo width by frequency: share of energy in the side signal (0% = mono). Faint bars carry little energy. Amber: wide content between 50 and 200 Hz.')}
+      ${fig(img.wfOverview, `Waveform (both channels mixed), 0:00–${fmtTime(b.duration)}.`)}
+    ` });
+
+    // 5. Reference (optional)
+    if (S.ref) {
+      const r = S.ref.sum;
+      const rr = [
+        ['Integrated loudness', m.lufs, r.lufs, 'LUFS', 1], ['True peak', m.truePeak, r.truePeak, 'dBTP', 1], ['Peak-to-loudness', m.plr, r.plr, 'dB', 1],
+        ['Loudness range', m.lra, r.lra, 'LU', 1], ['Crest factor', m.crest, r.crest, 'dB', 1], ['Tonal tilt', m.tilt, r.tilt, 'dB/oct', 1],
+        ['Presence vs low mids', m.lowMidPresenceGap, r.lowMidPresenceGap, 'dB', 1], ['Sub vs bass', m.subBassGap, r.subBassGap, 'dB', 1],
+        ['Phase correlation', m.corr, r.corr, '', 2], ['Stereo width', m.width, r.width, '%', 0], ['Bass width 60–200 Hz', m.lowWidth, r.lowWidth, '%', 0],
+      ];
+      pages.push({ section: 'Reference', html: `
+        <h2>Reference comparison</h2>
+        <p class="lead">Compared with <b>${esc(S.ref.name)}</b>. Its tonal curve is overlaid on the Tone page.</p>
+        <table class="ref"><tr><th>Measurement</th><th class="n">This track</th><th class="n">Reference</th><th class="n">Difference</th></tr>
+        ${rr.map(([n, a, c, u, d]) => `<tr><td>${n}</td><td class="n">${fmt(a, d)} ${u}</td><td class="n">${fmt(c, d)} ${u}</td><td class="n">${isFinite(a) && isFinite(c) ? fmtSigned(a - c, d) : '—'}</td></tr>`).join('')}</table>
+      ` });
+    }
+
+    // 6. All findings
+    const cats = ['loudness', 'dynamics', 'tone', 'stereo'];
+    pages.push({ section: 'Findings', html: `
+      <div class="allf"></div><h2>All findings</h2>
+      <p class="lead">Every check MasterScope ran, grouped by area. Thresholds are rules of thumb that vary by genre; use them to decide what to listen for.</p>
+      ${cats.map(c => { const l = sorted.filter(f => f.cat === c); return l.length ? `<h3>${CAT_TAB[c]}</h3>${l.map(findingHtmlR).join('')}` : ''; }).join('')}
+    ` });
+
+    // 7. Glossary & method
+    const eqActive = eqBands.some(x => Math.abs(x.node.gain.value) > 0.05);
+    pages.push({ section: 'Method', html: `
+      <h2>How to read this report</h2>
+      <dl class="gloss">${GLOSSARY.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+      <h3>Method</h3>
+      <p class="small">Loudness and true peak follow ITU-R BS.1770-4; loudness range follows EBU Tech 3342. Tonal and stereo measurements average the whole track. All analysis ran locally in the browser on the file as supplied (${esc(metaLine)}${info.size ? `, ${(info.size / 1048576).toFixed(1)} MB` : ''}).${info.lossy ? ' This was a lossy file, so true peak and high-frequency readings may differ from the lossless master.' : ''}</p>
+      ${eqActive ? `<p class="small">Playback EQ at the time of export (does not affect the measurements): ${eqBands.map((x, i) => `band ${i + 1} ${fmtHz(Math.round(x.node.frequency.value))}Hz ${fmtSigned(x.node.gain.value)} dB`).join(', ')}.</p>` : ''}
+    ` });
+
+    const N = pages.length;
+    const logo = '<svg width="18" height="18" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#3d5afe"/><path d="M10 34 L18 34 L22 22 L28 44 L33 14 L39 50 L44 26 L48 34 L54 34" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const pageHtml = pages.map((p, i) => `
+      <section class="page${i === 0 ? ' first' : ''}">
+        <header class="rh"><div class="brand">${logo}<span>Master<b>Scope</b></span></div><div class="rs">${esc(p.section)}</div></header>
+        <div class="body">${p.html}</div>
+        <footer class="rf"><span>${esc(S.fileName)} · ${esc(dateStr)}</span><span class="pn">Page ${i + 1} of ${N}</span></footer>
+      </section>`).join('');
+
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(baseName())} – MasterScope report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>${REPORT_CSS}</style></head><body>
+<div class="toolbar"><div><b>${esc(baseName())} – MasterScope report</b><span>In the print dialog, choose <b>Save as PDF</b> as the destination. For best results turn off “Headers and footers”.</span></div><button onclick="window.print()">Save as PDF</button></div>
+${pageHtml}
+<script>${PAGINATE_JS}<\/script>
+</body></html>`;
+  }
+
+  // Runs inside the report window: moves blocks that would run into the footer onto a continuation page
+  const PAGINATE_JS = `
+window.paginate = function () {
+  var pages = document.querySelectorAll('.page');
+  for (var i = 0; i < pages.length; i++) {
+    var p = pages[i], body = p.querySelector('.body'), limit = p.querySelector('.rf').getBoundingClientRect().top - 8;
+    var moved = [];
+    while (body.children.length > 1 && body.lastElementChild.getBoundingClientRect().bottom > limit) moved.unshift(body.removeChild(body.lastElementChild));
+    while (body.children.length > 1 && /^H[23]$/.test(body.lastElementChild.tagName)) moved.unshift(body.removeChild(body.lastElementChild));
+    if (moved.length) {
+      var np = p.cloneNode(true), nb = np.querySelector('.body');
+      nb.innerHTML = '';
+      moved.forEach(function (el) { nb.appendChild(el); });
+      p.parentNode.insertBefore(np, p.nextSibling);
+      pages = document.querySelectorAll('.page');
+    }
+  }
+  var pn = document.querySelectorAll('.pn');
+  for (var j = 0; j < pn.length; j++) pn[j].textContent = 'Page ' + (j + 1) + ' of ' + pn.length;
+};`;
+
+  const REPORT_CSS = `
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+html, body { margin: 0; }
+body { background: #e7e9ee; color: #161a22; font: 9.4pt/1.5 Inter, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 20px; background: #161a22; color: #e8eaf0; font-size: 13px; }
+.toolbar span { display: block; color: #9aa1b2; font-size: 12px; margin-top: 2px; }
+.toolbar button { background: #3d5afe; color: #fff; border: 0; border-radius: 8px; padding: 9px 16px; font: 600 13px Inter, sans-serif; cursor: pointer; white-space: nowrap; }
+.page { width: 210mm; height: 297mm; margin: 8mm auto; background: #fff; position: relative; overflow: hidden; padding: 13mm 16mm 18mm; box-shadow: 0 2px 12px rgba(0,0,0,.12); break-after: page; page-break-after: always; }
+.page:last-of-type { break-after: auto; page-break-after: auto; }
+@media print { body { background: #fff; } .toolbar { display: none; } .page { margin: 0; box-shadow: none; } }
+.rh { display: flex; justify-content: space-between; align-items: center; padding-bottom: 3.5mm; margin-bottom: 7mm; border-bottom: 0.3mm solid #e3e6ec; }
+.brand { display: flex; align-items: center; gap: 2mm; font-weight: 600; font-size: 9.5pt; letter-spacing: -0.01em; }
+.brand b { color: #3d5afe; font-weight: 600; }
+.rs { font-size: 7.5pt; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #8a91a1; }
+.rf { position: absolute; left: 16mm; right: 16mm; bottom: 9mm; display: flex; justify-content: space-between; font-size: 7.4pt; color: #8a91a1; border-top: 0.3mm solid #eceef2; padding-top: 2.5mm; }
+.title .kicker { font-size: 8pt; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #3d5afe; }
+h1 { font-size: 24pt; line-height: 1.12; letter-spacing: -0.025em; margin: 1.5mm 0 1.5mm; font-weight: 700; overflow-wrap: anywhere; }
+.meta { color: #5b6272; font-size: 9pt; }
+h2 { font-size: 15pt; letter-spacing: -0.015em; margin: 0 0 4mm; font-weight: 700; }
+h3 { font-size: 7.8pt; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: #5b6272; margin: 6mm 0 2.5mm; }
+.lead { color: #3e4554; margin: -1mm 0 5mm; }
+.muted { color: #6b7385; } .small { font-size: 8.2pt; color: #3e4554; } .note { font-size: 7.4pt; color: #8a91a1; margin: 2mm 0 0; }
+.verdict { display: flex; gap: 4mm; align-items: center; margin: 7mm 0 6mm; padding: 4.5mm 5mm; border-radius: 3mm; border: 0.3mm solid; }
+.verdict.ok { background: #effaf4; border-color: #bfe8d3; } .verdict.warn { background: #fff7ea; border-color: #f2d7a6; } .verdict.danger { background: #fdf0f1; border-color: #f2c2c7; }
+.verdict .vi { width: 9mm; height: 9mm; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; }
+.verdict.ok .vi { background: #12a26a; } .verdict.warn .vi { background: #c47a0a; } .verdict.danger .vi { background: #d43c4a; }
+.verdict .vi svg { width: 4.5mm; height: 4.5mm; }
+.verdict .vh { font-size: 13pt; font-weight: 700; letter-spacing: -0.01em; }
+.verdict .vs { color: #3e4554; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.6mm; }
+.tile { border: 0.3mm solid #e3e6ec; border-radius: 2.2mm; padding: 3mm 3.5mm; }
+.tl { font-size: 7.4pt; color: #5b6272; font-weight: 500; display: flex; align-items: center; gap: 1.5mm; white-space: nowrap; }
+.tv { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 15pt; font-weight: 600; letter-spacing: -0.02em; margin-top: 0.8mm; }
+.tv small { font-size: 7.2pt; color: #6b7385; font-weight: 500; margin-left: 1mm; letter-spacing: 0; }
+.td { font-size: 7.4pt; color: #5b6272; }
+.dot { width: 1.8mm; height: 1.8mm; border-radius: 50%; display: inline-block; flex-shrink: 0; background: #9aa1b2; }
+.dot.ok { background: #12a26a; } .dot.warn { background: #c47a0a; } .dot.danger { background: #d43c4a; }
+.gauges { display: flex; gap: 6mm; justify-content: center; margin: 5mm 0 0; }
+.gauges figure.g { width: 58mm; margin: 0; text-align: center; } .gauges figure.g img { border: 0; }
+figure { margin: 0 0 4.5mm; break-inside: avoid; }
+figure img { width: 100%; display: block; border-radius: 1.6mm; border: 0.3mm solid #e6e8ee; }
+figcaption { font-size: 7.4pt; color: #6b7385; margin-top: 1.4mm; line-height: 1.4; }
+figure.sq img { width: 100%; }
+.f { display: grid; grid-template-columns: 6mm 1fr; gap: 2.5mm; padding: 2.6mm 0; border-bottom: 0.3mm solid #eef0f4; break-inside: avoid; }
+.f:last-child { border-bottom: 0; }
+.fi { width: 5mm; height: 5mm; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: 0.4mm; }
+.fi svg { width: 2.8mm; height: 2.8mm; }
+.f.ok .fi { background: #e3f6ec; color: #12a26a; } .f.warn .fi { background: #fdf1dc; color: #c47a0a; } .f.danger .fi { background: #fbe3e5; color: #d43c4a; } .f.info .fi { background: #eceef2; color: #6b7385; }
+.ft { font-weight: 600; font-size: 9.2pt; }
+.ft .cat { font-size: 6.8pt; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #8a91a1; margin-left: 1.5mm; }
+.fb { color: #3e4554; font-size: 8.6pt; margin-top: 0.3mm; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; align-items: start; }
+.cols.scope { grid-template-columns: 74mm 1fr; margin-bottom: 2mm; }
+table { width: 100%; border-collapse: collapse; font-size: 8.4pt; }
+th { text-align: left; font-size: 7pt; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #8a91a1; padding: 1.4mm 1.6mm; border-bottom: 0.3mm solid #d9dde5; }
+td { padding: 1.55mm 1.6mm; border-bottom: 0.3mm solid #eef0f4; vertical-align: middle; }
+td:first-child { color: #3e4554; }
+.n { text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 8.1pt; white-space: nowrap; }
+td.bad { color: #d43c4a; }
+td.st { width: 15mm; text-align: right; }
+.pill { display: inline-block; font-size: 6.6pt; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 0.5mm 1.8mm; border-radius: 10mm; }
+.pill.ok { background: #e3f6ec; color: #0d8a59; } .pill.warn { background: #fdf1dc; color: #a86707; } .pill.danger { background: #fbe3e5; color: #c0303e; } .pill.info { background: #eceef2; color: #5b6272; }
+table.plat td, table.plat th { padding-left: 1.2mm; padding-right: 1.2mm; }
+table.oct { margin: 1mm 0 4mm; } table.oct th, table.oct td { padding: 1.3mm 1mm; } table.oct td:first-child, table.oct th:first-child { white-space: nowrap; }
+.kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2.5mm; margin-bottom: 5mm; }
+.kpis div { border: 0.3mm solid #e3e6ec; border-radius: 2mm; padding: 2.2mm 2.8mm; }
+.kpis span { display: block; font-size: 7pt; color: #5b6272; white-space: nowrap; }
+.kpis b { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10pt; font-weight: 600; }
+.findings-mini { margin-top: 4mm; }
+table.ref td, table.ref th { padding: 2.2mm 2mm; }
+.allf + h2 ~ .f .cat { display: none; }
+.allf + h2 ~ .f { padding: 2mm 0; }
+dl.gloss { margin: 0; }
+dl.gloss dt { font-weight: 650; font-size: 9pt; margin-top: 3mm; }
+dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
+`;
+
   $('exportPdfBtn').addEventListener('click', async () => {
     if (!S.buffer) return;
     const win = window.open('', '_blank');
     if (!win) return toast('Your browser blocked the report window. Allow pop-ups for this page and try again.', 5000);
-    const wasPlaying = isPlaying; if (wasPlaying) pause();
-    document.documentElement.classList.add('exporting');
-    redrawAllForExport();
-    const dur = fmtTime(S.buffer.duration);
-    const graphs = [
-      ['lufsGauge', 'Integrated loudness meter. Scale −30 to 0 LUFS; accent tick at −14 LUFS.', true],
-      ['tpGauge', 'True peak meter. Scale −12 to +1 dBTP; accent tick at −1 dBTP.', true],
-      ['timelineCanvas', `Loudness over time, 0:00–${dur}. Y axis −40 to 0 LUFS. Green = momentary (0.4 s), blue = short-term (3 s), dashed = integrated.`],
-      ['tonalCanvas', `Tonal balance: octave-band level relative to pink noise (0 dB = pink), normalised to the 125 Hz–4 kHz average.${S.ref ? ' Amber markers = reference track.' : ''}`],
-      ['spectrumCanvas', `Whole-track average spectrum, drawn so pink noise is flat (equal-octave bands). X axis 20 Hz–20 kHz log, Y axis dB relative.${S.ref ? ' Dashed amber = reference, aligned on 100 Hz–5 kHz.' : ''}`],
-      ['spectrogramCanvas', `Spectrogram, 0:00–${dur}. Y axis 20 Hz–20 kHz (log). Colour = level over a 72 dB range, dark blue (quiet) to white (loud).`],
-      ['vectorscopeCanvas', `Vectorscope of ~30,000 points across the whole track. Vertical = mono, diagonals = left/right only, horizontal = out of phase. Correlation ${fmtSigned(S.corr, 2)}.`, true],
-      ['stereoFieldCanvas', 'Stereo width by frequency: share of energy in the side channel (0% = mono), 20 Hz–20 kHz log. Faint bars carry little energy; amber = wide content below 200 Hz.'],
-      ['wfOverview', `Waveform (both channels mixed), 0:00–${dur}.`],
-      ['eqCanvas', 'Parametric EQ curve in the playback path at the time of export. X axis 20 Hz–20 kHz, Y axis ±12 dB.'],
-    ];
-    const figs = graphs.map(([id, cap, small]) => { const src = canvasImage(id); return src ? `<figure class="${small ? 'small' : ''}"><img src="${src}"><figcaption>${esc(cap)}</figcaption></figure>` : ''; }).join('');
-    document.documentElement.classList.remove('exporting');
-    redrawActive();
-    const eqState = eqBands.map((b, i) => `Band ${i + 1} (${b.type}): ${Math.round(b.node.frequency.value)} Hz, ${fmtSigned(b.node.gain.value)} dB, Q ${b.node.Q.value.toFixed(2)}`).join('\n');
-    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(baseName())} – MasterScope report</title>
-      <style>body{font-family:-apple-system,'Segoe UI',Inter,sans-serif;color:#111;margin:28px;max-width:900px}
-      h1{font-size:22px;margin:0 0 4px}h2{font-size:15px;margin:26px 0 8px;padding-bottom:4px;border-bottom:1px solid #ddd}
-      pre{font-family:Menlo,Consolas,monospace;font-size:11px;white-space:pre-wrap;line-height:1.5;margin:0}
-      figure{margin:0 0 18px;break-inside:avoid}figure.small{display:inline-block;width:48%;vertical-align:top;margin-right:2%}
-      img{max-width:100%;border-radius:6px;display:block}figcaption{font-size:11px;color:#444;margin-top:5px;line-height:1.4}
-      .meta{color:#666;font-size:12px}</style></head><body>
-      <h1>MasterScope report</h1><div class="meta">${esc(S.fileName)} · ${new Date().toLocaleString()}</div>
-      <h2>Measurements and findings</h2><pre>${esc(reportText())}</pre>
-      <h2>EQ in playback path (listening mode: ${esc(abMode)})</h2><pre>${esc(eqState)}</pre>
-      <h2>Graphs</h2>${figs}</body></html>`);
-    win.document.close();
-    const imgs = [...win.document.images];
-    await Promise.all(imgs.map(i => i.decode ? i.decode().catch(() => {}) : null));
+    win.document.write('<p style="font:14px -apple-system,sans-serif;padding:24px;color:#555">Preparing report…</p>');
+    if (isPlaying) pause();
+    stopPreview();
+    await tick();
+    let html;
+    try { html = buildReportHtml(captureChartsForReport()); }
+    catch (e) { win.close(); toast('Couldn’t build the report: ' + e.message, 5000); return; }
+    win.document.open(); win.document.write(html); win.document.close();
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    await Promise.race([
+      Promise.all([...win.document.images].map(i => i.decode ? i.decode().catch(() => {}) : null).concat(win.document.fonts ? [win.document.fonts.ready] : [])),
+      wait(3000),
+    ]);
+    try { win.paginate(); } catch (e) {}
     win.focus(); win.print();
   });
 
