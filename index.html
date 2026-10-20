@@ -1349,10 +1349,15 @@ const DSP = (() => {
     const density = m.plr < 8 ? 'squashed' : m.plr <= 12 ? 'competitive' : m.plr <= PLR_BUDGET ? 'open' : 'too-dynamic';
     let status, headline;
     if (peakCut > 0.05) { status = peakCut > 2 ? 'danger' : 'warn'; headline = `Needs ${peakCut.toFixed(1)} dB of peak control to reach −14`; }
+    else if (!tpOk && m.lufs > TARGET_LUFS + 0.05 && m.truePeak - (m.lufs - TARGET_LUFS) <= CEILING_DB + 0.05) {
+      // louder than −14 with hot peaks: one output trim fixes both
+      status = 'warn'; headline = `Turn it down ${(m.lufs - TARGET_LUFS).toFixed(1)} dB to land on −14`;
+    }
     else if (!tpOk) { status = 'warn'; headline = `Peaks are above −1 dBTP`; }
     else if (!atTarget) { status = 'warn'; headline = m.lufs < TARGET_LUFS ? `Turn up ${(TARGET_LUFS - m.lufs).toFixed(1)} dB to reach −14` : `${(m.lufs - TARGET_LUFS).toFixed(1)} dB louder than −14`; }
     else { status = 'ok'; headline = density === 'open' ? 'Ready for −14, with open dynamics' : density === 'squashed' ? 'At −14, but heavily limited' : 'Ready for −14'; }
-    return { peakCut, raise, playbackLufs, shortfall: TARGET_LUFS - playbackLufs, atTarget, tpOk, density, status, headline,
+    const trimOnly = !tpOk && peakCut <= 0.05 && m.lufs > TARGET_LUFS + 0.05 && m.truePeak - (m.lufs - TARGET_LUFS) <= CEILING_DB + 0.05;
+    return { peakCut, raise, playbackLufs, trimOnly, shortfall: TARGET_LUFS - playbackLufs, atTarget, tpOk, density, status, headline,
              budget: PLR_BUDGET, target: TARGET_LUFS, ceiling: CEILING_DB };
   }
 
@@ -2289,6 +2294,9 @@ const DSP = (() => {
     } else if (R.peakCut > 0.05) {
       steps.push(`<b>Take about ${R.peakCut.toFixed(1)} dB off the peaks.</b> <span>${p ? SRC_ADVICE[p.dominant] + ` Only ${fmtPct(p.pctAbove)} of the audio sits in the top ${p.cutDb.toFixed(1)} dB, so it is a small change.` : ''}</span>`);
       steps.push(`<b>Then raise the level into your limiter until it reads −14.0 LUFS at −1.0 dBTP.</b> <span>About ${fmtSigned(-14 - m.lufs)} dB from where it is now.</span>`);
+    } else if (R.trimOnly) {
+      const d = m.lufs + 14;
+      steps.push(`<b>Turn the master down ${d.toFixed(1)} dB after the limiter</b> <span>(for example a Utility at the very end of the chain). That lands on −14.0 LUFS with peaks at about ${fmt(m.truePeak - d)} dBTP, and keeps all the density you've built. Turning the limiter input down instead would undo some of it.</span>`);
     } else if (!R.tpOk) {
       steps.push(`<b>Set the limiter ceiling to −1.0 dBTP.</b> <span>True peak is ${fmt(m.truePeak)} dBTP now. Re-check the loudness afterwards.</span>`);
     } else if (!R.atTarget) {
