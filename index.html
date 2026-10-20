@@ -1384,14 +1384,23 @@ const DSP = (() => {
       while (lo <= hi) { const mid = (lo + hi) >> 1; if (hits[mid] < t) lo = mid + 1; else hi = mid - 1; }
       return [hits[lo - 1], hits[lo]].some(h => h !== undefined && Math.abs(h - t) <= 0.04);
     };
+    // A peak is percussive if the level jumps sharply just before it (any snare, clap, hat or
+    // pluck, not only the main hits detected earlier), and low-driven if most of it is below 150 Hz.
+    const env = envelope(mono, fs, 20); // 20 ms window: smooth enough not to ripple on bass notes
     const w = Math.round(0.003 * fs), counts = { hits: 0, kickbass: 0, low: 0, other: 0 };
     events.forEach(ev => {
       let la = 0, ma = 0;
       for (let j = Math.max(0, ev.idx - w), e = Math.min(n, ev.idx + w); j < e; j++) {
         const l = Math.abs(low[j]), m = Math.abs(mono[j]); if (l > la) la = l; if (m > ma) ma = m;
       }
-      const lowDriven = la / (ma + 1e-9) > 0.55, atHit = nearHit(ev.idx / fs);
-      counts[atHit ? (lowDriven ? 'kickbass' : 'hits') : (lowDriven ? 'low' : 'other')]++;
+      const t = Math.round(ev.idx / fs * 1000);
+      let pre = Infinity, at = 0;
+      for (let j = Math.max(0, t - 80); j <= t - 30 && j < env.length; j++) if (env[j] < pre) pre = env[j];
+      for (let j = Math.max(0, t - 10); j <= t + 10 && j < env.length; j++) if (env[j] > at) at = env[j];
+      const rise = isFinite(pre) && pre > 0 ? 20 * Math.log10(at / pre) : 0;
+      const percussive = rise >= 6 || nearHit(ev.idx / fs);
+      const lowDriven = la / (ma + 1e-9) > 0.55;
+      counts[percussive ? (lowDriven ? 'kickbass' : 'hits') : (lowDriven ? 'low' : 'other')]++;
     });
     const total = events.length || 1;
     const shares = {}; Object.keys(counts).forEach(k => shares[k] = counts[k] / total);
@@ -1535,9 +1544,9 @@ const DSP = (() => {
     // Loudness: judged against a −14 LUFS master with a −1 dBTP ceiling
     const SRC_FIX = {
       hits: 'Most of them are drum hits, so gentle clipping or fast limiting on the drum bus (or a soft clipper before the master limiter) is the cleanest way to take them off.',
-      kickbass: 'Most of them are kick hits landing on sustained bass, so sidechaining the bass to the kick lowers them and tightens the low end at the same time.',
-      low: 'Most of them come from bass or sub notes between hits, so compressing or saturating the bass, or taming the deepest sub, will free the most room.',
-      other: 'Most of them come from sustained parts rather than drums (often vocals or leads), so clip-gain or compress the loudest part before the master limiter.',
+      kickbass: 'Most of them are kick or other low-end hits, so clipping or fast-limiting the kick a little, and sidechaining the bass to it where they overlap, lowers them.',
+      low: 'Most of them come from sustained bass or sub notes, so compressing or saturating the bass, or taming the deepest sub, will free the most room.',
+      other: 'Most of them come from sustained parts rather than hits (often vocals, leads or pads), so compress or clip-gain the loudest part before the master limiter.',
     };
     if (isFinite(m.lufs) && isFinite(m.plr)) {
       const R = readiness(m);
@@ -1579,7 +1588,7 @@ const DSP = (() => {
     if (m.peaks) {
       const s = m.peaks.shares, pc = v => Math.round(v * 100) + '%';
       add('dynamics', 'info', 'Where the peaks come from',
-        `Of the loudest moments, ${pc(s.hits)} are drum hits, ${pc(s.kickbass)} are kick hits stacking with bass, ${pc(s.low)} are bass or sub notes and ${pc(s.other)} are other sustained parts.`);
+        `Of the loudest moments, ${pc(s.hits)} are drum hits and other transients, ${pc(s.kickbass)} are kick or low-end hits, ${pc(s.low)} are sustained bass notes and ${pc(s.other)} are other sustained parts.`);
     }
     if (isFinite(m.lra) && m.lra > 12) add('dynamics', 'info', 'Wide loudness range',
       `Loudness range is ${f(m.lra)} LU, so quiet and loud sections differ a lot. Check the Loudness timeline to see where.`);
@@ -2242,16 +2251,16 @@ const DSP = (() => {
   // −14 readiness, peaks & density
   // ===================================================================
   const SRC_META = {
-    hits: ['Drum hits', 'var(--accent)'],
-    kickbass: ['Kick + bass stacking', 'var(--warn)'],
-    low: ['Bass / sub notes', 'var(--danger)'],
-    other: ['Other parts', 'var(--info)'],
+    hits: ['Drum hits & transients', 'var(--accent)'],
+    kickbass: ['Kick & low-end hits', 'var(--warn)'],
+    low: ['Sustained bass', 'var(--danger)'],
+    other: ['Sustained parts', 'var(--info)'],
   };
   const SRC_ADVICE = {
-    hits: 'Most come from drum hits, so gentle clipping or fast limiting on the drum bus (or the soft clipper in Master to −14) takes them off cleanly.',
-    kickbass: 'Most are kick hits landing on sustained bass. Sidechaining the bass to the kick lowers them and tightens the low end at the same time.',
-    low: 'Most come from bass or sub notes between hits, so compress or saturate the bass, or tame the deepest sub.',
-    other: 'Most come from sustained parts rather than drums, so clip-gain or compress the loudest part (often a vocal or lead).',
+    hits: 'Most come from drum hits and other transients, so gentle clipping or fast limiting on the drum bus (or the soft clipper in Master to −14) takes them off cleanly.',
+    kickbass: 'Most are kick or other low-end hits. Clip or fast-limit the kick a little, and sidechain the bass to it where they overlap.',
+    low: 'Most come from sustained bass or sub notes, so compress or saturate the bass, or tame the deepest sub.',
+    other: 'Most come from sustained parts rather than hits (often vocals, leads or pads), so compress or clip-gain the loudest part before the master limiter.',
   };
   const fmtPct = v => !isFinite(v) ? '—' : v < 0.01 ? '<0.01%' : v.toFixed(v < 0.1 ? 3 : v < 1 ? 2 : 1) + '%';
 
@@ -2272,7 +2281,9 @@ const DSP = (() => {
 
   function readinessSteps(R, m) {
     const steps = [], p = S.peaks;
-    if (R.peakCut > 0.05) {
+    if (R.peakCut > 0.05 && p && p.pctAbove < 0.1 && m.truePeak > -1.3) {
+      steps.push(`<b>Raise your master limiter's input by ${(-14 - m.lufs).toFixed(1)} dB, keeping the ceiling at −1.0 dBTP.</b> <span>That takes the ${R.peakCut.toFixed(1)} dB off the peaks and lands on −14 in one move. Only ${fmtPct(p.pctAbove)} of the audio sits in the top ${p.cutDb.toFixed(1)} dB, so the extra limiting should be inaudible.</span>`);
+    } else if (R.peakCut > 0.05) {
       steps.push(`<b>Take about ${R.peakCut.toFixed(1)} dB off the peaks.</b> <span>${p ? SRC_ADVICE[p.dominant] + ` Only ${fmtPct(p.pctAbove)} of the audio sits in the top ${p.cutDb.toFixed(1)} dB, so it is a small change.` : ''}</span>`);
       steps.push(`<b>Then raise the level into your limiter until it reads −14.0 LUFS at −1.0 dBTP.</b> <span>About ${fmtSigned(-14 - m.lufs)} dB from where it is now.</span>`);
     } else if (!R.tpOk) {
@@ -3755,14 +3766,14 @@ const DSP = (() => {
       ${fig(img.timelineCanvas, `Loudness over time, 0:00–${fmtTime(b.duration)}. Green: momentary (0.4 s). Blue: short-term (3 s). Dashed: integrated (${fmt(m.lufs)} LUFS).`)}
       <div class="cols">
         <div><h3>Measurements</h3><table>
-          ${row('Integrated loudness', `${fmt(m.lufs)} LUFS`, Math.abs(m.lufs + 14) <= 5 ? 'ok' : 'warn')}
+          ${row('Integrated loudness', `${fmt(m.lufs)} LUFS`, R.atTarget ? 'ok' : 'warn')}
           ${row('Max short-term (3 s)', `${fmt(m.maxShortTerm)} LUFS`, '')}
           ${row('Max momentary (0.4 s)', `${fmt(m.maxMomentary)} LUFS`, '')}
           ${row('True peak', `${fmt(m.truePeak)} dBTP`, tpS)}
           ${row('Sample peak', `${fmt(m.samplePeak)} dBFS`, '')}
           ${row('Loudness range', `${fmt(m.lra)} LU`, m.lra > 12 ? 'info' : 'ok')}
           ${row('RMS level', `${fmt(m.rms)} dBFS`, '')}
-          ${row('Peak-to-loudness ratio', `${fmt(m.plr)} dB`, m.plr < 7 ? 'warn' : m.plr > 16 ? 'info' : 'ok')}
+          ${row('Peak-to-loudness ratio', `${fmt(m.plr)} dB`, { squashed: 'warn', competitive: 'ok', open: 'info', 'too-dynamic': 'warn' }[R.density])}
           ${row('Crest factor', `${fmt(m.crest)} dB`, '')}
           ${row('Loudest 3 s vs average', `${fmtSigned(m.maxShortTerm - m.lufs)} LU`, '')}
         </table></div>
