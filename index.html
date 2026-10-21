@@ -349,6 +349,7 @@
   .session-head h1 { margin: 4px 0 4px; font-size: 26px; letter-spacing: -0.02em; }
   .session-meta { color: var(--text-dim); font-size: 13px; }
   .sess-chart { width: 100%; height: 240px; display: block; }
+  .session-actions { display: flex; gap: 8px; flex-wrap: wrap; }
   #session .panel { margin-top: 16px; }
   @media (max-width: 720px) { #sessTiles.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .session-head { flex-direction: column; align-items: flex-start; } }
   .kv { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px 16px; font-size: 13px; }
@@ -574,7 +575,14 @@
         <h1 id="sessTitle">Liminal session</h1>
         <div class="session-meta" id="sessMeta"></div>
       </div>
-      <button class="btn" id="sessBack">Back</button>
+      <div class="session-actions">
+        <button class="btn" id="sessPdf" title="Open a printable report of this session, then save it as a PDF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>
+          <span class="lbl">Export PDF</span>
+        </button>
+        <button class="btn ghost" id="sessCsv" title="Download the per-second data as a spreadsheet (the same as saving .csv from the plugin)"><span class="lbl">CSV</span></button>
+        <button class="btn ghost" id="sessBack">Back</button>
+      </div>
     </div>
     <section class="panel">
       <div class="panel-head"><h2>Result</h2><span class="sub" id="sessSub"></span></div>
@@ -3654,7 +3662,7 @@ const DSP = (() => {
   // Liminal sessions: the plugin's Record button saves a .json session that
   // opens here with its numbers, verdicts, a timeline and the settings used.
   // ===================================================================
-  let sessionReturn = 'landing', lastSession = null;
+  let sessionReturn = 'landing', lastSession = null, lastSessionFindings = [];
   async function openSession(file) {
     let obj = null;
     try { obj = JSON.parse(await file.text()); } catch (e) { /* not JSON */ }
@@ -3670,8 +3678,10 @@ const DSP = (() => {
   $('sessBack').addEventListener('click', () => showView(sessionReturn === 'app' && S && S.sf ? 'app' : 'landing'));
   window.addEventListener('resize', () => { if (lastSession && !$('session').classList.contains('hidden')) drawSessionChart(lastSession); });
 
+  let lastSessionName = '';
   function renderSession(s, name) {
-    const sum = s.summary || {}, set = s.settings || {}, tl = s.timeline || {};
+    lastSessionName = name.replace(/\.json$/i, '');
+    const sum = Object.fromEntries(Object.entries(s.summary || {}).map(([k, v]) => [k, v === null ? NaN : v])), set = s.settings || {}, tl = s.timeline || {};   // null = not measured
     const target = isFinite(set.target) ? set.target : -14;
     const ceil = isFinite(set.ceiling) ? set.ceiling : -1;
     const created = s.created ? new Date(s.created) : null;
@@ -3701,7 +3711,7 @@ const DSP = (() => {
     if (isFinite(I)) {
       if (Math.abs(d) <= 1) F.push({ status: 'ok', title: `Loudness is on target (${fmt(I)} LUFS)`, body: 'Streaming services will play it at about the level you mastered it.' });
       else if (d < -1) F.push({ status: 'warn', title: `${fmt(-d)} LU quieter than the target`, body: `Services only turn quiet tracks up if there is headroom, so it may play quieter than the competition. Lower Threshold, or press Learn in Liminal to land on ${fmt(target)} LUFS.` });
-      else F.push({ status: 'info', title: `${fmt(d)} LU louder than the target`, body: `Services will turn it down by about ${fmt(d)} dB, so the extra limiting buys no loudness, only less punch. Consider raising Threshold, or use Learn.` });
+      else F.push({ status: d > 2 ? 'warn' : 'info', title: `${fmt(d)} LU louder than the target`, body: `Services will turn it down by about ${fmt(d)} dB, so the extra limiting buys no loudness, only less punch. Consider raising Threshold, or use Learn.` });
     }
     if (isFinite(tp)) F.push(tp > ceil + 0.05 ? { status: 'danger', title: `True peak ${fmt(tp)} dBTP is over the ${fmt(ceil)} dBTP ceiling`, body: 'Something after Liminal is adding level, or the ceiling was changed during the recording.' }
                                              : { status: 'ok', title: `True peak held at ${fmt(tp)} dBTP`, body: 'Safe for streaming delivery.' });
@@ -3711,6 +3721,7 @@ const DSP = (() => {
                                                   : { status: 'info', title: `PLR ${fmt(plr)} dB: lots of dynamics`, body: 'Fine for acoustic or cinematic music; pop and electronic masters usually sit at 8-12 dB.' });
     if (isFinite(gra) && gra > 4) F.push({ status: 'warn', title: `Average gain reduction ${fmt(gra)} dB`, body: 'Constant heavy limiting tends to sound flat and can pump. Fix the loudest elements in the mix, or try Bass first.' });
     if (isFinite(sum.correlation) && sum.correlation < 0.3) F.push({ status: sum.correlation < 0 ? 'danger' : 'warn', title: `Phase correlation ${fmt(sum.correlation, 2)}`, body: 'Parts of the mix may cancel on mono speakers. Check wide effects and keep the low end mono.' });
+    lastSessionFindings = F;
     $('sessFindings').innerHTML = F.map(f => `<div class="finding ${f.status}"><div class="ic">${STATUS_ICON[f.status]}</div><div><div class="ft">${esc(f.title)}</div><div class="fb">${esc(f.body)}</div></div></div>`).join('') || '<p class="note">No loudness data in this session yet.</p>';
 
     const MODES = ['Brickwall', 'Soft Clip', 'Lookahead', 'Multiband'];
@@ -3728,35 +3739,158 @@ const DSP = (() => {
   }
 
   function drawSessionChart(s) {
-    const cv = $('sessChart'), tl = s.timeline || {}, st = tl.shortTerm || [], gr = tl.gr || [];
-    const dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+    const cv = $('sessChart'), W = cv.clientWidth, H = cv.clientHeight;
     if (!W || !H) return;
+    const dpr = window.devicePixelRatio || 1;
     cv.width = W * dpr; cv.height = H * dpr;
-    const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     const css = getComputedStyle(document.documentElement), col = n => css.getPropertyValue(n).trim();
+    paintSessionChart(cv.getContext('2d'), s, W, H, dpr,
+      { faint: col('--text-faint'), grid: col('--grid'), ok: col('--ok'), danger: col('--danger'), accent: col('--accent'), font: col('--font') });
+  }
+  // Shared by the page and the PDF report (which uses fixed light colours)
+  function paintSessionChart(g, s, W, H, scale, P) {
+    const tl = s.timeline || {}, st = tl.shortTerm || [], gr = tl.gr || [];
+    g.setTransform(scale, 0, 0, scale, 0, 0); g.clearRect(0, 0, W, H);
     const target = isFinite((s.settings || {}).target) ? s.settings.target : -14;
-    const L = 40, R = 40, T = 8, B = 22, pw = W - L - R, ph = H - T - B;
+    const fs = P.fontSize || 11, L = fs * 3.6, R = fs * 3.6, T = 8, B = fs * 2, pw = W - L - R, ph = H - T - B;
     const lo = -30, hi = -3, y = v => T + (1 - (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * ph;
     const n = Math.max(st.length, gr.length, 2), x = i => L + i / (n - 1) * pw;
-    g.font = '11px ' + col('--font'); g.fillStyle = col('--text-faint'); g.strokeStyle = col('--grid'); g.lineWidth = 1;
-    for (const v of [-6, -10, -14, -18, -24]) { g.beginPath(); g.moveTo(L, y(v) + .5); g.lineTo(W - R, y(v) + .5); g.stroke(); g.fillText(String(v).replace('-', MINUS), 6, y(v) + 4); }
-    for (const dg of [3, 6, 9]) g.fillText(MINUS + dg, W - R + 8, T + dg / 12 * ph * 0.5 + 4);
+    g.font = fs + 'px ' + P.font; g.fillStyle = P.faint; g.strokeStyle = P.grid; g.lineWidth = 1;
+    for (const v of [-6, -10, -14, -18, -24]) { g.beginPath(); g.moveTo(L, y(v) + .5); g.lineTo(W - R, y(v) + .5); g.stroke(); g.fillText(String(v).replace('-', MINUS), 6, y(v) + fs * 0.35); }
+    for (const dg of [3, 6, 9]) g.fillText(MINUS + dg, W - R + 8, T + dg / 12 * ph * 0.5 + fs * 0.35);
     const dur = Math.max(st.length, gr.length) > 1 ? (Math.max(st.length, gr.length) - 1) * (tl.intervalSec || 1) : (s.durationSec || 0);
-    for (let k = 0; k <= 4; k++) { const t = dur * k / 4; g.fillText(fmtTime(t), L + k / 4 * pw - (k === 4 ? 24 : k ? 12 : 0), H - 6); }
-    g.setLineDash([5, 4]); g.strokeStyle = col('--ok'); g.beginPath(); g.moveTo(L, y(target)); g.lineTo(W - R, y(target)); g.stroke(); g.setLineDash([]);
+    for (let k = 0; k <= 4; k++) { const t = dur * k / 4; g.fillText(fmtTime(t), L + k / 4 * pw - (k === 4 ? fs * 2.2 : k ? fs * 1.1 : 0), H - fs * 0.5); }
+    g.setLineDash([5, 4]); g.strokeStyle = P.ok; g.beginPath(); g.moveTo(L, y(target)); g.lineTo(W - R, y(target)); g.stroke(); g.setLineDash([]);
     if (gr.length) {   // gain reduction from the top, 0-12 dB over the upper half
+      const gy = v => T + Math.min(1, Math.abs(v) / 12) * ph * 0.5;
       g.beginPath(); g.moveTo(x(0), T);
-      gr.forEach((v, i) => g.lineTo(x(i), T + Math.min(1, Math.abs(v) / 12) * ph * 0.5));
+      gr.forEach((v, i) => g.lineTo(x(i), gy(+v || 0)));
       g.lineTo(x(gr.length - 1), T); g.closePath();
-      g.fillStyle = col('--danger') + '33'; g.fill();
-      g.beginPath(); gr.forEach((v, i) => (i ? g.lineTo : g.moveTo).call(g, x(i), T + Math.min(1, Math.abs(v) / 12) * ph * 0.5));
-      g.strokeStyle = col('--danger'); g.lineWidth = 1.5; g.stroke();
+      g.fillStyle = P.danger + '33'; g.fill();
+      g.beginPath(); gr.forEach((v, i) => (i ? g.lineTo : g.moveTo).call(g, x(i), gy(+v || 0)));
+      g.strokeStyle = P.danger; g.lineWidth = 1.5; g.stroke();
     }
-    const pts = st.map((v, i) => [x(i), v]).filter(p => isFinite(p[1]) && p[1] > -69);
+    const pts = st.map((v, i) => [x(i), v]).filter(p => typeof p[1] === 'number' && isFinite(p[1]) && p[1] > -69);   // null = no reading yet
     if (pts.length > 1) {
       g.beginPath(); pts.forEach(([px, v], i) => (i ? g.lineTo : g.moveTo).call(g, px, y(v)));
-      g.strokeStyle = col('--accent'); g.lineWidth = 2; g.stroke();
+      g.strokeStyle = P.accent; g.lineWidth = 2; g.stroke();
     }
+  }
+
+
+
+  // ---- Session exports ----
+  // CSV: the plugin's own per-second table when the file has it (identical to
+  // saving .csv from Liminal); older session files fall back to the timeline.
+  $('sessCsv').addEventListener('click', () => {
+    const s = lastSession; if (!s) return;
+    const q = v => (v === null || v === undefined || (typeof v === 'number' && !isFinite(v))) ? '' : String(v);
+    let lines;
+    if (s.table && Array.isArray(s.table.columns) && Array.isArray(s.table.rows) && s.table.rows.length) {
+      lines = [s.table.columns.join(',')].concat(s.table.rows.map(r => r.map(q).join(',')));
+    } else {
+      const tl = s.timeline || {}, n = Math.max(...['shortTerm', 'momentary', 'gr', 'correlation'].map(k => (tl[k] || []).length));
+      lines = ['time_s,shortterm_LUFS,momentary_LUFS,GR_max_last_second_dB,correlation'];
+      for (let i = 0; i < n; i++) lines.push([i * (tl.intervalSec || 1), q((tl.shortTerm || [])[i]), q((tl.momentary || [])[i]), q((tl.gr || [])[i]), q((tl.correlation || [])[i])].join(','));
+    }
+    download(new Blob([lines.join('\n')], { type: 'text/csv' }), `${lastSessionName || 'liminal_session'}.csv`);
+  });
+
+  $('sessPdf').addEventListener('click', async () => {
+    const s = lastSession; if (!s) return;
+    const win = window.open('', '_blank');
+    if (!win) return toast('Your browser blocked the report window. Allow pop-ups for this page and try again.', 5000);
+    let html;
+    try { html = buildSessionReportHtml(s); } catch (e) { win.close(); toast('Couldn’t build the report: ' + e.message, 5000); return; }
+    win.document.open(); win.document.write(html); win.document.close();
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    await Promise.race([Promise.all([...win.document.images].map(i => i.decode ? i.decode().catch(() => {}) : null).concat(win.document.fonts ? [win.document.fonts.ready] : [])), wait(3000)]);
+    try { win.paginate(); } catch (e) {}
+    win.focus(); win.print();
+  });
+
+  function buildSessionReportHtml(s) {
+    const set = s.settings || {};
+    const target = isFinite(set.target) ? set.target : -14, ceil = isFinite(set.ceiling) ? set.ceiling : -1;
+    const created = s.created ? new Date(s.created) : new Date();
+    const dateStr = (isNaN(created) ? new Date() : created).toLocaleString(undefined, { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+    const name = lastSessionName || 'Liminal session';
+    const metaLine = [s.plugin || 'Liminal', isFinite(s.durationSec) ? fmtTime(s.durationSec) + ' recorded' : '', s.sampleRate ? (s.sampleRate / 1000) + ' kHz' : ''].filter(Boolean).join(' · ');
+
+    // Headline verdict
+    const F = lastSessionFindings || [];
+    const issues = F.filter(f => f.status === 'warn' || f.status === 'danger');
+    const nD = issues.filter(f => f.status === 'danger').length, nW = issues.length - nD;
+    const vStatus = nD ? 'danger' : nW ? 'warn' : 'ok';
+    const vHead = nD ? `${nD} issue${nD > 1 ? 's' : ''} to fix${nW ? `, ${nW} to review` : ''}` : nW ? `${nW} thing${nW > 1 ? 's' : ''} to review` : 'Ready for release at ' + fmt(target) + ' LUFS';
+    const vSub = issues.length ? `Most important: ${issues[0].title.charAt(0).toLowerCase() + issues[0].title.slice(1)}.` : 'Loudness, true peak and density are all where they should be for streaming.';
+
+    const tiles = $('sessTiles').innerHTML ? [...$('sessTiles').querySelectorAll('.tile')].map(t => {
+      const dot = t.querySelector('.dot'), st = dot ? [...dot.classList].find(c => c !== 'dot') : '';
+      return `<div class="tile"><div class="tl">${st ? `<span class="dot ${st}"></span>` : ''}${esc(t.querySelector('.lt').textContent)}</div><div class="tv">${t.querySelector('.value').innerHTML}</div><div class="td">${t.querySelector('.verdict') ? esc(t.querySelector('.verdict').textContent) : ''}</div></div>`;
+    }).join('') : '';
+    const findingHtml = f => `<div class="f ${f.status}"><div class="fi">${STATUS_ICON[f.status]}</div><div><div class="ft">${esc(f.title)}</div><div class="fb">${esc(f.body)}</div></div></div>`;
+
+    // Chart in report colours
+    const cw = 1200, ch = 400, cv = document.createElement('canvas'); cv.width = cw * 2; cv.height = ch * 2;
+    paintSessionChart(cv.getContext('2d'), s, cw, ch, 2, { faint: '#6b7385', grid: '#e6e8ee', ok: '#12a26a', danger: '#d43c4a', accent: '#3d5afe', font: 'Inter, sans-serif', fontSize: 20 });
+    const chartImg = cv.toDataURL('image/png');
+
+    // Section table: loudness and limiting per 15 s
+    const tl = s.timeline || {}, stt = tl.shortTerm || [], grr = tl.gr || [], step = 15;
+    let secRows = '';
+    for (let i = 0; i < Math.max(stt.length, grr.length); i += step) {
+      const isNum = v => typeof v === 'number' && isFinite(v);
+      const sv = stt.slice(i, i + step).filter(v => isNum(v) && v > -69), gv = grr.slice(i, i + step).filter(isNum);
+      if (!sv.length && !gv.length) continue;
+      const lu = sv.length ? -0.691 + 10 * Math.log10(sv.reduce((a2, v) => a2 + Math.pow(10, (v + 0.691) / 10), 0) / sv.length) : NaN;
+      const gmax = gv.length ? Math.max(...gv) : NaN, gavg = gv.length ? gv.reduce((a2, v) => a2 + v, 0) / gv.length : NaN;
+      secRows += `<tr><td>${fmtTime(i)}–${fmtTime(Math.min(i + step, Math.max(stt.length, grr.length) - 1))}</td><td class="n">${fmt(lu)} LUFS</td><td class="n">${fmt(gavg)} dB</td><td class="n${gmax > 9 ? ' bad' : ''}">${fmt(gmax)} dB</td></tr>`;
+    }
+
+    const items = [...$('sessSettings').querySelectorAll('div')].map(d => `<tr><td>${esc(d.querySelector('span').textContent)}</td><td class="n">${esc(d.querySelector('b').textContent)}</td></tr>`);
+    const half = Math.ceil(items.length / 2);
+
+    const pages = [];
+    pages.push({ section: 'Session', html: `
+      <div class="title"><div class="kicker">Liminal session report · ${esc(fmt(target))} LUFS</div><h1>${esc(name)}</h1>
+      <div class="meta">${esc(metaLine)} · Recorded ${esc(dateStr)}</div></div>
+      <div class="verdict ${vStatus}"><div class="vi">${STATUS_ICON[vStatus]}</div><div><div class="vh">${esc(vHead)}</div><div class="vs">${esc(vSub)}</div></div></div>
+      <h3>Result</h3><div class="tiles">${tiles}</div>
+      <h3>What it means</h3>${F.map(findingHtml).join('') || '<p class="muted">No loudness data in this session.</p>'}
+    ` });
+    pages.push({ section: 'Over time', html: `
+      <h2>Over time</h2>
+      <p class="lead">Short-term loudness (blue) against the ${esc(fmt(target))} LUFS target (green, dashed). Gain reduction hangs from the top (red, 0 to 12 dB).</p>
+      <figure><img src="${chartImg}" alt=""><figcaption>One point per second of the recording.</figcaption></figure>
+      <h3>By section (15 s)</h3>
+      <table><thead><tr><th>Time</th><th class="n">Loudness</th><th class="n">Avg GR</th><th class="n">Max GR</th></tr></thead><tbody>${secRows}</tbody></table>
+      <p class="note">Max GR above 9 dB on a section means single hits are being turned down hard: listen with Delta and consider controlling that sound in the mix.</p>
+    ` });
+    pages.push({ section: 'Settings', html: `
+      <h2>Settings used</h2>
+      <p class="lead">Liminal's settings when the recording stopped. Load them again to reproduce this master.</p>
+      <div class="cols"><table><tbody>${items.slice(0, half).join('')}</tbody></table><table><tbody>${items.slice(half).join('')}</tbody></table></div>
+      <h3>How these are measured</h3>
+      <p class="small">Loudness and true peak follow ITU-R BS.1770-4; loudness range follows EBU Tech 3342. The codec peak estimate is the output's true peak after a 16 kHz low-pass like the one AAC, MP3 and Opus encoders apply; real encoders also add noise, so treat it as the least overshoot to expect. PLR is true peak minus integrated loudness. Gain reduction includes Liminal's true-peak ceiling stage.</p>
+    ` });
+
+    const N = pages.length;
+    const logo = '<svg width="18" height="18" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#3d5afe"/><path d="M10 34 L18 34 L22 22 L28 44 L33 14 L39 50 L44 26 L48 34 L54 34" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const pageHtml = pages.map((p, i) => `
+      <section class="page${i === 0 ? ' first' : ''}">
+        <header class="rh"><div class="brand">${logo}<span>Master<b>Scope</b> · Liminal</span></div><div class="rs">${esc(p.section)}</div></header>
+        <div class="body">${p.html}</div>
+        <footer class="rf"><span>${esc(name)} · ${esc(dateStr)}</span><span class="pn">Page ${i + 1} of ${N}</span></footer>
+      </section>`).join('');
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(name)} – Liminal session report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>${REPORT_CSS}</style></head><body>
+<div class="toolbar"><div><b>${esc(name)} – Liminal session report</b><span>In the print dialog, choose <b>Save as PDF</b> as the destination. For best results turn off “Headers and footers”.</span></div><button onclick="window.print()">Save as PDF</button></div>
+${pageHtml}
+<script>${PAGINATE_JS}<\/script>
+</body></html>`;
   }
 
   // ===================================================================
