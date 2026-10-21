@@ -345,6 +345,12 @@
   .slider-row label { font-size: 13px; color: var(--text-dim); }
   .slider-row input[type=range] { width: 220px; accent-color: var(--accent); }
   .status-line { font-size: 12.5px; color: var(--text-dim); }
+  .session-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin: 8px 0 18px; }
+  .session-head h1 { margin: 4px 0 4px; font-size: 26px; letter-spacing: -0.02em; }
+  .session-meta { color: var(--text-dim); font-size: 13px; }
+  .sess-chart { width: 100%; height: 240px; display: block; }
+  #session .panel { margin-top: 16px; }
+  @media (max-width: 720px) { #sessTiles.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .session-head { flex-direction: column; align-items: flex-start; } }
   .kv { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px 16px; font-size: 13px; }
   .kv div span { color: var(--text-faint); display: block; font-size: 12px; }
   .kv div b { font-family: var(--mono); font-weight: 550; font-variant-numeric: tabular-nums; }
@@ -536,7 +542,7 @@
     <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose an audio file to analyse">
       <div class="dz-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
       <div class="dz-title">Drop an audio file here</div>
-      <div class="dz-sub">WAV, AIFF, FLAC or MP3. Lossless files give the most accurate results.</div>
+      <div class="dz-sub">WAV, AIFF, FLAC or MP3. Lossless files give the most accurate results. You can also drop a Liminal session file (.json).</div>
       <button class="btn primary" type="button" tabindex="-1">Choose file</button>
     </div>
     <div class="steps">
@@ -558,6 +564,34 @@
       <div class="bar"><div id="progressBar"></div></div>
       <div class="step" id="progressStep">Decoding audio…</div>
     </div>
+  </section>
+
+  <!-- ================= Liminal session ================= -->
+  <section id="session" class="hidden">
+    <div class="session-head">
+      <div>
+        <div class="eyebrow">Liminal session</div>
+        <h1 id="sessTitle">Liminal session</h1>
+        <div class="session-meta" id="sessMeta"></div>
+      </div>
+      <button class="btn" id="sessBack">Back</button>
+    </div>
+    <section class="panel">
+      <div class="panel-head"><h2>Result</h2><span class="sub" id="sessSub"></span></div>
+      <div class="tiles big cols-4" id="sessTiles"></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>What it means</h2></div>
+      <div class="findings" id="sessFindings"></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Over time</h2><span class="sub">Short-term loudness (blue) against your target (green); gain reduction hangs from the top (red)</span></div>
+      <canvas id="sessChart" class="sess-chart"></canvas>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Settings</h2></div>
+      <div class="kv" id="sessSettings"></div>
+    </section>
   </section>
 
   <!-- ================= App ================= -->
@@ -828,7 +862,7 @@
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<input type="file" id="fileInput" accept="audio/*,.wav,.aif,.aiff,.flac,.mp3,.m4a" class="hidden">
+<input type="file" id="fileInput" accept="audio/*,.wav,.aif,.aiff,.flac,.mp3,.m4a,.json" class="hidden">
 <input type="file" id="refInput" accept="audio/*,.wav,.aif,.aiff,.flac,.mp3,.m4a" class="hidden">
 <input type="file" id="histInput" accept="application/json" class="hidden">
 
@@ -1993,6 +2027,7 @@ const DSP = (() => {
   }
 
   async function openFile(file) {
+    if (/\.json$/i.test(file.name)) return openSession(file);
     stopEverything();
     showView('progress');
     $('progressFile').textContent = file.name;
@@ -2026,11 +2061,12 @@ const DSP = (() => {
     $('landing').classList.toggle('hidden', which !== 'landing');
     $('progress').classList.toggle('hidden', which !== 'progress');
     $('app').classList.toggle('hidden', which !== 'app');
+    $('session').classList.toggle('hidden', which !== 'session');
     const inApp = which === 'app';
     $('tabbar').classList.toggle('hidden', !inApp);
     $('transport').classList.toggle('hidden', !inApp);
     $('fileChip').classList.toggle('hidden', !inApp);
-    $('openAnotherBtn').classList.toggle('hidden', !inApp);
+    $('openAnotherBtn').classList.toggle('hidden', !inApp && which !== 'session');
     document.body.classList.toggle('has-transport', inApp);
   }
 
@@ -3612,6 +3648,116 @@ const DSP = (() => {
     if (!loadHist().length) return;
     if (confirm('Delete all saved versions from this browser? This can’t be undone.')) { saveHist([]); histSel = []; renderHistory(); }
   });
+
+
+  // ===================================================================
+  // Liminal sessions: the plugin's Record button saves a .json session that
+  // opens here with its numbers, verdicts, a timeline and the settings used.
+  // ===================================================================
+  let sessionReturn = 'landing', lastSession = null;
+  async function openSession(file) {
+    let obj = null;
+    try { obj = JSON.parse(await file.text()); } catch (e) { /* not JSON */ }
+    if (!obj || obj.format !== 'liminal-session') return toast('That .json file isn’t a Liminal session.');
+    const appVisible = !$('app').classList.contains('hidden');
+    sessionReturn = appVisible ? 'app' : 'landing';
+    if (appVisible) stopEverything();
+    lastSession = obj;
+    renderSession(obj, file.name);
+    showView('session');
+    window.scrollTo(0, 0);
+  }
+  $('sessBack').addEventListener('click', () => showView(sessionReturn === 'app' && S && S.sf ? 'app' : 'landing'));
+  window.addEventListener('resize', () => { if (lastSession && !$('session').classList.contains('hidden')) drawSessionChart(lastSession); });
+
+  function renderSession(s, name) {
+    const sum = s.summary || {}, set = s.settings || {}, tl = s.timeline || {};
+    const target = isFinite(set.target) ? set.target : -14;
+    const ceil = isFinite(set.ceiling) ? set.ceiling : -1;
+    const created = s.created ? new Date(s.created) : null;
+    $('sessTitle').textContent = name.replace(/\.json$/i, '');
+    $('sessMeta').textContent = [s.plugin || 'Liminal', created && !isNaN(created) ? created.toLocaleString() : '', isFinite(s.durationSec) ? fmtTime(s.durationSec) + ' recorded' : '', s.sampleRate ? (s.sampleRate / 1000) + ' kHz' : ''].filter(Boolean).join(' · ');
+    $('sessSub').textContent = `Target ${fmt(target)} LUFS · ceiling ${fmt(ceil)} dBTP`;
+
+    const I = sum.integrated, d = I - target;
+    const iStatus = !isFinite(I) ? '' : Math.abs(d) <= 1 ? 'ok' : 'warn';
+    const tp = sum.truePeakOut, tpStatus = !isFinite(tp) ? '' : tp > ceil + 0.05 ? 'danger' : 'ok';
+    const cp = sum.codecPeak, cpStatus = !isFinite(cp) ? '' : cp > 0 ? 'danger' : cp > -0.5 ? 'warn' : 'ok';
+    const plr = sum.plr, plrStatus = !isFinite(plr) ? '' : plr < 8 ? 'warn' : 'ok';
+    const gra = sum.grAvg, graStatus = !isFinite(gra) ? '' : gra > 4 ? 'warn' : 'ok';
+    const pct = sum.grPercent, pctStatus = !isFinite(pct) ? '' : pct > 50 ? 'warn' : 'ok';
+    $('sessTiles').innerHTML = [
+      tile('Integrated', fmt(I), 'LUFS', iStatus, isFinite(I) ? (Math.abs(d) < 0.25 ? 'On target' : `${fmt(Math.abs(d))} LU ${d < 0 ? 'under' : 'over'} target`) : ''),
+      tile('Max short-term', fmt(sum.maxShortTerm), 'LUFS', '', 'Loudest 3 s'),
+      tile('True peak', fmt(tp), 'dBTP', tpStatus, tpStatus === 'danger' ? 'Over the ceiling' : 'Under the ceiling'),
+      tile('Codec peak (est.)', fmt(cp), 'dBTP', cpStatus, cpStatus === 'ok' ? 'Safe for AAC / MP3' : 'May clip after encoding'),
+      tile('PLR', fmt(plr), 'dB', plrStatus, !isFinite(plr) ? '' : plr < 8 ? 'Squashed' : plr <= 13 ? 'Competitive' : 'Very dynamic'),
+      tile('LRA', fmt(sum.lra), 'LU', '', 'Loudness range'),
+      tile('Gain reduction', fmt(gra), 'dB avg', graStatus, isFinite(sum.grPeak) ? `Peak ${fmt(sum.grPeak)} dB` : ''),
+      tile('Time limiting', isFinite(pct) ? Math.round(pct) : '—', '%', pctStatus, 'More than 0.5 dB'),
+    ].join('');
+
+    const F = [];
+    if (isFinite(I)) {
+      if (Math.abs(d) <= 1) F.push({ status: 'ok', title: `Loudness is on target (${fmt(I)} LUFS)`, body: 'Streaming services will play it at about the level you mastered it.' });
+      else if (d < -1) F.push({ status: 'warn', title: `${fmt(-d)} LU quieter than the target`, body: `Services only turn quiet tracks up if there is headroom, so it may play quieter than the competition. Lower Threshold, or press Learn in Liminal to land on ${fmt(target)} LUFS.` });
+      else F.push({ status: 'info', title: `${fmt(d)} LU louder than the target`, body: `Services will turn it down by about ${fmt(d)} dB, so the extra limiting buys no loudness, only less punch. Consider raising Threshold, or use Learn.` });
+    }
+    if (isFinite(tp)) F.push(tp > ceil + 0.05 ? { status: 'danger', title: `True peak ${fmt(tp)} dBTP is over the ${fmt(ceil)} dBTP ceiling`, body: 'Something after Liminal is adding level, or the ceiling was changed during the recording.' }
+                                             : { status: 'ok', title: `True peak held at ${fmt(tp)} dBTP`, body: 'Safe for streaming delivery.' });
+    if (isFinite(cp) && cp > -0.5) F.push({ status: cpStatus, title: `Codec peak estimate ${fmt(cp)} dBTP`, body: 'Lossy encoders cut the top octave, which makes loud peaks overshoot. Lower the Ceiling to -1.5 or -2.0 dBTP to stay clean after encoding.' });
+    if (isFinite(plr)) F.push(plr < 8 ? { status: 'warn', title: `PLR ${fmt(plr)} dB: heavily limited`, body: 'At -14 LUFS this costs punch with no loudness benefit. Back off the limiting, or let Bass first take the kick peaks.' }
+                                      : plr <= 13 ? { status: 'ok', title: `PLR ${fmt(plr)} dB: competitive`, body: 'Punchy and dense, in the range of commercial masters at -14 LUFS.' }
+                                                  : { status: 'info', title: `PLR ${fmt(plr)} dB: lots of dynamics`, body: 'Fine for acoustic or cinematic music; pop and electronic masters usually sit at 8-12 dB.' });
+    if (isFinite(gra) && gra > 4) F.push({ status: 'warn', title: `Average gain reduction ${fmt(gra)} dB`, body: 'Constant heavy limiting tends to sound flat and can pump. Fix the loudest elements in the mix, or try Bass first.' });
+    if (isFinite(sum.correlation) && sum.correlation < 0.3) F.push({ status: sum.correlation < 0 ? 'danger' : 'warn', title: `Phase correlation ${fmt(sum.correlation, 2)}`, body: 'Parts of the mix may cancel on mono speakers. Check wide effects and keep the low end mono.' });
+    $('sessFindings').innerHTML = F.map(f => `<div class="finding ${f.status}"><div class="ic">${STATUS_ICON[f.status]}</div><div><div class="ft">${esc(f.title)}</div><div class="fb">${esc(f.body)}</div></div></div>`).join('') || '<p class="note">No loudness data in this session yet.</p>';
+
+    const MODES = ['Brickwall', 'Soft Clip', 'Lookahead', 'Multiband'];
+    const onOff = v => v ? 'On' : 'Off';
+    const items = [
+      ['Mode', MODES[set.mode] || set.mode], ['Threshold', fmt(set.threshold) + ' dB'], ['Ceiling', fmt(set.ceiling) + ' dBTP'],
+      ['Input', fmtSigned(set.inputGain) + ' dB'], ['Attack', fmt(set.attack) + ' ms'], ['Release', fmt(set.release, 0) + ' ms' + (set.adaptiveRelease === false ? ', fixed' : set.adaptiveRelease ? ', adaptive' : '')],
+      ['Lookahead', fmt(set.lookahead) + ' ms'], ['Auto makeup', onOff(set.makeup)], ['Output', fmtSigned(set.outputGain) + ' dB'],
+      ['Bass first', set.bassFirst ? `On, ${fmt(set.bassRange)} dB below ${fmt(set.bassFreq, 0)} Hz` : 'Off'], ['Stereo link', fmt(set.linkAmount, 0) + '%'],
+      ['M/S', onOff(set.msMode)], ['Oversampling', ['Off', '2x', '4x'][set.osMode] || '—'], ['4x on export', onOff(set.exportOS)],
+      ['Drive', fmt(set.drive) + ' dB'], ['Crossover', fmt(set.xoverFreq, 0) + ' Hz'], ['Dither', ['Off', '24-bit', '16-bit'][set.dither] || '—'], ['Target', fmt(target) + ' LUFS'],
+    ];
+    $('sessSettings').innerHTML = items.map(([k, v]) => `<div><span>${esc(k)}</span><b>${esc(String(v))}</b></div>`).join('');
+    requestAnimationFrame(() => drawSessionChart(s));
+  }
+
+  function drawSessionChart(s) {
+    const cv = $('sessChart'), tl = s.timeline || {}, st = tl.shortTerm || [], gr = tl.gr || [];
+    const dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+    if (!W || !H) return;
+    cv.width = W * dpr; cv.height = H * dpr;
+    const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    const css = getComputedStyle(document.documentElement), col = n => css.getPropertyValue(n).trim();
+    const target = isFinite((s.settings || {}).target) ? s.settings.target : -14;
+    const L = 40, R = 40, T = 8, B = 22, pw = W - L - R, ph = H - T - B;
+    const lo = -30, hi = -3, y = v => T + (1 - (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * ph;
+    const n = Math.max(st.length, gr.length, 2), x = i => L + i / (n - 1) * pw;
+    g.font = '11px ' + col('--font'); g.fillStyle = col('--text-faint'); g.strokeStyle = col('--grid'); g.lineWidth = 1;
+    for (const v of [-6, -10, -14, -18, -24]) { g.beginPath(); g.moveTo(L, y(v) + .5); g.lineTo(W - R, y(v) + .5); g.stroke(); g.fillText(String(v).replace('-', MINUS), 6, y(v) + 4); }
+    for (const dg of [3, 6, 9]) g.fillText(MINUS + dg, W - R + 8, T + dg / 12 * ph * 0.5 + 4);
+    const dur = Math.max(st.length, gr.length) > 1 ? (Math.max(st.length, gr.length) - 1) * (tl.intervalSec || 1) : (s.durationSec || 0);
+    for (let k = 0; k <= 4; k++) { const t = dur * k / 4; g.fillText(fmtTime(t), L + k / 4 * pw - (k === 4 ? 24 : k ? 12 : 0), H - 6); }
+    g.setLineDash([5, 4]); g.strokeStyle = col('--ok'); g.beginPath(); g.moveTo(L, y(target)); g.lineTo(W - R, y(target)); g.stroke(); g.setLineDash([]);
+    if (gr.length) {   // gain reduction from the top, 0-12 dB over the upper half
+      g.beginPath(); g.moveTo(x(0), T);
+      gr.forEach((v, i) => g.lineTo(x(i), T + Math.min(1, Math.abs(v) / 12) * ph * 0.5));
+      g.lineTo(x(gr.length - 1), T); g.closePath();
+      g.fillStyle = col('--danger') + '33'; g.fill();
+      g.beginPath(); gr.forEach((v, i) => (i ? g.lineTo : g.moveTo).call(g, x(i), T + Math.min(1, Math.abs(v) / 12) * ph * 0.5));
+      g.strokeStyle = col('--danger'); g.lineWidth = 1.5; g.stroke();
+    }
+    const pts = st.map((v, i) => [x(i), v]).filter(p => isFinite(p[1]) && p[1] > -69);
+    if (pts.length > 1) {
+      g.beginPath(); pts.forEach(([px, v], i) => (i ? g.lineTo : g.moveTo).call(g, px, y(v)));
+      g.strokeStyle = col('--accent'); g.lineWidth = 2; g.stroke();
+    }
+  }
 
   // ===================================================================
   // Reports
