@@ -1461,10 +1461,14 @@ const DSP = (() => {
       status = 'warn'; headline = `Turn it down ${(m.lufs - TARGET_LUFS).toFixed(1)} dB to land on −14`;
     }
     else if (!tpOk) { status = 'warn'; headline = `Peaks are above −1 dBTP`; }
+    else if (m.lufs > TARGET_LUFS + 0.5 && m.plr >= 8) { status = 'ok'; headline = `Ready: a louder master at ${(m.lufs < 0 ? '−' : '') + Math.abs(m.lufs).toFixed(1)} LUFS`; }
     else if (!atTarget) { status = 'warn'; headline = m.lufs < TARGET_LUFS ? `Turn up ${(TARGET_LUFS - m.lufs).toFixed(1)} dB to reach −14` : `${(m.lufs - TARGET_LUFS).toFixed(1)} dB louder than −14`; }
     else { status = 'ok'; headline = density === 'open' ? 'Ready for −14, with open dynamics' : density === 'squashed' ? 'At −14, but heavily limited' : 'Ready for −14'; }
     const trimOnly = !tpOk && peakCut <= 0.05 && m.lufs > TARGET_LUFS + 0.05 && m.truePeak - (m.lufs - TARGET_LUFS) <= CEILING_DB + 0.05;
-    return { peakCut, raise, playbackLufs, trimOnly, shortfall: TARGET_LUFS - playbackLufs, atTarget, tpOk, density, status, headline,
+    // Louder than −14 with safe peaks and a competitive PLR: a deliberate choice of density,
+    // which plays the same as a −14 master on streaming and louder where nothing normalises.
+    const louderByChoice = tpOk && peakCut <= 0.05 && m.lufs > TARGET_LUFS + 0.5 && m.plr >= 8;
+    return { peakCut, raise, playbackLufs, trimOnly, louderByChoice, shortfall: TARGET_LUFS - playbackLufs, atTarget, tpOk, density, status, headline,
              budget: PLR_BUDGET, target: TARGET_LUFS, ceiling: CEILING_DB };
   }
 
@@ -1691,18 +1695,22 @@ const DSP = (() => {
     }
     // budget result
     let budget = null;
-    const contrib = new Float64Array(B); let used = 0;
+    const contrib = new Float64Array(B), led = new Float64Array(B), ledHits = new Float64Array(B); let used = 0;
     for (let i = 0; i < evs.length; i++) {
       const v = vals[i]; let bj = 0, bs = 0;
       for (let j = 0; j < span; j++) { let s = 0; for (let b = 0; b < B; b++) s += v[b * span + j]; if (Math.abs(s) > Math.abs(bs)) { bs = s; bj = j; } }
       if (!bs) continue;
-      for (let b = 0; b < B; b++) contrib[b] += v[b * span + bj] / bs;
+      let lead = 0, leadV = -Infinity;
+      for (let b = 0; b < B; b++) { const c = v[b * span + bj] / bs; contrib[b] += c; if (c > leadV) { leadV = c; lead = b; } }
+      if (evs[i].cat) { led[lead]++; if (evs[i].cat === 'hits' || evs[i].cat === 'kickbass') ledHits[lead]++; }
       used++;
     }
     if (used) {
       const loudTot = loud.reduce((a, b) => a + b, 0) || 1;
       const pos = Array.from(contrib, x => Math.max(0, x / used)), posTot = pos.reduce((a, b) => a + b, 0) || 1;
-      const out = bands.map((b, i) => ({ key: b.key, name: b.name, range: b.range, peakShare: pos[i] / posTot, loudShare: loud[i] / loudTot }));
+      // hitShare: of the peaks this band leads, how many are drum hits rather than sustained parts
+      const out = bands.map((b, i) => ({ key: b.key, name: b.name, range: b.range, peakShare: pos[i] / posTot, loudShare: loud[i] / loudTot,
+        hitShare: led[i] >= 5 ? ledHits[i] / led[i] : null, led: led[i] }));
       out.forEach(b => { b.ratio = b.peakShare / Math.max(0.005, b.loudShare); });
       budget = { bands: out, peaksUsed: used,
         costly: out.filter(b => b.peakShare >= 0.1 && b.ratio >= 1.8).sort((a, b) => (b.peakShare - b.loudShare) - (a.peakShare - a.loudShare)),
@@ -1714,7 +1722,8 @@ const DSP = (() => {
       const list = bands.map((bd, b) => {
         const dLufs = 10 * Math.log10((msVar[b] || 1e-20) / (msBase || 1e-20)), work = workFromPeaks(varPk[b], base.lufs + dLufs, target);
         const saved = baseWork.avg - work.avg;
-        return { key: bd.key, name: bd.name, range: bd.range, cutDb: BAND_CUT_DB, dLufs, work, saved, pct: baseWork.avg > 0.01 ? saved / baseWork.avg * 100 : 0, savedMax: baseWork.max - work.max };
+        const hb = budget && budget.bands.find(x => x.key === bd.key);
+        return { key: bd.key, name: bd.name, range: bd.range, hitShare: hb ? hb.hitShare : null, cutDb: BAND_CUT_DB, dLufs, work, saved, pct: baseWork.avg > 0.01 ? saved / baseWork.avg * 100 : 0, savedMax: baseWork.max - work.max };
       });
       moves = { target, base: baseWork, moves: list.sort((a, b) => b.saved - a.saved) };
     }
@@ -1908,19 +1917,36 @@ const DSP = (() => {
   }
 
   const mmss = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
-  const BAND_FIX = {
-    sub: 'Compress or saturate the sub and 808, or sidechain it to the kick.',
-    bass: 'Compress or saturate the bass, or sidechain it to the kick where they overlap.',
-    lowmid: 'Compress the busiest low-mid parts (guitars, keys, low vocals) or tame the body of the kick and snare.',
-    mid: 'Compress vocals and leads, or clip the snare a little.',
-    presence: 'In most mixes that range is snare and hat attacks, vocal consonants and bright leads, so a clipper or fast limiter on the drum bus, a de-esser, or a compressor on the lead takes it off cleanly.',
-    high: 'In most mixes that range is hats, cymbals and sibilance, so a clipper or fast limiter on the drum bus, or a de-esser, takes it off cleanly.',
+  // What to reach for, by range and by whether that range's peaks are drum hits or sustained parts
+  const BAND_ADVICE = {
+    sub: { hits: ['Clip or fast-limit the kick, and sidechain the sub to it', 'Those peaks land on the kick, so clipping or fast-limiting the kick a little, and sidechaining the sub or 808 to it, takes them off.'],
+           sustained: ['Compress or saturate the sub and 808', 'Those peaks come from sustained sub notes, so compressing or saturating the sub and 808 evens them out.'] },
+    bass: { hits: ['Clip the kick, and sidechain the bass to it', 'Those peaks land on the kick, so a little kick clipping and sidechaining the bass to the kick takes them off.'],
+            sustained: ['Compress or saturate the bass', 'Those peaks come from sustained bass notes, so compressing or saturating the bass evens them out.'] },
+    lowmid: { hits: ['Tame the body of the kick and snare', 'Those peaks are drum hits, so taming the body of the kick and snare (a clipper or fast compressor on the drum bus) takes them off.'],
+              sustained: ['Compress the busiest guitars, keys or low vocals', 'Those peaks come from sustained parts, so compressing the busiest guitars, keys or low vocals evens them out.'] },
+    mid: { hits: ['A little snare clipping, or a drum-bus clipper', 'Those peaks are drum hits, mostly snare, so a little clipping on the snare or the drum bus takes them off.'],
+           sustained: ['Compress vocals and leads', 'Those peaks come from sustained parts, usually vocals and leads, so compressing or clip-gaining them evens them out.'] },
+    presence: { hits: ['Drum-bus clipper or fast limiter on the snare and hats', 'Those peaks are drum hits, mostly snare and hat attacks, so a clipper or fast limiter on the drum bus takes them off cleanly.'],
+                sustained: ['De-esser or compression on vocals and bright leads', 'Those peaks come from sustained parts rather than drum hits: usually vocal sibilance or a bright lead or synth, so a de-esser or compression on that part takes them off. Check which part is bright at the peak clusters on the Loudness timeline.'] },
+    high: { hits: ['Drum-bus clipper or fast limiter on hats and cymbals', 'Those peaks are drum hits, mostly hats and cymbals, so a clipper or fast limiter on the drum bus takes them off cleanly.'],
+            sustained: ['De-esser on vocals, or tame bright cymbals and synths', 'Those peaks come from sustained parts rather than sharp hits: usually sibilance, ringing cymbals or a bright synth, so a de-esser or a gentle high-shelf compressor on that part takes them off. Check which part is bright at the peak clusters on the Loudness timeline.'] },
   };
+  // hitShare null (unknown) leans on the drum-bus advice, which fits most mixes
+  function bandAdvice(key, hitShare, long) {
+    const a = BAND_ADVICE[key]; if (!a) return '';
+    const kind = hitShare === null || hitShare === undefined ? null : hitShare >= 0.5 ? 'hits' : 'sustained';
+    if (kind) return a[kind][long ? 1 : 0];
+    return long ? `${a.hits[1]} If they come from sustained parts instead, ${a.sustained[0].charAt(0).toLowerCase() + a.sustained[0].slice(1)}.` : `${a.hits[0]}, or ${a.sustained[0].charAt(0).toLowerCase() + a.sustained[0].slice(1)}`;
+  }
+
 
   // When the limiter is already fighting the presence range, boosting it there costs headroom.
   function presenceClash(m) {
     const mv = m.louder && m.louder.moves && m.louder.moves.moves;
     if (!mv || !mv.length || mv[0].pct < 10 || !['presence', 'high'].includes(mv[0].key)) return '';
+    const hs = mv[0].hitShare;
+    if (hs !== null && hs !== undefined && hs < 0.5) return ' Your loudest peaks also come from this range, mostly from a bright sustained part, so de-ess or compress that part first, then lift the parts that sit underneath it (pads, backing vocals, guitars) rather than the whole mix; together you get the presence without extra limiting.';
     return ' Your loudest peaks also come from this range, so lift the sustained parts (vocals, leads, pads) rather than the whole mix, and clip or fast-limit the drum transients there; together you get the presence without extra limiting.';
   }
 
@@ -1951,6 +1977,8 @@ const DSP = (() => {
         `Integrated loudness is ${f(m.lufs)} LUFS, within half a dB of the −14 target, so services will play it at full level without changing its sound.`);
       else if (m.lufs < TARGET_LUFS) add('loudness', 'warn', 'Below −14',
         `Integrated loudness is ${f(m.lufs)} LUFS. Your peaks leave room to raise it by ${(TARGET_LUFS - m.lufs).toFixed(1)} dB and still stay under −1 dBTP, so turn up the limiter input.`);
+      else if (m.plr >= 8 && m.truePeak <= CEILING_DB + 0.05) add('loudness', 'ok', 'Louder master with competitive density',
+        `Integrated loudness is ${f(m.lufs)} LUFS at a PLR of ${f(m.plr)} dB. Streaming services turn it down ${(m.lufs - TARGET_LUFS).toFixed(1)} dB, where it plays like any −14 track with this density; where nothing normalises (SoundCloud, Bandcamp, DJ sets) it plays louder. Mastering at −14 instead only makes sense if you want a more open sound.`);
       else add('loudness', m.lufs > -11 ? 'warn' : 'info', 'Louder than −14',
         `Integrated loudness is ${f(m.lufs)} LUFS, so services will turn it down ${(m.lufs - TARGET_LUFS).toFixed(1)} dB. It will play at −14 like everything else, but with the extra limiting baked in. Mastering to −14 would let you keep about ${(m.lufs - TARGET_LUFS).toFixed(1)} dB more punch.`);
     }
@@ -2038,7 +2066,7 @@ const DSP = (() => {
       const where = pair ? `${top.name.toLowerCase()} and ${second.name.toLowerCase()}` : top.name.toLowerCase();
       if (top.pct >= 10) add('loudness', top.pct >= 20 ? 'warn' : 'info', `Your limiter is mostly fighting the ${where}`,
         `Taking ${top.cutDb} dB off the loudest moments in the ${top.name.toLowerCase()} (${top.range}) would cut the master limiting by about ${Math.round(top.pct)}%` +
-        (pair ? `, and in the ${second.name.toLowerCase()} by ${Math.round(second.pct)}%` : '') + `, measured on this track at a PLR of ${LM.moves.target}. ${BAND_FIX[top.key]}` +
+        (pair ? `, and in the ${second.name.toLowerCase()} by ${Math.round(second.pct)}%` : '') + `, measured on this track at a PLR of ${LM.moves.target}. ${bandAdvice(top.key, top.hitShare, true)}` +
         (worst.pct <= -5 ? ` Controlling the ${worst.name.toLowerCase()} instead would make it worse: it removes more loudness than peak.` : '') +
         (m.limited ? ' This file is already limited, so for the clearest answer, analyse your mix before the master limiter.' : ''));
     }
@@ -2072,7 +2100,7 @@ const DSP = (() => {
   return {
     applyBiquad, kWeightChannel, fft, mixToMono, loudness, truePeak, levels, tonal, logBars,
     averagePsd, bandPower, correlation, stereoField, vectorscopePoints, spectrogram, transients,
-    summary, findings, OCTAVE_CENTRES, loudnessBudget, mixMoves, energyDips, peakHotspots, loudnessVerdict, findPeakEvents, MIX_MOVES, rbjCoefs, looksLimited, louder, readiness, peakSources, processMaster, asBuffer, referenceDiffs, TARGET_LUFS, CEILING_DB, PLR_BUDGET,
+    summary, findings, OCTAVE_CENTRES, loudnessBudget, mixMoves, energyDips, peakHotspots, loudnessVerdict, findPeakEvents, bandAdvice, MIX_MOVES, rbjCoefs, looksLimited, louder, readiness, peakSources, processMaster, asBuffer, referenceDiffs, TARGET_LUFS, CEILING_DB, PLR_BUDGET,
   };
 })();
 
@@ -2567,14 +2595,14 @@ const DSP = (() => {
   function summaryItems() {
     const m = S.metrics;
     const R = DSP.readiness(m);
-    const lufsSt = R.atTarget ? 'ok' : 'warn';
+    const lufsSt = R.atTarget || R.louderByChoice ? 'ok' : 'warn';
     const tpSt = m.truePeak > -0.1 ? 'danger' : m.truePeak > -1 + 0.05 ? 'warn' : 'ok';
     const plrSt = { squashed: 'warn', competitive: 'ok', open: 'info', 'too-dynamic': 'warn' }[R.density];
     const tSt = tiltStatus(m.tilt);
     const cSt = corrStatus(m.corr);
     const mono = !isFinite(m.width);
     return [
-      { label: 'Integrated loudness', short: 'Loudness', value: fmt(m.lufs), unit: 'LUFS', status: lufsSt, verdict: R.atTarget ? 'On target for −14' : m.lufs < -14 ? `${(-14 - m.lufs).toFixed(1)} dB below −14` : `${(m.lufs + 14).toFixed(1)} dB above −14` },
+      { label: 'Integrated loudness', short: 'Loudness', value: fmt(m.lufs), unit: 'LUFS', status: lufsSt, verdict: R.atTarget ? 'On target for −14' : R.louderByChoice ? `Louder by choice, PLR ${fmt(m.plr)}` : m.lufs < -14 ? `${(-14 - m.lufs).toFixed(1)} dB below −14` : `${(m.lufs + 14).toFixed(1)} dB above −14` },
       { label: 'True peak', value: fmt(m.truePeak), unit: 'dBTP', status: tpSt, verdict: tpSt === 'ok' ? 'Safe headroom' : tpSt === 'warn' ? 'Above −1 dBTP' : 'No headroom' },
       { label: 'Peak-to-loudness', value: fmt(m.plr), unit: 'dB', status: plrSt, verdict: { squashed: 'Heavily limited', competitive: 'Competitive density', open: 'Open (12–13 dB)', 'too-dynamic': `Over the ${DSP.PLR_BUDGET} dB budget` }[R.density] },
       { label: 'Loudness range', value: fmt(m.lra), unit: 'LU', status: m.lra > 12 ? 'info' : 'ok', verdict: m.lra > 12 ? 'Large section changes' : 'Consistent sections' },
@@ -2720,7 +2748,9 @@ const DSP = (() => {
     } else if (!R.atTarget) {
       steps.push(m.lufs < -14
         ? `<b>Raise the limiter input by ${(-14 - m.lufs).toFixed(1)} dB.</b> <span>Your peaks have room, so it will reach −14 LUFS without going over −1 dBTP.</span>`
-        : `<b>Master to −14 instead of ${fmt(m.lufs)} LUFS.</b> <span>Services turn it down ${(m.lufs + 14).toFixed(1)} dB anyway, so easing the limiter keeps more punch at no cost.</span>`);
+        : R.louderByChoice
+          ? `<b>Louder master at ${fmt(m.lufs)} LUFS, with safe peaks.</b> <span>Streaming services turn it down ${(m.lufs + 14).toFixed(1)} dB, where it plays like any −14 track at a PLR of ${fmt(m.plr)} dB; where nothing normalises (SoundCloud, Bandcamp, DJ sets) it plays louder. Master to −14 instead only if you want a more open sound.</span>`
+          : `<b>Master to −14 instead of ${fmt(m.lufs)} LUFS.</b> <span>Services turn it down ${(m.lufs + 14).toFixed(1)} dB anyway, so easing the limiter keeps more punch at no cost.</span>`);
     } else {
       steps.push(`<b>Level and peaks are on target.</b> <span>${fmt(m.lufs)} LUFS at ${fmt(m.truePeak)} dBTP.</span>`);
     }
@@ -2728,7 +2758,7 @@ const DSP = (() => {
     if (after > 12) steps.push(`<b>For a denser, more competitive sound, aim for a PLR of 10–12 dB.</b> <span>That is another ${(after - 12).toFixed(1)}–${(after - 10).toFixed(1)} dB of peak control. Listen as you go: it trades some transient snap for fullness.</span>`);
     else if (m.plr < 8) steps.push(`<b>Ease the limiting.</b> <span>At a PLR of ${fmt(m.plr)} dB the master is denser than it needs to be at −14; backing off 1–2 dB brings back punch at no loudness cost.</span>`);
     const LM = S.louder && S.louder.moves, top = LM && LM.moves[0];
-    if (top && top.pct >= 15 && LM.base.avg >= 0.02) steps.push(`<b>Biggest mix win: control the ${esc(top.name.toLowerCase())} peaks.</b> <span>Taking ${top.cutDb} dB off the loudest moments in the ${esc(top.range)} range cuts the limiting by about ${pctTxt(top.pct)}. ${esc(BAND_TOOL[top.key])}. See Louder at −14 on the Loudness tab.</span>`);
+    if (top && top.pct >= 15 && LM.base.avg >= 0.02) steps.push(`<b>Biggest mix win: control the ${esc(top.name.toLowerCase())} peaks.</b> <span>Taking ${top.cutDb} dB off the loudest moments in the ${esc(top.range)} range cuts the limiting by about ${pctTxt(top.pct)}. ${esc(bandTool(top))}. See Louder at −14 on the Loudness tab.</span>`);
     if (S.ref && S.refDiffs && S.refDiffs.length) steps.push(`<b>Close the gap to your reference.</b> <span>${esc(S.refDiffs[0].text)}</span>`);
     else if (!S.ref) steps.push(`<b>Compare with a reference.</b> <span>Load a released track in your genre on the Compare tab to see where your mix differs at equal loudness.</span>`);
     return steps;
@@ -2737,6 +2767,7 @@ const DSP = (() => {
   function readinessSub(R, m) {
     if (R.trimOnly) return `Peaks are ${fmt(m.truePeak)} dBTP and the level is ${fmt(m.lufs)} LUFS. A ${(m.lufs + 14).toFixed(1)} dB trim at the very end of the chain fixes both and keeps your density.`;
     if (R.peakCut > 0.05 || (!R.atTarget && m.lufs < -14)) return R.shortfall > 0.05 ? `Right now it plays ${R.shortfall.toFixed(1)} dB quieter than tracks mastered to −14 on services that won't push peaks past −1 dBTP, such as Spotify.` : 'Peaks have room; only the level needs to come up.';
+    if (R.louderByChoice) return `Streaming services turn it down ${(m.lufs + 14).toFixed(1)} dB and it keeps its density; it plays louder wherever nothing normalises.`;
     if (m.lufs > -13.5) return `Services will turn it down ${(m.lufs + 14).toFixed(1)} dB, so the extra loudness is lost and only the limiting remains.`;
     return R.density === 'open' ? 'It fits −14, but it is more open than most competitive releases.' : R.density === 'squashed' ? 'Peaks are heavily limited for a −14 master.' : 'It will play at full level next to other releases.';
   }
@@ -2776,14 +2807,7 @@ const DSP = (() => {
   // ===================================================================
   // Louder at −14: loudness budget, peak-control moves, tone moves
   // ===================================================================
-  const BAND_TOOL = {
-    sub: 'Sub or 808 compression, saturation, or sidechain to the kick',
-    bass: 'Bass compression or saturation, or sidechain to the kick',
-    lowmid: 'Compress the busiest guitars, keys or low vocals',
-    mid: 'Vocal and lead compression, or a little snare clipping',
-    presence: 'Drum-bus clipper or fast limiter, de-esser, lead compression',
-    high: 'Drum-bus clipper or fast limiter, de-esser',
-  };
+  const bandTool = mv => DSP.bandAdvice(mv.key, mv.hitShare, false);
   const pctTxt = v => `${Math.round(Math.abs(v))}%`;
   const joinNames = arr => arr.length < 2 ? (arr[0] || '') : arr.slice(0, -1).join(', ') + ' and ' + arr[arr.length - 1];
   function budgetLead(B) {
@@ -2825,7 +2849,7 @@ const DSP = (() => {
       <div class="lb-legend"><span><i style="background:var(--warn)"></i>Peak height</span><span><i style="background:var(--accent)"></i>Loudness</span></div></div>`;
     const moves = M ? `<div><h3 class="mini-h">What to control</h3>
       <p class="lb-lead">${movesLead(M)} Each row takes ${M.moves[0].cutDb} dB off the loudest 2% of moments in one range, then measures how much less a limiter has to do to reach a PLR of ${M.target} dB.</p>
-      <div>${M.moves.map((mv, i) => `<div class="mv-row${i === 0 && mv.pct >= 10 ? ' top' : ''}"><div class="lb-name">${esc(mv.name)}<small>${esc(mv.range)}</small></div>${moveBar(mv.pct)}<div class="mv-val ${moveCls(mv.pct)}">${moveVal(mv.pct)}</div>${mv.pct >= 10 ? `<div class="mv-how">${esc(BAND_TOOL[mv.key])}</div>` : ''}</div>`).join('')}</div></div>` : '';
+      <div>${M.moves.map((mv, i) => `<div class="mv-row${i === 0 && mv.pct >= 10 ? ' top' : ''}"><div class="lb-name">${esc(mv.name)}<small>${esc(mv.range)}</small></div>${moveBar(mv.pct)}<div class="mv-val ${moveCls(mv.pct)}">${moveVal(mv.pct)}</div>${mv.pct >= 10 ? `<div class="mv-how">${esc(bandTool(mv))}</div>` : ''}</div>`).join('')}</div></div>` : '';
     const allFlat = E && E.moves.every(mv => Math.abs(mv.pct) < 5);
     const eq = E ? `<div><h3 class="mini-h">Tone moves</h3>
       <p class="lb-lead">${allFlat ? 'None of these EQ moves changes the limiting much on this track, so choose tone by ear and against a reference.' : 'How each EQ move changes the limiting at the same density.'} More presence makes a mix feel louder at the same LUFS, even when it costs a little limiting.</p>
