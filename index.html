@@ -1153,6 +1153,18 @@ const DSP = (() => {
     return { truePeakDb: 20 * Math.log10(peak || 1e-10), samplePeakDb: 20 * Math.log10(samplePeak || 1e-10) };
   }
 
+  // ---------- Codec peak estimate ----------
+  // Lossy encoders drop content above ~16 kHz, and removing it changes the waveform's shape,
+  // so peaks can rise. Estimate: 8th-order Butterworth low-pass at 16 kHz, then true peak.
+  function codecPeak(buffer) {
+    const fs = buffer.sampleRate; if (fs < 34000) return NaN;
+    const w0 = 2 * Math.PI * 16000 / fs, c = Math.cos(w0), sn = Math.sin(w0);
+    const stages = [0.5098, 0.6013, 0.9000, 2.5629].map(q => { const al = sn / (2 * q), a0 = 1 + al; return { b0: (1 - c) / 2 / a0, b1: (1 - c) / a0, b2: (1 - c) / 2 / a0, a1: -2 * c / a0, a2: (1 - al) / a0 }; });
+    const chans = [];
+    for (let k = 0; k < buffer.numberOfChannels; k++) { let x = buffer.getChannelData(k); for (const s of stages) x = applyBiquad(x, s); chans.push(x); }
+    return truePeak({ sampleRate: fs, numberOfChannels: chans.length, length: chans[0].length, getChannelData: i => chans[i] }).truePeakDb;
+  }
+
   // ---------- Level statistics (all channels) ----------
   function levels(buffer, mono) {
     let sumSq = 0, peak = 0, n = 0, clipped = 0;
@@ -1447,6 +1459,16 @@ const DSP = (() => {
   // integrated loudness. PLR above that budget means the track can't reach −14.
   const TARGET_LUFS = -14, CEILING_DB = -1, PLR_BUDGET = TARGET_LUFS * -1 + CEILING_DB; // 13 dB
 
+  // Encoded peaks should stay at or below −1 dBTP. Without an estimate, fall back to Spotify's
+  // advice of −2 dBTP for masters louder than −14.
+  function hotForCodec(m) {
+    if (isFinite(m.codecPeak)) return m.codecPeak > CEILING_DB + 0.1;
+    return m.lufs > TARGET_LUFS + 0.5 && m.truePeak > -2.05;
+  }
+  function safeCeilingFor(m) {
+    const over = isFinite(m.codecPeak) ? m.codecPeak - CEILING_DB : m.truePeak + 2;
+    return Math.floor((m.truePeak - Math.max(0, over)) * 10) / 10; // round down to 0.1 dB
+  }
   function readiness(m) {
     const peakCut = Math.max(0, m.plr - PLR_BUDGET);
     const raise = m.lufs < TARGET_LUFS ? Math.max(0, Math.min(TARGET_LUFS - m.lufs, CEILING_DB - m.truePeak)) : 0;
@@ -1461,14 +1483,18 @@ const DSP = (() => {
       status = 'warn'; headline = `Turn it down ${(m.lufs - TARGET_LUFS).toFixed(1)} dB to land on −14`;
     }
     else if (!tpOk) { status = 'warn'; headline = `Peaks are above −1 dBTP`; }
-    else if (m.lufs > TARGET_LUFS + 0.5 && m.plr >= 8) { status = 'ok'; headline = `Ready: a louder master at ${(m.lufs < 0 ? '−' : '') + Math.abs(m.lufs).toFixed(1)} LUFS`; }
+    else if (m.lufs > TARGET_LUFS + 0.5 && m.plr >= 8) {
+      if (hotForCodec(m)) { status = 'warn'; headline = 'Louder master, but peaks are too hot for encoding'; }
+      else { status = 'ok'; headline = `Ready: a louder master at ${(m.lufs < 0 ? '−' : '') + Math.abs(m.lufs).toFixed(1)} LUFS`; }
+    }
     else if (!atTarget) { status = 'warn'; headline = m.lufs < TARGET_LUFS ? `Turn up ${(TARGET_LUFS - m.lufs).toFixed(1)} dB to reach −14` : `${(m.lufs - TARGET_LUFS).toFixed(1)} dB louder than −14`; }
     else { status = 'ok'; headline = density === 'open' ? 'Ready for −14, with open dynamics' : density === 'squashed' ? 'At −14, but heavily limited' : 'Ready for −14'; }
     const trimOnly = !tpOk && peakCut <= 0.05 && m.lufs > TARGET_LUFS + 0.05 && m.truePeak - (m.lufs - TARGET_LUFS) <= CEILING_DB + 0.05;
     // Louder than −14 with safe peaks and a competitive PLR: a deliberate choice of density,
     // which plays the same as a −14 master on streaming and louder where nothing normalises.
     const louderByChoice = tpOk && peakCut <= 0.05 && m.lufs > TARGET_LUFS + 0.5 && m.plr >= 8;
-    return { peakCut, raise, playbackLufs, trimOnly, louderByChoice, shortfall: TARGET_LUFS - playbackLufs, atTarget, tpOk, density, status, headline,
+    const codecHot = hotForCodec(m), safeCeiling = safeCeilingFor(m);
+    return { peakCut, raise, playbackLufs, trimOnly, louderByChoice, codecHot, safeCeiling, shortfall: TARGET_LUFS - playbackLufs, atTarget, tpOk, density, status, headline,
              budget: PLR_BUDGET, target: TARGET_LUFS, ceiling: CEILING_DB };
   }
 
@@ -1990,6 +2016,15 @@ const DSP = (() => {
       else add('loudness', 'ok', 'True-peak headroom is safe',
         `True peak is ${f(m.truePeak)} dBTP, below the −1 dBTP streaming guideline.`);
     }
+    if (isFinite(m.codecPeak)) {
+      const sc = safeCeilingFor(m), fc = v => (v < 0 ? '−' : '') + Math.abs(v).toFixed(1);
+      if (m.codecPeak > 0.05) add('loudness', m.codecPeak > 0.5 ? 'danger' : 'warn', 'Peaks will clip after encoding',
+        `The codec peak estimate is ${m.codecPeak > 0 ? '+' : ''}${fc(m.codecPeak)} dBTP: once a lossy encoder (AAC, Ogg, MP3) removes the very top end, the peaks rise ${fc(m.codecPeak - m.truePeak)} dB and go over full scale, so players that don't turn the track down first (SoundCloud, downloads, DJ software, Bluetooth) can distort on them. Lower the limiter ceiling to about ${fc(sc)} dBTP${m.lufs > TARGET_LUFS + 0.5 ? ` and Learn again at the same PLR (target ${fc(sc - m.plr)} LUFS)` : ''}. Spotify recommends −2 dBTP or lower for masters louder than −14.`);
+      else if (m.codecPeak > CEILING_DB + 0.1) add('loudness', 'warn', 'Tight headroom after encoding',
+        `The codec peak estimate is ${fc(m.codecPeak)} dBTP, above the −1 dBTP guideline: encoding raises the peaks ${fc(m.codecPeak - m.truePeak)} dB. A ceiling of about ${fc(sc)} dBTP keeps the encoded peaks under −1.`);
+      else add('loudness', 'ok', 'Safe after encoding',
+        `The codec peak estimate is ${fc(m.codecPeak)} dBTP, so the peaks stay under −1 dBTP after lossy encoding.`);
+    }
     if (m.clippedSamples > 0) add('loudness', m.clipPct > 0.01 ? 'danger' : 'warn', 'Samples at full scale',
       `${m.clippedSamples.toLocaleString()} samples (${m.clipPct.toFixed(4)}%) are at or above full scale, which usually means the bounce clipped. Re-export with more headroom.`);
     if (Math.abs(m.dcOffset) > 0.003) add('loudness', 'warn', 'DC offset',
@@ -2098,7 +2133,7 @@ const DSP = (() => {
   }
 
   return {
-    applyBiquad, kWeightChannel, fft, mixToMono, loudness, truePeak, levels, tonal, logBars,
+    applyBiquad, kWeightChannel, fft, codecPeak, mixToMono, loudness, truePeak, levels, tonal, logBars,
     averagePsd, bandPower, correlation, stereoField, vectorscopePoints, spectrogram, transients,
     summary, findings, OCTAVE_CENTRES, loudnessBudget, mixMoves, energyDips, peakHotspots, loudnessVerdict, findPeakEvents, bandAdvice, MIX_MOVES, rbjCoefs, looksLimited, louder, readiness, peakSources, processMaster, asBuffer, referenceDiffs, TARGET_LUFS, CEILING_DB, PLR_BUDGET,
   };
@@ -2480,7 +2515,7 @@ const DSP = (() => {
     const fs = buffer.sampleRate;
     const steps = [
       ['Measuring loudness', () => { S.loud = DSP.loudness(buffer); }],
-      ['Checking true peak', () => { S.tp = DSP.truePeak(buffer); }],
+      ['Checking true peak', () => { S.tp = DSP.truePeak(buffer); S.codec = DSP.codecPeak(buffer); }],
       ['Measuring levels', () => { S.mono = DSP.mixToMono(buffer); S.levels = DSP.levels(buffer, S.mono); }],
       ['Analysing tonal balance', () => { S.tone = DSP.tonal(S.mono, fs); S.specBars = DSP.logBars(S.tone.psd, S.tone.binHz, 20, Math.min(20000, fs / 2), 140); }],
       ['Analysing the stereo image', () => { S.sf = DSP.stereoField(buffer); S.corr = DSP.correlation(buffer); S.vs = DSP.vectorscopePoints(buffer, 30000); }],
@@ -2506,7 +2541,7 @@ const DSP = (() => {
     const L = S.loud, T = S.tone, lv = S.levels, sf = S.sf;
     S.metrics = {
       lufs: L.integrated, lra: L.lra, maxShortTerm: L.maxShortTerm, maxMomentary: L.maxMomentary,
-      truePeak: S.tp.truePeakDb, samplePeak: lv.samplePeakDb, rms: lv.rmsDb, crest: lv.crest,
+      truePeak: S.tp.truePeakDb, codecPeak: S.codec, samplePeak: lv.samplePeakDb, rms: lv.rmsDb, crest: lv.crest,
       plr: S.tp.truePeakDb - L.integrated,
       tilt: T.tilt, lowMidPresenceGap: T.lowMidPresenceGap, subBassGap: T.subBassGap, lowMidBump: T.lowMidBump, airGap: T.airGap,
       corr: S.corr, width: sf ? sf.overallWidth : NaN, bassWidth: sf ? sf.bassWidth : NaN,
@@ -2596,14 +2631,16 @@ const DSP = (() => {
     const m = S.metrics;
     const R = DSP.readiness(m);
     const lufsSt = R.atTarget || R.louderByChoice ? 'ok' : 'warn';
-    const tpSt = m.truePeak > -0.1 ? 'danger' : m.truePeak > -1 + 0.05 ? 'warn' : 'ok';
+    const codecHot = isFinite(m.codecPeak) && m.codecPeak > -0.9;
+    const tpSt0 = m.truePeak > -0.1 ? 'danger' : m.truePeak > -1 + 0.05 ? 'warn' : 'ok';
+    const tpSt = tpSt0 === 'ok' && codecHot ? (m.codecPeak > 0.5 ? 'danger' : 'warn') : tpSt0;
     const plrSt = { squashed: 'warn', competitive: 'ok', open: 'info', 'too-dynamic': 'warn' }[R.density];
     const tSt = tiltStatus(m.tilt);
     const cSt = corrStatus(m.corr);
     const mono = !isFinite(m.width);
     return [
       { label: 'Integrated loudness', short: 'Loudness', value: fmt(m.lufs), unit: 'LUFS', status: lufsSt, verdict: R.atTarget ? 'On target for −14' : R.louderByChoice ? `Louder by choice, PLR ${fmt(m.plr)}` : m.lufs < -14 ? `${(-14 - m.lufs).toFixed(1)} dB below −14` : `${(m.lufs + 14).toFixed(1)} dB above −14` },
-      { label: 'True peak', value: fmt(m.truePeak), unit: 'dBTP', status: tpSt, verdict: tpSt === 'ok' ? 'Safe headroom' : tpSt === 'warn' ? 'Above −1 dBTP' : 'No headroom' },
+      { label: 'True peak', value: fmt(m.truePeak), unit: 'dBTP', status: tpSt, verdict: tpSt0 !== 'ok' ? (tpSt0 === 'warn' ? 'Above −1 dBTP' : 'No headroom') : codecHot ? `Encodes to ${fmtSigned(m.codecPeak)} dBTP` : 'Safe headroom' },
       { label: 'Peak-to-loudness', value: fmt(m.plr), unit: 'dB', status: plrSt, verdict: { squashed: 'Heavily limited', competitive: 'Competitive density', open: 'Open (12–13 dB)', 'too-dynamic': `Over the ${DSP.PLR_BUDGET} dB budget` }[R.density] },
       { label: 'Loudness range', value: fmt(m.lra), unit: 'LU', status: m.lra > 12 ? 'info' : 'ok', verdict: m.lra > 12 ? 'Large section changes' : 'Consistent sections' },
       { label: 'Tonal tilt', value: fmtSigned(m.tilt), unit: 'dB/oct', status: tSt, verdict: m.tilt < -4.5 ? 'Very dark' : m.tilt < -3 ? 'Dark-leaning' : m.tilt > 1.5 ? 'Very bright' : m.tilt > 0.5 ? 'Bright-leaning' : 'Typical balance' },
@@ -2637,8 +2674,8 @@ const DSP = (() => {
     $('loudTiles').innerHTML =
       tile('Integrated', fmt(m.lufs), 'LUFS') + tile('Max short-term', fmt(m.maxShortTerm), 'LUFS') +
       tile('Max momentary', fmt(m.maxMomentary), 'LUFS') + tile('True peak', fmt(m.truePeak), 'dBTP') +
-      tile('Sample peak', fmt(m.samplePeak), 'dBFS') + tile('Loudness range', fmt(m.lra), 'LU') +
-      tile('PLR', fmt(m.plr), 'dB') + tile('RMS', fmt(m.rms), 'dBFS');
+      tile('Sample peak', fmt(m.samplePeak), 'dBFS') + tile('Codec peak (est.)', isFinite(m.codecPeak) ? fmtSigned(m.codecPeak) : '—', 'dBTP', !isFinite(m.codecPeak) ? null : m.codecPeak > 0.05 ? 'danger' : m.codecPeak > -0.9 ? 'warn' : 'ok') +
+      tile('Loudness range', fmt(m.lra), 'LU') + tile('PLR', fmt(m.plr), 'dB') + tile('RMS', fmt(m.rms), 'dBFS');
   }
 
   const PLATFORMS = [
@@ -2748,7 +2785,9 @@ const DSP = (() => {
     } else if (!R.atTarget) {
       steps.push(m.lufs < -14
         ? `<b>Raise the limiter input by ${(-14 - m.lufs).toFixed(1)} dB.</b> <span>Your peaks have room, so it will reach −14 LUFS without going over −1 dBTP.</span>`
-        : R.louderByChoice
+        : R.louderByChoice && R.codecHot
+          ? `<b>Lower the limiter ceiling to about ${fmt(R.safeCeiling)} dBTP, then Learn again at a target of ${fmt(R.safeCeiling - m.plr)} LUFS.</b> <span>${isFinite(m.codecPeak) ? `Encoding raises the peaks to an estimated ${fmtSigned(m.codecPeak)} dBTP` : `Peaks are at ${fmt(m.truePeak)} dBTP`}, which can distort wherever the track plays at full level. That keeps your PLR of ${fmt(m.plr)} dB and costs ${(m.truePeak - R.safeCeiling).toFixed(1)} dB of level, which streaming services take off anyway.</span>`
+          : R.louderByChoice
           ? `<b>Louder master at ${fmt(m.lufs)} LUFS, with safe peaks.</b> <span>Streaming services turn it down ${(m.lufs + 14).toFixed(1)} dB, where it plays like any −14 track at a PLR of ${fmt(m.plr)} dB; where nothing normalises (SoundCloud, Bandcamp, DJ sets) it plays louder. Master to −14 instead only if you want a more open sound.</span>`
           : `<b>Master to −14 instead of ${fmt(m.lufs)} LUFS.</b> <span>Services turn it down ${(m.lufs + 14).toFixed(1)} dB anyway, so easing the limiter keeps more punch at no cost.</span>`);
     } else {
@@ -2767,6 +2806,7 @@ const DSP = (() => {
   function readinessSub(R, m) {
     if (R.trimOnly) return `Peaks are ${fmt(m.truePeak)} dBTP and the level is ${fmt(m.lufs)} LUFS. A ${(m.lufs + 14).toFixed(1)} dB trim at the very end of the chain fixes both and keeps your density.`;
     if (R.peakCut > 0.05 || (!R.atTarget && m.lufs < -14)) return R.shortfall > 0.05 ? `Right now it plays ${R.shortfall.toFixed(1)} dB quieter than tracks mastered to −14 on services that won't push peaks past −1 dBTP, such as Spotify.` : 'Peaks have room; only the level needs to come up.';
+    if (R.louderByChoice && R.codecHot) return `Its density is fine, but its peaks would go over after lossy encoding${isFinite(m.codecPeak) ? ` (estimated ${fmtSigned(m.codecPeak)} dBTP)` : ''}. A lower ceiling fixes it.`;
     if (R.louderByChoice) return `Streaming services turn it down ${(m.lufs + 14).toFixed(1)} dB and it keeps its density; it plays louder wherever nothing normalises.`;
     if (m.lufs > -13.5) return `Services will turn it down ${(m.lufs + 14).toFixed(1)} dB, so the extra loudness is lost and only the limiting remains.`;
     return R.density === 'open' ? 'It fits −14, but it is more open than most competitive releases.' : R.density === 'squashed' ? 'Peaks are heavily limited for a −14 master.' : 'It will play at full level next to other releases.';
@@ -4411,7 +4451,7 @@ ${pageHtml}
     line('Format', `${i.format || '—'} · ${b.sampleRate} Hz${i.bitDepth ? ' · ' + i.bitDepth + '-bit' : ''} · ${b.numberOfChannels} ch · ${fmtTime(b.duration)}`);
     L.push('', 'LOUDNESS', '-'.repeat(50));
     line('Integrated loudness', `${fmt(m.lufs)} LUFS`); line('Max short-term', `${fmt(m.maxShortTerm)} LUFS`); line('Max momentary', `${fmt(m.maxMomentary)} LUFS`);
-    line('True peak (4x oversampled)', `${fmt(m.truePeak)} dBTP`); line('Sample peak', `${fmt(m.samplePeak)} dBFS`);
+    line('True peak (4x oversampled)', `${fmt(m.truePeak)} dBTP`); if (isFinite(m.codecPeak)) line('Codec peak (estimate)', `${fmtSigned(m.codecPeak)} dBTP`); line('Sample peak', `${fmt(m.samplePeak)} dBFS`);
     line('Loudness range (EBU)', `${fmt(m.lra)} LU`); line('Peak-to-loudness ratio', `${fmt(m.plr)} dB`); line('Crest factor', `${fmt(m.crest)} dB`); line('RMS', `${fmt(m.rms)} dBFS`);
     L.push('', 'TONE (per octave, relative to pink noise)', '-'.repeat(50));
     line('Tilt 63 Hz–8 kHz', `${fmtSigned(m.tilt)} dB/oct`); line('Low-mid bump 250–500 Hz', `${fmtSigned(m.lowMidBump)} dB`);
@@ -4588,10 +4628,11 @@ ${pageHtml}
       ${fig(img.timelineCanvas, `Loudness over time, 0:00–${fmtTime(b.duration)}. Green: momentary (0.4 s). Blue: short-term (3 s). Dashed: integrated (${fmt(m.lufs)} LUFS).`)}
       <div class="cols">
         <div><h3>Measurements</h3><table>
-          ${row('Integrated loudness', `${fmt(m.lufs)} LUFS`, R.atTarget ? 'ok' : 'warn')}
+          ${row('Integrated loudness', `${fmt(m.lufs)} LUFS`, R.atTarget || R.louderByChoice ? 'ok' : 'warn')}
           ${row('Max short-term (3 s)', `${fmt(m.maxShortTerm)} LUFS`, '')}
           ${row('Max momentary (0.4 s)', `${fmt(m.maxMomentary)} LUFS`, '')}
           ${row('True peak', `${fmt(m.truePeak)} dBTP`, tpS)}
+          ${isFinite(m.codecPeak) ? row('Codec peak (estimate)', `${fmtSigned(m.codecPeak)} dBTP`, m.codecPeak > 0.05 ? 'danger' : m.codecPeak > -0.9 ? 'warn' : 'ok') : ''}
           ${row('Sample peak', `${fmt(m.samplePeak)} dBFS`, '')}
           ${row('Loudness range', `${fmt(m.lra)} LU`, m.lra > 12 ? 'info' : 'ok')}
           ${row('RMS level', `${fmt(m.rms)} dBFS`, '')}
