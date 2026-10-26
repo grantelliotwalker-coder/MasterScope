@@ -488,6 +488,63 @@
     .seg button { padding: 5px 7px; font-size: 12px; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  /* ---------- Louder at −14 ---------- */
+  .lb-notice { font-size: 13px; color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--warn); border-radius: 8px; padding: 10px 12px; margin-bottom: 16px; line-height: 1.5; }
+  .lb-notice b { color: var(--text); }
+  .lb-sec + .lb-sec { margin-top: 22px; }
+  .lb-lead { font-size: 13px; color: var(--text-dim); margin: -2px 0 10px; line-height: 1.5; }
+  .lb-lead b { color: var(--text); font-weight: 600; }
+  .lb-rows { display: flex; flex-direction: column; gap: 6px; }
+  .lb-row { display: grid; grid-template-columns: 150px 1fr 120px; gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-name { font-size: 13px; font-weight: 600; line-height: 1.25; }
+  .lb-name small { display: block; font-weight: 400; color: var(--text-faint); font-size: 11.5px; font-family: var(--mono); }
+  .lb-bars { display: flex; flex-direction: column; gap: 4px; }
+  .lb-bar { display: grid; grid-template-columns: 1fr 40px; gap: 8px; align-items: center; }
+  .lb-track { height: 8px; border-radius: 4px; background: var(--surface-3); overflow: hidden; }
+  .lb-fill { height: 100%; border-radius: 4px; }
+  .lb-fill.peak { background: var(--warn); }
+  .lb-fill.loud { background: var(--accent); }
+  .lb-val { font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); text-align: right; font-variant-numeric: tabular-nums; }
+  .lb-tag { font-size: 12px; color: var(--text-faint); text-align: right; }
+  .lb-tag.cost { color: var(--warn); font-weight: 600; }
+  .lb-tag.eff { color: var(--ok); font-weight: 600; }
+  .lb-legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-dim); margin: 8px 0 0; }
+  .lb-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .mv-row { display: grid; grid-template-columns: 130px 1fr 112px; gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .mv-row:last-child { border-bottom: none; }
+  .mv-row.eq { grid-template-columns: 130px 1fr 112px auto; }
+  .mv-row.top .lb-name { color: var(--ok); }
+  .mv-axis { position: relative; height: 10px; border-radius: 5px; background: var(--surface-3); }
+  .mv-axis::after { content: ''; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--border-strong); }
+  .mv-fill { position: absolute; top: 0; bottom: 0; border-radius: 5px; }
+  .mv-fill.good { left: 50%; background: var(--ok); }
+  .mv-fill.bad { right: 50%; background: var(--danger); opacity: .8; }
+  .mv-val { font-family: var(--mono); font-size: 12px; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
+  .mv-val.good { color: var(--ok); } .mv-val.bad { color: var(--danger); } .mv-val.flat { color: var(--text-faint); }
+  .mv-how { grid-column: 2 / -1; font-size: 12px; color: var(--text-faint); margin-top: -4px; }
+  .lb-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .tl-notes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .tl-chip { font: inherit; font-size: 12px; color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+  .tl-chip:hover { border-color: var(--border-strong); color: var(--text); }
+  .tl-chip b { font-family: var(--mono); font-weight: 600; color: var(--text); margin-right: 6px; }
+  .tl-chip.dip b { color: var(--warn); }
+  .legend i.tick { width: 2px; height: 10px; background: var(--text-dim); border-radius: 1px; vertical-align: -1px; }
+  .legend i.dip { background: var(--warn); opacity: .25; }
+  .verdict-box { border: 1px solid var(--border); background: var(--surface-2); border-radius: 10px; padding: 12px 14px; margin: 4px 0 16px; }
+  .verdict-box .vh { font-weight: 650; font-size: 14px; margin-bottom: 4px; }
+  .verdict-box ul { margin: 6px 0 0; padding-left: 18px; font-size: 13px; color: var(--text-dim); line-height: 1.55; }
+  .verdict-box .vn { font-size: 12px; color: var(--text-faint); margin-top: 6px; }
+  @media (max-width: 720px) {
+    .lb-row { grid-template-columns: 1fr; gap: 6px; }
+    .lb-tag { text-align: left; }
+    .mv-row, .mv-row.eq { grid-template-columns: 1fr auto; }
+    .mv-row .mv-axis { grid-column: 1 / -1; grid-row: 2; }
+    .mv-row.eq .btn { grid-column: 1 / -1; justify-self: start; }
+    .mv-how { grid-column: 1 / -1; margin-top: 0; }
+    .lb-cols { grid-template-columns: 1fr; gap: 22px; }
+  }
 </style>
 </head>
 <body>
@@ -647,6 +704,10 @@
           <div class="panel-head"><h2>Peaks &amp; density</h2></div>
           <div id="peaksDensity"></div>
         </section>
+        <section class="panel" data-help="louder" id="louderPanel">
+          <div class="panel-head"><h2>Louder at −14</h2><span class="sub">What to control in the mix, measured on this track</span></div>
+          <div id="louder"></div>
+        </section>
         <section class="panel" data-help="timeline">
           <div class="panel-head"><h2>Loudness over time</h2></div>
           <canvas id="timelineCanvas"></canvas>
@@ -654,7 +715,10 @@
             <span><i style="background:var(--live)"></i>Momentary (0.4 s)</span>
             <span><i style="background:var(--accent)"></i>Short-term (3 s)</span>
             <span style="color:var(--warn)"><i class="dash"></i><span style="color:var(--text-dim)">Integrated</span></span>
+            <span><i class="tick"></i>Loudest peaks</span>
+            <span><i class="dip"></i>Energy dip</span>
           </div>
+          <div class="tl-notes" id="timelineNotes"></div>
         </section>
         <section class="panel" data-help="platforms">
           <div class="panel-head"><h2>Streaming platforms</h2></div>
@@ -831,6 +895,7 @@
               </div>
               <span class="status-line">Both play at −14 LUFS. Switching keeps your place.</span>
             </div>
+            <div id="refVerdict"></div>
             <h3 class="mini-h">Where you differ most</h3>
             <div id="refDiffs" class="diffs"></div>
             <h3 class="mini-h">All measurements</h3>
@@ -1420,7 +1485,8 @@ const DSP = (() => {
       if (absMax(i) <= thr) continue;
       let best = i, bv = 0;
       for (let j = i, e = Math.min(n, i + look); j < e; j++) { const v = absMax(j); if (v > bv) { bv = v; best = j; } }
-      events.push({ idx: best, val: bv });
+      let chMax = 0, cv = 0; for (let c = 0; c < nCh; c++) { const v = Math.abs(ch[c][best]); if (v > cv) { cv = v; chMax = c; } }
+      events.push({ idx: best, val: bv, ch: chMax });
       i = best + sep;
     }
     if (events.length > 3000) events = events.sort((a, b) => b.val - a.val).slice(0, 3000);
@@ -1447,7 +1513,8 @@ const DSP = (() => {
       const rise = isFinite(pre) && pre > 0 ? 20 * Math.log10(at / pre) : 0;
       const percussive = rise >= 6 || nearHit(ev.idx / fs);
       const lowDriven = la / (ma + 1e-9) > 0.55;
-      counts[percussive ? (lowDriven ? 'kickbass' : 'hits') : (lowDriven ? 'low' : 'other')]++;
+      ev.cat = percussive ? (lowDriven ? 'kickbass' : 'hits') : (lowDriven ? 'low' : 'other');
+      counts[ev.cat]++;
     });
     const total = events.length || 1;
     const shares = {}; Object.keys(counts).forEach(k => shares[k] = counts[k] / total);
@@ -1455,8 +1522,267 @@ const DSP = (() => {
     // how much of the track would a limiter/clipper actually touch to remove the needed dB
     const cut = Math.max(0.5, needDb || 0), thrCut = peak * Math.pow(10, -cut / 20);
     let above = 0; for (let i = 0; i < n; i++) if (absMax(i) > thrCut) above++;
-    return { counts, shares, dominant, events: events.length, cutDb: cut, pctAbove: above / n * 100,
+    const list = events.map(e => ({ idx: e.idx, ch: e.ch, t: e.idx / fs, cat: e.cat })).sort((a, b) => a.idx - b.idx);
+    return { counts, shares, dominant, events: events.length, list, cutDb: cut, pctAbove: above / n * 100,
              eventsPerMin: events.length / (n / fs / 60) };
+  }
+
+  // ---------- Louder at −14: where loudness comes from, and what costs peak room ----------
+  // At a fixed ceiling, loudness is limited by peaks. Each band is scored by its share of
+  // the height of the loudest peaks (unweighted, as a limiter sees them) against its share
+  // of the K-weighted energy that LUFS counts.
+  const BUDGET_BANDS = [
+    { key: 'sub', name: 'Sub', range: '20–60 Hz', lo: 0, hi: 60 },
+    { key: 'bass', name: 'Bass', range: '60–200 Hz', lo: 60, hi: 200 },
+    { key: 'lowmid', name: 'Low mids', range: '200–800 Hz', lo: 200, hi: 800 },
+    { key: 'mid', name: 'Mids', range: '800 Hz–2.5 kHz', lo: 800, hi: 2500 },
+    { key: 'presence', name: 'Presence', range: '2.5–6 kHz', lo: 2500, hi: 6000 },
+    { key: 'high', name: 'Highs', range: '6 kHz and up', lo: 6000, hi: Infinity },
+  ];
+  function highpassCoefs(fs, f0) {
+    const w0 = 2 * Math.PI * f0 / fs, c = Math.cos(w0), al = Math.sin(w0) / (2 * Math.SQRT1_2), a0 = 1 + al;
+    return { b0: (1 + c) / 2 / a0, b1: -(1 + c) / a0, b2: (1 + c) / 2 / a0, a1: -2 * c / a0, a2: (1 - al) / a0 };
+  }
+  function biquadMag2(c, f, fs) {
+    const w = 2 * Math.PI * f / fs, c1 = Math.cos(w), s1 = Math.sin(w), c2 = Math.cos(2 * w), s2 = Math.sin(2 * w);
+    const nr = c.b0 + c.b1 * c1 + c.b2 * c2, ni = -(c.b1 * s1 + c.b2 * s2);
+    const dr = 1 + c.a1 * c1 + c.a2 * c2, di = -(c.a1 * s1 + c.a2 * s2);
+    return (nr * nr + ni * ni) / (dr * dr + di * di);
+  }
+  // Loudest peaks (within 3 dB of the maximum, 50 ms apart), with the channel that made each one
+  function findPeakEvents(buffer) {
+    const n = buffer.length, nCh = buffer.numberOfChannels, ch = [];
+    for (let c = 0; c < nCh; c++) ch.push(buffer.getChannelData(c));
+    let peak = 0; for (const d of ch) for (let i = 0; i < n; i++) { const a = Math.abs(d[i]); if (a > peak) peak = a; }
+    if (!peak) return [];
+    const thr = peak * Math.pow(10, -3 / 20), sep = Math.round(0.05 * buffer.sampleRate), look = Math.round(0.01 * buffer.sampleRate);
+    let out = [];
+    for (let i = 0; i < n; i++) {
+      let a = 0; for (const d of ch) { const v = Math.abs(d[i]); if (v > a) a = v; }
+      if (a <= thr) continue;
+      let best = i, bv = 0, bc = 0;
+      for (let j = i, e = Math.min(n, i + look); j < e; j++) for (let c = 0; c < nCh; c++) { const v = Math.abs(ch[c][j]); if (v > bv) { bv = v; best = j; bc = c; } }
+      out.push({ idx: best, ch: bc, val: bv });
+      i = best + sep;
+    }
+    if (out.length > 3000) out = out.sort((x, y) => y.val - x.val).slice(0, 3000).sort((x, y) => x.idx - y.idx);
+    return out;
+  }
+  // (loudnessBudget is defined with bandMoves below: they share one band split)
+
+  // RBJ biquads, matching the Web Audio filter types used by the live EQ (shelves use S = 1)
+  function rbjCoefs(type, f0, gainDb, q, fs) {
+    const A = Math.pow(10, gainDb / 40), w0 = 2 * Math.PI * f0 / fs, cw = Math.cos(w0), sw = Math.sin(w0);
+    let b0, b1, b2, a0, a1, a2;
+    if (type === 'peaking') {
+      const al = sw / (2 * q);
+      b0 = 1 + al * A; b1 = -2 * cw; b2 = 1 - al * A; a0 = 1 + al / A; a1 = -2 * cw; a2 = 1 - al / A;
+    } else {
+      const al = sw / 2 * Math.SQRT2, sA = 2 * Math.sqrt(A) * al;
+      if (type === 'lowshelf') {
+        b0 = A * ((A + 1) - (A - 1) * cw + sA); b1 = 2 * A * ((A - 1) - (A + 1) * cw); b2 = A * ((A + 1) - (A - 1) * cw - sA);
+        a0 = (A + 1) + (A - 1) * cw + sA; a1 = -2 * ((A - 1) + (A + 1) * cw); a2 = (A + 1) + (A - 1) * cw - sA;
+      } else {
+        b0 = A * ((A + 1) + (A - 1) * cw + sA); b1 = -2 * A * ((A - 1) + (A + 1) * cw); b2 = A * ((A + 1) + (A - 1) * cw - sA);
+        a0 = (A + 1) - (A - 1) * cw + sA; a1 = 2 * ((A - 1) - (A + 1) * cw); a2 = (A + 1) - (A - 1) * cw - sA;
+      }
+    }
+    return { b0: b0 / a0, b1: b1 / a0, b2: b2 / a0, a1: a1 / a0, a2: a2 / a0 };
+  }
+  // Common mix moves, each tried on the real audio. "Freed" is how much the peak-to-loudness
+  // ratio drops: the same loudness with that much less limiting, or that much louder at the
+  // same limiting. eqBand/eqFreq/eqQ load the move into the live EQ.
+  const MIX_MOVES = [
+    { key: 'sub', label: 'Tame the sub', detail: 'Low shelf −3 dB at 50 Hz', type: 'lowshelf', f: 50, g: -3, q: 0.8, eqBand: 0 },
+    { key: 'low', label: 'Lighten the low end', detail: 'Low shelf −2 dB at 120 Hz', type: 'lowshelf', f: 120, g: -2, q: 0.8, eqBand: 0 },
+    { key: 'lowmid', label: 'Clear the low mids', detail: '−2 dB at 350 Hz', type: 'peaking', f: 350, g: -2, q: 1.1, eqBand: 1 },
+    { key: 'presence', label: 'Add presence', detail: '+2 dB at 3.2 kHz', type: 'peaking', f: 3200, g: 2, q: 0.9, eqBand: 3 },
+  ];
+  // How hard a limiter has to work to bring audio to a given density at its own loudness:
+  // average gain reduction (dB, across the whole track) from 5 ms block peaks, 60 ms release.
+  const MOVE_BLOCK_SEC = 0.005;
+  function blockPeaks(chans, fs, into) {
+    const blk = Math.max(1, Math.round(MOVE_BLOCK_SEC * fs)), n = chans[0].length, nb = Math.ceil(n / blk);
+    const out = into || new Float32Array(nb);
+    for (const x of chans) for (let b = 0; b < nb; b++) { let pk = out[b]; for (let i = b * blk, e = Math.min(n, i + blk); i < e; i++) { const a = Math.abs(x[i]); if (a > pk) pk = a; } out[b] = pk; }
+    return out;
+  }
+  function workFromPeaks(pk, lufs, plrTarget) {
+    const ceil = Math.pow(10, (lufs + plrTarget) / 20), rel = Math.exp(-MOVE_BLOCK_SEC * 1000 / 60);
+    let gr = 0, sum = 0, max = 0, active = 0;
+    for (let b = 0; b < pk.length; b++) {
+      const need = pk[b] > ceil ? 20 * Math.log10(pk[b] / ceil) : 0;
+      gr = need > gr ? need : gr * rel;
+      sum += gr; if (gr > 0.05) active++; if (gr > max) max = gr;
+    }
+    return { avg: sum / pk.length, max, pct: active / pk.length * 100 };
+  }
+  // A file whose loudest peaks are packed close together at a moderate PLR has already been
+  // limited, so its peaks no longer show everything the mix would ask of a limiter.
+  function looksLimited(plr, peaks) { return isFinite(plr) && plr <= 12.5 && !!peaks && peaks.eventsPerMin >= 120; }
+  // Density the moves are judged at: a competitive PLR of 10 for an open mix, or 2 dB denser
+  // than a master that is already there.
+  const moveTarget = plr => plr > 12 ? 10 : Math.max(5, Math.round((plr - 2) * 2) / 2);
+
+  // Tone moves (EQ), each re-measured at its own loudness.
+  function mixMoves(buffer, base) {
+    const fs = buffer.sampleRate, src = [];
+    for (let k = 0; k < buffer.numberOfChannels; k++) src.push(buffer.getChannelData(k));
+    const target = moveTarget(base.plr), baseWork = workFromPeaks(blockPeaks(src, fs), base.lufs, target), out = [];
+    for (const mv of MIX_MOVES) {
+      if (mv.f > fs * 0.45) continue;
+      const c = rbjCoefs(mv.type, mv.f, mv.g, mv.q, fs), chans = src.map(x => applyBiquad(x, c));
+      const lufs = loudness(asBuffer(chans, fs)).integrated, work = workFromPeaks(blockPeaks(chans, fs), lufs, target);
+      const saved = baseWork.avg - work.avg;
+      out.push({ ...mv, lufs, dLufs: lufs - base.lufs, work, saved, pct: baseWork.avg > 0.01 ? saved / baseWork.avg * 100 : 0, savedMax: baseWork.max - work.max });
+    }
+    return { target, base: baseWork, moves: out.sort((a, b) => b.saved - a.saved) };
+  }
+
+  // One band split per channel serves two questions:
+  //  1. Budget: each band's share of the height of the loudest peaks (decomposed at the peak
+  //     sample) against its share of the K-weighted energy LUFS counts.
+  //  2. Peak-control moves (when `base` is given): take cutDb off the loudest 2% of moments in
+  //     one band (a fast band limiter, like a drum-bus clipper, bass compressor or de-esser),
+  //     recombine, and measure how much less the master limiter has to do.
+  const BAND_CUT_DB = 4, BAND_PCT = 0.98;
+  function louder(buffer, tone, events, base) {
+    const fs = buffer.sampleRate, n = buffer.length, nCh = buffer.numberOfChannels, nyq = fs / 2;
+    const bands = BUDGET_BANDS.filter(b => b.lo < nyq * 0.95), B = bands.length;
+    const lr4 = (x, c) => applyBiquad(applyBiquad(x, c), c);
+    // budget: loudness share from the K-weighted average spectrum
+    const [k1, k2] = kWeightCoefs(fs), loud = new Float64Array(B);
+    for (let k = 1; k < tone.psd.length; k++) {
+      const f = k * tone.binHz; if (f < 20) continue;
+      const bi = bands.findIndex(b => f >= b.lo && f < b.hi); if (bi >= 0) loud[bi] += tone.psd[k] * biquadMag2(k1, f, fs) * biquadMag2(k2, f, fs);
+    }
+    const evs = (events && events.length ? events : findPeakEvents(buffer)).filter(e => e.idx > 64 && e.idx < n - 64);
+    const W = Math.max(2, Math.round(0.0005 * fs)), span = 2 * W + 1, vals = evs.map(() => new Float32Array(B * span));
+    // moves
+    const blk = Math.max(1, Math.round(MOVE_BLOCK_SEC * fs)), nb = Math.ceil(n / blk), rel = Math.exp(-MOVE_BLOCK_SEC * 1000 / 60);
+    const basePk = base ? new Float32Array(nb) : null, varPk = base ? bands.map(() => new Float32Array(nb)) : null;
+    let msBase = 0; const msVar = new Float64Array(B);
+    for (let c = 0; c < nCh; c++) {
+      let rest = buffer.getChannelData(c); const parts = [];
+      for (let b = 0; b < B; b++) {
+        if (b < B - 1) { const fc = bands[b].hi; parts.push(lr4(rest, lowpassCoefs(fs, fc))); rest = lr4(rest, highpassCoefs(fs, fc)); }
+        else parts.push(rest);
+      }
+      evs.forEach((e, i) => { if ((e.ch || 0) !== c && nCh > 1) return; const base0 = e.idx - W, v = vals[i]; for (let b = 0; b < B; b++) for (let j = 0; j < span; j++) v[b * span + j] = parts[b][base0 + j]; });
+      if (!base) continue;
+      const sum = new Float32Array(n);
+      for (const p of parts) for (let i = 0; i < n; i++) sum[i] += p[i];
+      blockPeaks([sum], fs, basePk);
+      for (let i = 0; i < n; i++) msBase += sum[i] * sum[i];
+      const v = new Float32Array(n);
+      for (let b = 0; b < B; b++) {
+        const p = parts[b], env = blockPeaks([p], fs);
+        const sorted = Float32Array.from(env).sort(), thr = (sorted[Math.floor(sorted.length * BAND_PCT)] || 0) * Math.pow(10, -BAND_CUT_DB / 20);
+        let grDb = 0, ms = 0;
+        for (let k = 0; k < nb; k++) {
+          const need = thr > 0 && env[k] > thr ? 20 * Math.log10(env[k] / thr) : 0;
+          grDb = need > grDb ? need : grDb * rel;
+          const lose = 1 - Math.pow(10, -grDb / 20);
+          for (let i = k * blk, e = Math.min(n, i + blk); i < e; i++) { const y = sum[i] - p[i] * lose; v[i] = y; ms += y * y; }
+        }
+        msVar[b] += ms;
+        blockPeaks([v], fs, varPk[b]);
+      }
+    }
+    // budget result
+    let budget = null;
+    const contrib = new Float64Array(B); let used = 0;
+    for (let i = 0; i < evs.length; i++) {
+      const v = vals[i]; let bj = 0, bs = 0;
+      for (let j = 0; j < span; j++) { let s = 0; for (let b = 0; b < B; b++) s += v[b * span + j]; if (Math.abs(s) > Math.abs(bs)) { bs = s; bj = j; } }
+      if (!bs) continue;
+      for (let b = 0; b < B; b++) contrib[b] += v[b * span + bj] / bs;
+      used++;
+    }
+    if (used) {
+      const loudTot = loud.reduce((a, b) => a + b, 0) || 1;
+      const pos = Array.from(contrib, x => Math.max(0, x / used)), posTot = pos.reduce((a, b) => a + b, 0) || 1;
+      const out = bands.map((b, i) => ({ key: b.key, name: b.name, range: b.range, peakShare: pos[i] / posTot, loudShare: loud[i] / loudTot }));
+      out.forEach(b => { b.ratio = b.peakShare / Math.max(0.005, b.loudShare); });
+      budget = { bands: out, peaksUsed: used,
+        costly: out.filter(b => b.peakShare >= 0.1 && b.ratio >= 1.8).sort((a, b) => (b.peakShare - b.loudShare) - (a.peakShare - a.loudShare)),
+        efficient: out.filter(b => b.loudShare >= 0.1 && b.ratio <= 0.6).sort((a, b) => (b.loudShare - b.peakShare) - (a.loudShare - a.peakShare)) };
+    }
+    let moves = null;
+    if (base) {
+      const target = moveTarget(base.plr), baseWork = workFromPeaks(basePk, base.lufs, target);
+      const list = bands.map((bd, b) => {
+        const dLufs = 10 * Math.log10((msVar[b] || 1e-20) / (msBase || 1e-20)), work = workFromPeaks(varPk[b], base.lufs + dLufs, target);
+        const saved = baseWork.avg - work.avg;
+        return { key: bd.key, name: bd.name, range: bd.range, cutDb: BAND_CUT_DB, dLufs, work, saved, pct: baseWork.avg > 0.01 ? saved / baseWork.avg * 100 : 0, savedMax: baseWork.max - work.max };
+      });
+      moves = { target, base: baseWork, moves: list.sort((a, b) => b.saved - a.saved) };
+    }
+    return { budget, moves };
+  }
+  const loudnessBudget = (buffer, tone, events) => louder(buffer, tone, events, null).budget;
+
+  // Stretches where the 3 s loudness sags well below the track's average (intro and outro excluded)
+  function energyDips(loud, duration, thresholdLu = 3, minSec = 4) {
+    const st = loud.shortTerm, I = loud.integrated, hop = loud.hopSec || 0.1, off = 1.5;
+    if (!st || !isFinite(I)) return [];
+    const runs = []; let s = -1;
+    for (let i = 0; i <= st.length; i++) {
+      const low = i < st.length && isFinite(st[i]) && st[i] < I - thresholdLu && st[i] > I - 40;
+      if (low && s < 0) s = i;
+      if (!low && s >= 0) { runs.push([s, i - 1]); s = -1; }
+    }
+    const merged = [];
+    runs.forEach(r => { const last = merged[merged.length - 1]; if (last && (r[0] - last[1]) * hop <= 1) last[1] = r[1]; else merged.push(r.slice()); });
+    return merged.map(([a, b]) => {
+      let min = Infinity, sum = 0; for (let i = a; i <= b; i++) { min = Math.min(min, st[i]); sum += st[i]; }
+      return { start: Math.max(0, a * hop + off - 1.5), end: Math.min(duration, b * hop + off + 1.5), depth: I - min, avg: I - sum / (b - a + 1) };
+    }).reduce((acc, d) => { // padding can make neighbours overlap: join them
+      const last = acc[acc.length - 1];
+      if (last && d.start <= last.end + 0.5) { last.end = Math.max(last.end, d.end); last.depth = Math.max(last.depth, d.depth); }
+      else acc.push(d);
+      return acc;
+    }, []).filter(d => d.end - d.start >= minSec && d.start > 3 && d.end < duration - 3);
+  }
+
+  // Five-second windows where the loudest peaks cluster
+  function peakHotspots(list, duration, winSec = 5) {
+    if (!list || list.length < 5 || duration < winSec * 2) return [];
+    const rate = list.length / duration, cands = [];
+    for (let t = 0; t + winSec <= duration; t += 1) {
+      const inWin = list.filter(e => e.t >= t && e.t < t + winSec);
+      if (inWin.length < Math.max(5, rate * winSec * 1.6)) continue;
+      const c = {}; inWin.forEach(e => c[e.cat] = (c[e.cat] || 0) + 1);
+      cands.push({ start: t, end: t + winSec, count: inWin.length, ratio: inWin.length / (rate * winSec), dominant: Object.keys(c).sort((a, b) => c[b] - c[a])[0] });
+    }
+    const picked = [];
+    cands.sort((a, b) => b.count - a.count).forEach(c => { if (picked.length < 3 && picked.every(p => c.end <= p.start || c.start >= p.end)) picked.push(c); });
+    return picked.sort((a, b) => a.start - b.start);
+  }
+
+  // Why does the reference sound louder or fuller at the same −14?
+  function loudnessVerdict(mine, ref) {
+    const f = v => (v < 0 ? '−' : '') + Math.abs(v).toFixed(1);
+    const parts = [];
+    const dp = mine.plr - ref.plr;
+    if (Math.abs(dp) >= 1) parts.push({ kind: 'density', w: Math.abs(dp) / 1, text: dp > 0 ? `it is ${f(dp)} dB denser (PLR ${f(ref.plr)} vs your ${f(mine.plr)})` : `yours is ${f(-dp)} dB denser (PLR ${f(mine.plr)} vs ${f(ref.plr)}), so density isn't the gap` , theirs: dp > 0 });
+    const dpr = ref.lowMidPresenceGap - mine.lowMidPresenceGap;
+    if (Math.abs(dpr) >= 1.5) parts.push({ kind: 'tone', w: Math.abs(dpr) / 1.5, text: dpr > 0 ? `it has ${f(dpr)} dB more presence against its low mids` : `you have ${f(-dpr)} dB more presence`, theirs: dpr > 0 });
+    const ds = mine.subBassGap - ref.subBassGap;
+    if (Math.abs(ds) >= 2) parts.push({ kind: 'tone', w: Math.abs(ds) / 2, text: ds > 0 ? `your sub is ${f(ds)} dB heavier, which spends peak room without adding much loudness` : `its sub is ${f(-ds)} dB heavier`, theirs: ds > 0 });
+    if (mine.budget && ref.budget) {
+      const sm = mine.budget.bands.find(b => b.key === 'sub'), sr = ref.budget.bands.find(b => b.key === 'sub');
+      if (sm && sr && sm.peakShare - sr.peakShare >= 0.1) parts.push({ kind: 'tone', w: (sm.peakShare - sr.peakShare) / 0.1, text: `sub makes ${Math.round(sm.peakShare * 100)}% of your peak height vs ${Math.round(sr.peakShare * 100)}% of the reference's`, theirs: true });
+    }
+    const dl = mine.lra - ref.lra;
+    if (dl >= 2) parts.push({ kind: 'arrangement', w: dl / 2, text: `your sections vary more (loudness range ${f(mine.lra)} vs ${f(ref.lra)} LU), so yours has more quiet stretches`, theirs: true });
+    const helps = parts.filter(p => p.theirs).sort((a, b) => b.w - a.w);
+    const score = k => helps.filter(p => p.kind === k).reduce((a, p) => a + p.w, 0);
+    const kinds = ['tone', 'density', 'arrangement'].map(k => [k, score(k)]).sort((a, b) => b[1] - a[1]);
+    let headline;
+    if (!helps.length) headline = 'At −14 your track should sound about as full as the reference';
+    else headline = { tone: 'The gap is mostly tone, not limiting', density: 'The gap is mostly density', arrangement: 'The gap is mostly arrangement' }[kinds[0][0]];
+    return { headline, reasons: helps.map(p => p.text), notes: parts.filter(p => !p.theirs).map(p => p.text), main: helps.length ? kinds[0][0] : null };
   }
 
   // ---------- Mastering: soft clipper + true-peak limiter ----------
@@ -1581,6 +1907,23 @@ const DSP = (() => {
     };
   }
 
+  const mmss = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+  const BAND_FIX = {
+    sub: 'Compress or saturate the sub and 808, or sidechain it to the kick.',
+    bass: 'Compress or saturate the bass, or sidechain it to the kick where they overlap.',
+    lowmid: 'Compress the busiest low-mid parts (guitars, keys, low vocals) or tame the body of the kick and snare.',
+    mid: 'Compress vocals and leads, or clip the snare a little.',
+    presence: 'In most mixes that range is snare and hat attacks, vocal consonants and bright leads, so a clipper or fast limiter on the drum bus, a de-esser, or a compressor on the lead takes it off cleanly.',
+    high: 'In most mixes that range is hats, cymbals and sibilance, so a clipper or fast limiter on the drum bus, or a de-esser, takes it off cleanly.',
+  };
+
+  // When the limiter is already fighting the presence range, boosting it there costs headroom.
+  function presenceClash(m) {
+    const mv = m.louder && m.louder.moves && m.louder.moves.moves;
+    if (!mv || !mv.length || mv[0].pct < 10 || !['presence', 'high'].includes(mv[0].key)) return '';
+    return ' Your loudest peaks also come from this range, so lift the sustained parts (vocals, leads, pads) rather than the whole mix, and clip or fast-limit the drum transients there; together you get the presence without extra limiting.';
+  }
+
   // ---------- Findings ----------
   // Every finding: { cat, status: ok|warn|danger|info, title, body }
   function findings(m) {
@@ -1685,6 +2028,26 @@ const DSP = (() => {
         `20–60 Hz is ${f(-m.subBassGap)} dB per octave below 60–250 Hz. Fine on small speakers; it may feel light on a club system.`);
     }
 
+    // Louder at −14: presence, what the limiter is fighting, energy dips
+    if (isFinite(m.lowMidPresenceGap) && m.lowMidPresenceGap < -7.5 && !(m.tilt < -3)) add('tone', 'warn', 'Presence sits low',
+      `2–5 kHz is ${f(-m.lowMidPresenceGap)} dB per octave below 250–500 Hz; most releases sit around 3 to 6 dB below. The ear is most sensitive to presence, so a mix this dark sounds smaller at −14 than its loudness suggests. Try +1.5 to 2 dB around 3 kHz on vocals and leads (or the mix bus), or a little less around 300 Hz, and compare with a reference.` + presenceClash(m));
+    const LM = m.louder;
+    if (LM && LM.moves && LM.moves.moves.length && LM.moves.base.avg > 0.02) {
+      const mv = LM.moves.moves, top = mv[0], second = mv[1], worst = mv[mv.length - 1];
+      const pair = second && second.pct >= top.pct * 0.7 && second.pct >= 10;
+      const where = pair ? `${top.name.toLowerCase()} and ${second.name.toLowerCase()}` : top.name.toLowerCase();
+      if (top.pct >= 10) add('loudness', top.pct >= 20 ? 'warn' : 'info', `Your limiter is mostly fighting the ${where}`,
+        `Taking ${top.cutDb} dB off the loudest moments in the ${top.name.toLowerCase()} (${top.range}) would cut the master limiting by about ${Math.round(top.pct)}%` +
+        (pair ? `, and in the ${second.name.toLowerCase()} by ${Math.round(second.pct)}%` : '') + `, measured on this track at a PLR of ${LM.moves.target}. ${BAND_FIX[top.key]}` +
+        (worst.pct <= -5 ? ` Controlling the ${worst.name.toLowerCase()} instead would make it worse: it removes more loudness than peak.` : '') +
+        (m.limited ? ' This file is already limited, so for the clearest answer, analyse your mix before the master limiter.' : ''));
+    }
+    if (m.dips && m.dips.length) {
+      const list = m.dips.slice(0, 3).map(d => `${mmss(d.start)}–${mmss(d.end)} (${f(d.depth)} LU down)`).join(', ');
+      add('dynamics', 'info', `${m.dips.length} stretch${m.dips.length > 1 ? 'es' : ''} where the energy drops`,
+        `The 3-second loudness falls more than 3 LU below the track's average at ${list}${m.dips.length > 3 ? ' and more' : ''}. That's right for a breakdown. If those parts should drive, they will feel smaller next to other releases at −14; more energy in the arrangement, or level automation, closes the gap.`);
+    }
+
     // Stereo
     if (isFinite(m.corr)) {
       if (m.corr < -0.1) add('stereo', 'danger', 'Mono compatibility risk',
@@ -1709,7 +2072,7 @@ const DSP = (() => {
   return {
     applyBiquad, kWeightChannel, fft, mixToMono, loudness, truePeak, levels, tonal, logBars,
     averagePsd, bandPower, correlation, stereoField, vectorscopePoints, spectrogram, transients,
-    summary, findings, OCTAVE_CENTRES, readiness, peakSources, processMaster, asBuffer, referenceDiffs, TARGET_LUFS, CEILING_DB, PLR_BUDGET,
+    summary, findings, OCTAVE_CENTRES, loudnessBudget, mixMoves, energyDips, peakHotspots, loudnessVerdict, findPeakEvents, MIX_MOVES, rbjCoefs, looksLimited, louder, readiness, peakSources, processMaster, asBuffer, referenceDiffs, TARGET_LUFS, CEILING_DB, PLR_BUDGET,
   };
 })();
 
@@ -1782,6 +2145,9 @@ const DSP = (() => {
     peaksDensity: ['What decides how loud this track can be at −14: how far its peaks stand above its body (PLR), and what is making those peaks.',
       'Each of the loudest peaks is classified by whether it lands on a detected drum hit and whether it is mostly low-frequency energy. "Audio affected" is how much of the track sits in the top few dB that would need to come off.',
       'Competitive density (PLR 8–12) with peaks coming mostly from drum hits, which are the easiest to control cleanly.'],
+    louder: ['At −14 every track plays at the same loudness, so what makes one sound bigger is how much loudness it gets out of its peaks. This shows which parts of the spectrum cost peak room, which give loudness, and which mix moves would make the limiter work less.',
+      'Amber bars are each range’s share of the height of the loudest peaks; blue bars are its share of the loudness LUFS counts. A range with a long amber bar and a short blue one spends headroom without adding much loudness. "What to control" takes 4 dB off the loudest 2% of moments in one range and measures how much less limiting the track then needs; green means less, red means more. Tone moves do the same for simple EQ changes, and Try in EQ lets you hear them.',
+      'Peaks coming mostly from the ranges that also carry the loudness, and no range that makes far more peak than loudness. Measured on a mix before the master limiter, this points straight at the bus or instrument to control.'],
     summary: ['The headline numbers for this file, each with a short verdict.',
       'Green is within a typical range, amber is worth a listen, red is likely a problem. Grey is informational.',
       'For streaming: about −14 LUFS integrated, true peak at or below −1 dBTP, and positive phase correlation.'],
@@ -1799,7 +2165,7 @@ const DSP = (() => {
       'Around −14 LUFS suits streaming (louder genres often master to −9 to −11). True peak at or below −1 dBTP. PLR of roughly 8–12 dB is typical of modern releases.'],
     timeline: ['How loudness changes across the track, measured every 100 ms.',
       'Green is momentary loudness (0.4 s), blue is short-term (3 s), and the dashed line is the integrated loudness of the whole track.',
-      'Sections sitting where you intend. Long dips well below the dashed line are candidates for level automation (see Tools).'],
+      'Sections sitting where you intend. Ticks along the top mark the loudest peaks, coloured by what made them, and brackets mark where they cluster. Shaded spans are energy dips more than 3 LU below the average: fine for breakdowns, but parts that should drive will feel smaller at −14. Click a chip below the chart to play from there.'],
     platforms: ['How much each service’s loudness normalisation would turn this file up or down, and where its true peak would land afterwards.',
       'A down arrow means the service turns you down. Red peak text means the result would go above −1 dBTP.',
       'Small changes. Being turned down costs nothing; being turned up can push peaks into the service’s limiter.'],
@@ -1878,7 +2244,7 @@ const DSP = (() => {
     compare: '<path d="M8 3v18M16 3v18M3 8h5M16 16h5"/>',
   };
   const FEATURES = [
-    ['loud', '−14 readiness', 'Exactly how far your track is from a competitive −14 LUFS master, what is causing the peaks that hold it back, and the steps to fix it.', ['Integrated LUFS', 'True peak', 'PLR budget', 'LRA', 'Peak sources', 'Platform preview']],
+    ['loud', '−14 readiness', 'Exactly how far your track is from a competitive −14 LUFS master, what is causing the peaks that hold it back, and the steps to fix it.', ['Integrated LUFS', 'True peak', 'PLR budget', 'LRA', 'Peak sources', 'Louder at −14', 'Platform preview']],
     ['tone', 'Tone', 'See where your mix sits from sub to air, compared with pink noise and with a reference track if you load one.', ['Tonal balance', 'Spectrum', 'Spectrogram']],
     ['stereo', 'Stereo', 'Check width and mono compatibility before phones, Bluetooth speakers and club systems do it for you.', ['Vectorscope', 'Correlation', 'Width by frequency']],
     ['dyn', 'Dynamics', 'How much your peaks stand out, how much sections vary, and whether the low end clears between hits.', ['PLR', 'Crest factor', 'Kick & bass separation']],
@@ -1891,6 +2257,7 @@ const DSP = (() => {
     'True peak': 'The highest level the waveform reaches, including peaks that fall between samples. Keeping it at or below −1 dBTP stops lossy streaming formats from distorting.',
     'PLR budget': 'At −14 LUFS with peaks at −1 dBTP, peaks can stand at most 13 dB above the average loudness. MasterScope shows how much of that budget your track uses.',
     'LRA': 'Loudness range: how much the loudness changes between the quiet and loud parts of the song, in LU. Low values mean a consistent track; high values mean big contrasts between sections.',
+    'Louder at −14': 'Shows which parts of the spectrum use up peak room and which give loudness, then tests mix moves on your actual track (controlling one range, or a simple EQ change) to show which would make the limiter work least.',
     'Peak sources': 'Works out what is making your loudest peaks (drum hits, kick and bass overlapping, bass notes or other parts), so you know where to fix them.',
     'Platform preview': 'Shows how much Spotify, Apple Music, YouTube and others will turn your track up or down, and where its peaks land afterwards.',
     'Tonal balance': 'Your average level in each octave from sub to air, compared with pink noise and with a reference track if you load one.',
@@ -2092,7 +2459,10 @@ const DSP = (() => {
       ['Building the spectrogram', () => { S.spec = DSP.spectrogram(S.mono, fs, buffer.duration, 640, 4096); S.specImage = null; }],
       ['Detecting hits and transients', () => { S.trans = DSP.transients(S.mono, fs); }],
       ['Tracing the loudest peaks', () => { const plr = S.tp.truePeakDb - S.loud.integrated; S.peaks = DSP.peakSources(buffer, S.mono, S.trans ? S.trans.hitTimesSec : null, Math.max(0, plr - DSP.PLR_BUDGET)); }],
+      ['Finding what the limiter has to fight', () => { S.louder = DSP.louder(buffer, S.tone, S.peaks ? S.peaks.list : null, louderBase()); }],
+      ['Testing tone moves', () => { S.eqMoves = DSP.mixMoves(buffer, louderBase()); }],
     ];
+    function louderBase() { return { plr: S.tp.truePeakDb - S.loud.integrated, lufs: S.loud.integrated, truePeak: S.tp.truePeakDb }; }
     for (let i = 0; i < steps.length; i++) {
       setProgress(0.1 + 0.85 * i / steps.length, steps[i][0] + '…');
       await tick();
@@ -2115,6 +2485,10 @@ const DSP = (() => {
       lowWidth: sf ? sf.lowWidth : NaN, lowPeakWidth: sf ? sf.lowPeakWidth : NaN, lowPeakFreq: sf ? sf.lowPeakFreq : 0,
       clippedSamples: lv.clippedSamples, clipPct: lv.clipPct, dcOffset: lv.dcOffset,
       transient: S.trans, peaks: S.peaks,
+      louder: S.louder, eqMoves: S.eqMoves,
+      limited: DSP.looksLimited(S.tp.truePeakDb - L.integrated, S.peaks),
+      dips: DSP.energyDips(L, buffer.duration),
+      hotspots: DSP.peakHotspots(S.peaks ? S.peaks.list : null, buffer.duration),
     };
     S.findings = DSP.findings(S.metrics);
     if (S.fileInfo && S.fileInfo.lossy) S.findings.push({ cat: 'loudness', status: 'info', title: 'Lossy source file',
@@ -2353,6 +2727,8 @@ const DSP = (() => {
     const after = Math.min(m.plr, DSP.PLR_BUDGET);
     if (after > 12) steps.push(`<b>For a denser, more competitive sound, aim for a PLR of 10–12 dB.</b> <span>That is another ${(after - 12).toFixed(1)}–${(after - 10).toFixed(1)} dB of peak control. Listen as you go: it trades some transient snap for fullness.</span>`);
     else if (m.plr < 8) steps.push(`<b>Ease the limiting.</b> <span>At a PLR of ${fmt(m.plr)} dB the master is denser than it needs to be at −14; backing off 1–2 dB brings back punch at no loudness cost.</span>`);
+    const LM = S.louder && S.louder.moves, top = LM && LM.moves[0];
+    if (top && top.pct >= 15 && LM.base.avg >= 0.02) steps.push(`<b>Biggest mix win: control the ${esc(top.name.toLowerCase())} peaks.</b> <span>Taking ${top.cutDb} dB off the loudest moments in the ${esc(top.range)} range cuts the limiting by about ${pctTxt(top.pct)}. ${esc(BAND_TOOL[top.key])}. See Louder at −14 on the Loudness tab.</span>`);
     if (S.ref && S.refDiffs && S.refDiffs.length) steps.push(`<b>Close the gap to your reference.</b> <span>${esc(S.refDiffs[0].text)}</span>`);
     else if (!S.ref) steps.push(`<b>Compare with a reference.</b> <span>Load a released track in your genre on the Compare tab to see where your mix differs at equal loudness.</span>`);
     return steps;
@@ -2397,9 +2773,95 @@ const DSP = (() => {
       </div>`;
   }
 
+  // ===================================================================
+  // Louder at −14: loudness budget, peak-control moves, tone moves
+  // ===================================================================
+  const BAND_TOOL = {
+    sub: 'Sub or 808 compression, saturation, or sidechain to the kick',
+    bass: 'Bass compression or saturation, or sidechain to the kick',
+    lowmid: 'Compress the busiest guitars, keys or low vocals',
+    mid: 'Vocal and lead compression, or a little snare clipping',
+    presence: 'Drum-bus clipper or fast limiter, de-esser, lead compression',
+    high: 'Drum-bus clipper or fast limiter, de-esser',
+  };
+  const pctTxt = v => `${Math.round(Math.abs(v))}%`;
+  const joinNames = arr => arr.length < 2 ? (arr[0] || '') : arr.slice(0, -1).join(', ') + ' and ' + arr[arr.length - 1];
+  function budgetLead(B) {
+    const sum = (list, k) => Math.round(list.reduce((a, b) => a + b[k], 0) * 100);
+    const parts = [];
+    if (B.costly.length) parts.push(`<b>${esc(joinNames(B.costly.map(b => b.name.toLowerCase())))}</b> make${B.costly.length > 1 ? '' : 's'} ${sum(B.costly, 'peakShare')}% of your peak height but only ${sum(B.costly, 'loudShare')}% of your loudness.`);
+    if (B.efficient.length) parts.push(`<b>${esc(joinNames(B.efficient.map(b => b.name.toLowerCase())))}</b> give${B.efficient.length > 1 ? '' : 's'} ${sum(B.efficient, 'loudShare')}% of the loudness for ${sum(B.efficient, 'peakShare')}% of the peaks.`);
+    if (!parts.length) parts.push('Each range costs roughly as much peak room as it gives in loudness, so no single range is holding the level back.');
+    return parts.map(t => t.replace(/^<b>(.)/, (x, c) => '<b>' + c.toUpperCase())).join(' ');
+  }
+  function movesLead(M) {
+    const top = M.moves[0];
+    if (!top || M.base.avg < 0.02) return 'The limiter barely has to work at this density, so there is little to gain here.';
+    if (top.pct < 10) return `No single range stands out: controlling any one of them changes the limiting by less than 10%.`;
+    return `Controlling the <b>${esc(top.name.toLowerCase())}</b> cuts the limiting most, by about ${pctTxt(top.pct)}.`;
+  }
+  function moveBar(pct) {
+    const w = Math.min(50, Math.abs(pct) / 50 * 50); // ±50% fills half the track
+    return `<div class="mv-axis">${Math.abs(pct) >= 1 ? `<div class="mv-fill ${pct > 0 ? 'good' : 'bad'}" style="width:${w}%"></div>` : ''}</div>`;
+  }
+  const moveCls = pct => pct >= 3 ? 'good' : pct <= -3 ? 'bad' : 'flat';
+  const moveVal = pct => Math.abs(pct) < 3 ? 'no change' : `${pct > 0 ? '−' : '+'}${pctTxt(pct)} limiting`;
+  function louderHtml(forReport, extraRight) {
+    const m = S.metrics, L = S.louder, E = S.eqMoves;
+    if (!L || !L.budget) return '<div class="empty">Not enough peaks to analyse.</div>';
+    const B = L.budget, M = L.moves, maxShare = Math.max(...B.bands.map(b => Math.max(b.peakShare, b.loudShare)), 0.01);
+    const notice = m.limited ? `<div class="lb-notice"><b>This file has already been limited.</b> These numbers show what the limiter is fighting now. For the clearest picture of the mix, bounce it with the master limiter off and open that file.</div>` : '';
+    const budget = `<div class="lb-sec"><h3 class="mini-h">Where your loudness comes from</h3>
+      <p class="lb-lead">${budgetLead(B)}</p>
+      <div class="lb-rows">${B.bands.map(b => {
+        const cost = B.costly.includes(b), eff = B.efficient.includes(b);
+        return `<div class="lb-row"><div class="lb-name">${esc(b.name)}<small>${esc(b.range)}</small></div>
+          <div class="lb-bars">
+            <div class="lb-bar" title="Share of the height of the loudest peaks"><div class="lb-track"><div class="lb-fill peak" style="width:${b.peakShare / maxShare * 100}%"></div></div><span class="lb-val">${Math.round(b.peakShare * 100)}%</span></div>
+            <div class="lb-bar" title="Share of the loudness (LUFS) of the track"><div class="lb-track"><div class="lb-fill loud" style="width:${b.loudShare / maxShare * 100}%"></div></div><span class="lb-val">${Math.round(b.loudShare * 100)}%</span></div>
+          </div>
+          <div class="lb-tag ${cost ? 'cost' : eff ? 'eff' : ''}">${cost ? 'Costs peak room' : eff ? 'Efficient' : ''}</div></div>`;
+      }).join('')}</div>
+      <div class="lb-legend"><span><i style="background:var(--warn)"></i>Peak height</span><span><i style="background:var(--accent)"></i>Loudness</span></div></div>`;
+    const moves = M ? `<div><h3 class="mini-h">What to control</h3>
+      <p class="lb-lead">${movesLead(M)} Each row takes ${M.moves[0].cutDb} dB off the loudest 2% of moments in one range, then measures how much less a limiter has to do to reach a PLR of ${M.target} dB.</p>
+      <div>${M.moves.map((mv, i) => `<div class="mv-row${i === 0 && mv.pct >= 10 ? ' top' : ''}"><div class="lb-name">${esc(mv.name)}<small>${esc(mv.range)}</small></div>${moveBar(mv.pct)}<div class="mv-val ${moveCls(mv.pct)}">${moveVal(mv.pct)}</div>${mv.pct >= 10 ? `<div class="mv-how">${esc(BAND_TOOL[mv.key])}</div>` : ''}</div>`).join('')}</div></div>` : '';
+    const allFlat = E && E.moves.every(mv => Math.abs(mv.pct) < 5);
+    const eq = E ? `<div><h3 class="mini-h">Tone moves</h3>
+      <p class="lb-lead">${allFlat ? 'None of these EQ moves changes the limiting much on this track, so choose tone by ear and against a reference.' : 'How each EQ move changes the limiting at the same density.'} More presence makes a mix feel louder at the same LUFS, even when it costs a little limiting.</p>
+      <div>${E.moves.map(mv => `<div class="mv-row eq"><div class="lb-name">${esc(mv.label)}<small>${esc(mv.detail)}</small></div>${moveBar(mv.pct)}<div class="mv-val ${moveCls(mv.pct)}">${moveVal(mv.pct)}</div>${forReport ? '' : `<button class="btn sm ghost" data-trymove="${mv.key}" title="Load this move into the EQ on the Tools tab so you can hear it">Try in EQ</button>`}</div>`).join('')}</div>${extraRight || ''}</div>` : '';
+    return notice + budget + `<div class="lb-sec lb-cols">${moves}${eq}</div>`;
+  }
+  function renderLouder() {
+    $('louder').innerHTML = louderHtml(false);
+    document.querySelectorAll('[data-trymove]').forEach(b => b.addEventListener('click', () => tryMove(b.dataset.trymove)));
+  }
+  function tryMove(key) {
+    const mv = DSP.MIX_MOVES.find(x => x.key === key); if (!mv || !eqBands.length) return;
+    resetEq();
+    const band = eqBands[mv.eqBand];
+    band.node.frequency.value = mv.f; band.node.gain.value = mv.g; if (mv.type === 'peaking') band.node.Q.value = mv.q;
+    setTab('tools'); drawEq();
+    $('eqReadout').textContent = `Loaded: ${mv.label} (${mv.detail}). You are hearing it now. Use Master to −14 below to hear it at matched loudness.`;
+    eqChanged();
+    setTimeout(() => $('eqCanvas').scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
+  }
+
+  // Timeline notes: where the peaks cluster and where the energy drops
+  function renderTimelineNotes() {
+    const m = S.metrics, chips = [];
+    (m.hotspots || []).forEach(h => chips.push(`<button class="tl-chip" data-seek="${h.start}" title="Play from here"><b>${fmtTime(h.start)}–${fmtTime(h.end)}</b>Peak cluster, mostly ${esc(SRC_META[h.dominant][0].toLowerCase())}</button>`));
+    (m.dips || []).forEach(d => chips.push(`<button class="tl-chip dip" data-seek="${d.start}" title="Play from here"><b>${fmtTime(d.start)}–${fmtTime(d.end)}</b>Energy dip, ${fmt(d.depth)} LU below average</button>`));
+    $('timelineNotes').innerHTML = chips.join('');
+    document.querySelectorAll('[data-seek]').forEach(b => b.addEventListener('click', () => seekTo(+b.dataset.seek, true)));
+  }
+
   function computeRefDiffs() {
-    if (!S.ref || !S.metrics) { S.refDiffs = null; return; }
+    if (!S.ref || !S.metrics) { S.refDiffs = null; S.refVerdict = null; return; }
     const m = S.metrics, r = S.ref.sum;
+    S.refVerdict = DSP.loudnessVerdict(
+      { plr: m.plr, lowMidPresenceGap: m.lowMidPresenceGap, subBassGap: m.subBassGap, lra: m.lra, budget: S.louder && S.louder.budget },
+      { plr: r.plr, lowMidPresenceGap: r.lowMidPresenceGap, subBassGap: r.subBassGap, lra: r.lra, budget: S.ref.budget });
     S.refDiffs = DSP.referenceDiffs(
       { plr: m.plr, tilt: m.tilt, lra: m.lra, width: m.width, lowWidth: m.lowWidth, octaveRel: S.tone.octaveRel },
       { plr: r.plr, tilt: r.tilt, lra: r.lra, width: r.width, lowWidth: r.lowWidth, octaveRel: r.tone.octaveRel });
@@ -2528,7 +2990,7 @@ const DSP = (() => {
     renderFileInfo(); renderSummary(); renderFindings(); renderLoudnessTiles(); renderPlatforms();
     renderToneTiles(); renderStereoTiles(); renderDynamics(); renderRegionInfo(); renderQuietList();
     $('regionTable').innerHTML = ''; $('zoomPanel').classList.add('hidden');
-    computeRefDiffs(); renderRefContent(); renderHistory(); renderReadiness(); renderPeaksDensity(); renderMasterResult(); updateMasteredButton(); updateTransport(0);
+    computeRefDiffs(); renderRefContent(); renderHistory(); renderReadiness(); renderPeaksDensity(); renderLouder(); renderTimelineNotes(); renderMasterResult(); updateMasteredButton(); updateTransport(0);
     invalidateCaches();
   }
 
@@ -2710,6 +3172,18 @@ const DSP = (() => {
     const dur = S.buffer.duration;
     timeAxis(ctx, padL, W, padT, padT + H, dur, h - 5);
     [-40, -30, -23, -14, -9, 0].forEach(v => { hline(ctx, y(v), padL, padL + W, css('--grid')); label(ctx, fmt(v, 0), padL - 4, y(v) + 3, 'right'); });
+    const xt = t => padL + t / dur * W, m = S.metrics;
+    // energy dips: shaded spans
+    (m.dips || []).forEach(d => { ctx.fillStyle = css('--warn'); ctx.globalAlpha = 0.12; ctx.fillRect(xt(d.start), padT, Math.max(1, xt(d.end) - xt(d.start)), H); ctx.globalAlpha = 1; });
+    // loudest peaks: ticks along the top, coloured by what made them; clusters get a bracket
+    if (S.peaks && S.peaks.list) {
+      const varColor = v => css(v.replace(/^var\((--[^)]+)\)$/, '$1'));
+      const cols = {}; Object.keys(SRC_META).forEach(k => cols[k] = varColor(SRC_META[k][1]));
+      ctx.globalAlpha = 0.7; ctx.lineWidth = 1;
+      S.peaks.list.forEach(e => { ctx.strokeStyle = cols[e.cat] || css('--text-dim'); const x = Math.round(xt(e.t)) + 0.5; ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + 6); ctx.stroke(); });
+      ctx.globalAlpha = 1;
+      (m.hotspots || []).forEach(hs => { ctx.strokeStyle = css('--text-dim'); ctx.lineWidth = 1.5; const a = xt(hs.start), b = xt(hs.end), yb = padT + 9; ctx.beginPath(); ctx.moveTo(a, yb - 2); ctx.lineTo(a, yb); ctx.lineTo(b, yb); ctx.lineTo(b, yb - 2); ctx.stroke(); });
+    }
     const plot = (arr, offsetSec, color, lw) => {
       ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineJoin = 'round'; ctx.beginPath();
       let started = false;
@@ -3529,6 +4003,7 @@ const DSP = (() => {
       await tick();
       const sum = DSP.summary(buf);
       S.ref = { buffer: buf, name: f.name, sum };
+      try { S.ref.budget = DSP.loudnessBudget(buf, sum.tone, null); } catch (e) { S.ref.budget = null; }
       S.ref.bars = refBarsFor(S.ref);
       computeRefDiffs(); renderRefContent(); renderToneTiles(); renderReadiness(); renderPeaksDensity();
       toast('Reference loaded. Its tonal curve is now on the Tone tab.');
@@ -3545,6 +4020,13 @@ const DSP = (() => {
     startPreview('ref', S.ref.buffer, g, comparePos() % S.ref.buffer.duration);
   });
   $('refStop').addEventListener('click', stopPreview);
+  function verdictHtml(V) {
+    if (!V) return '';
+    const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+    return `<div class="verdict-box"><div class="vh">${esc(V.headline)}</div>
+      ${V.reasons.length ? `<div class="lb-lead" style="margin:0">Why the reference may sound bigger at −14:</div><ul>${V.reasons.map(r => `<li>${esc(cap(r))}.</li>`).join('')}</ul>` : ''}
+      ${V.notes.length ? `<div class="vn">Other differences: ${esc(V.notes.join('; '))}.</div>` : ''}</div>`;
+  }
   function renderRefContent() {
     const has = !!S.ref;
     $('refEmpty').classList.toggle('hidden', has);
@@ -3553,6 +4035,7 @@ const DSP = (() => {
     $('refClearBtn').classList.toggle('hidden', !has);
     if (!has || !S.metrics) return;
     $('refName').textContent = S.ref.name;
+    $('refVerdict').innerHTML = verdictHtml(S.refVerdict);
     $('refDiffs').innerHTML = S.refDiffs && S.refDiffs.length
       ? S.refDiffs.slice(0, 6).map((d, i) => `<div class="diff"><div class="dn">${i + 1}</div><div><b>${esc(d.label)}</b><span>${esc(d.text)}</span></div></div>`).join('')
       : '<div class="empty">Your track is close to the reference on every measure.</div>';
@@ -3918,6 +4401,17 @@ ${pageHtml}
       line('Kick-band rise 50–90 Hz', `${fmt(t.kickRiseDb)} dB`); line('Kick-band settle', t.kickDecay !== null && t.kickRiseDb >= 6 ? t.kickDecay + ' ms' : 'not separable');
       line('Bass-band settle 60–250 Hz', t.bassDecay !== null ? t.bassDecay + ' ms' : 'does not settle'); line('Low end vs mids at hits', `${fmtSigned(t.lowVsMidDb)} dB`);
     }
+    if (S.louder && S.louder.budget) {
+      L.push('', 'LOUDER AT -14', '-'.repeat(50));
+      if (m.limited) L.push('(This file is already limited; analyse the mix before the master limiter for the clearest picture.)');
+      L.push('Share of peak height / share of loudness:');
+      S.louder.budget.bands.forEach(b => line(`  ${b.name} (${b.range})`, `${Math.round(b.peakShare * 100)}% / ${Math.round(b.loudShare * 100)}%${S.louder.budget.costly.includes(b) ? '  costs peak room' : S.louder.budget.efficient.includes(b) ? '  efficient' : ''}`));
+      const M = S.louder.moves;
+      if (M) { L.push(`Peak control (${M.moves[0].cutDb} dB off the loudest 2% of moments in one range), limiting to reach PLR ${M.target}:`); M.moves.forEach(mv => line(`  ${mv.name}`, moveVal(mv.pct))); }
+      if (S.eqMoves) { L.push('Tone moves:'); S.eqMoves.moves.forEach(mv => line(`  ${mv.label} (${mv.detail})`, moveVal(mv.pct))); }
+      (m.hotspots || []).forEach(h => line(`Peak cluster ${fmtTime(h.start)}-${fmtTime(h.end)}`, `mostly ${SRC_META[h.dominant][0].toLowerCase()}`));
+      (m.dips || []).forEach(d => line(`Energy dip ${fmtTime(d.start)}-${fmtTime(d.end)}`, `${fmt(d.depth)} LU below average`));
+    }
     L.push('', 'STREAMING PLATFORMS', '-'.repeat(50));
     PLATFORMS.forEach(([n, target]) => { let a = target - m.lufs; if (n === 'YouTube' && a > 0) a = 0; let cap = ''; if (a > 0 && m.truePeak + a > -1) { a = Math.max(0, -1 - m.truePeak); cap = ' (held back by peak headroom)'; } line(n, `${fmtSigned(a)} dB → peak ${fmt(m.truePeak + a)} dBTP${cap}`); });
     L.push('', 'FINDINGS', '-'.repeat(50));
@@ -3930,6 +4424,7 @@ ${pageHtml}
       line('Integrated loudness', `${fmt(r.lufs)} LUFS`); line('True peak', `${fmt(r.truePeak)} dBTP`); line('PLR', `${fmt(r.plr)} dB`);
       line('Tilt', `${fmtSigned(r.tilt)} dB/oct`); line('Correlation', fmtSigned(r.corr, 2)); line('Width', r.width.toFixed(0) + '%');
       line('Octave bands (Hz: dB)', DSP.OCTAVE_CENTRES.map((c, k) => `${c}: ${fmtSigned(r.tone.octaveRel[k])}`).join(', '));
+      if (S.refVerdict) { L.push('', S.refVerdict.headline); S.refVerdict.reasons.forEach(x => L.push('  - ' + x)); }
     }
     return L.join('\n');
   }
@@ -4043,6 +4538,17 @@ ${pageHtml}
       </div>
     ` });
 
+    // 2b. Louder at −14
+    if (S.louder && S.louder.budget) {
+      const spots = (m.hotspots || []).map(h => `<div class="lb-spot"><b>${fmtTime(h.start)}–${fmtTime(h.end)}</b>Peak cluster, mostly ${esc(SRC_META[h.dominant][0].toLowerCase())}</div>`).join('') +
+        (m.dips || []).map(d => `<div class="lb-spot dip"><b>${fmtTime(d.start)}–${fmtTime(d.end)}</b>Energy dip, ${fmt(d.depth)} LU below average</div>`).join('');
+      pages.push({ section: 'Louder at −14', html: `
+        <h2>Louder at −14</h2>
+        <p class="lead">At −14 every track plays at the same loudness, so what makes one sound bigger is how much loudness it gets out of its peaks. These are measured on this track.</p>
+        ${louderHtml(true, spots ? `<h3 class="mini-h" style="margin-top:6mm">Where to look</h3>${spots}` : '')}
+      ` });
+    }
+
     // 2. Loudness & dynamics
     const plat = PLATFORMS.map(([n, target, note]) => {
       let a = target - m.lufs, capped = false;
@@ -4127,7 +4633,7 @@ ${pageHtml}
 
     // 5. Reference (optional)
     if (S.ref) {
-      const r = S.ref.sum;
+      const r = S.ref.sum, verdictBlock = verdictHtml(S.refVerdict);
       const rr = [
         ['Integrated loudness', m.lufs, r.lufs, 'LUFS', 1], ['True peak', m.truePeak, r.truePeak, 'dBTP', 1], ['Peak-to-loudness', m.plr, r.plr, 'dB', 1],
         ['Loudness range', m.lra, r.lra, 'LU', 1], ['Crest factor', m.crest, r.crest, 'dB', 1], ['Tonal tilt', m.tilt, r.tilt, 'dB/oct', 1],
@@ -4137,6 +4643,7 @@ ${pageHtml}
       pages.push({ section: 'Reference', html: `
         <h2>Reference comparison</h2>
         <p class="lead">Compared with <b>${esc(S.ref.name)}</b>, both judged at equal loudness. Its tonal curve is overlaid on the Tone page.</p>
+        ${verdictBlock}
         <h3>Where you differ most</h3>
         ${S.refDiffs && S.refDiffs.length ? `<div class="rdiffs">${S.refDiffs.slice(0, 6).map((d, i) => `<div class="rdiff"><div class="dn">${i + 1}</div><div><b>${esc(d.label)}</b><div class="fb">${esc(d.text)}</div></div></div>`).join('')}</div>` : '<p class="muted">Your track is close to the reference on every measure.</p>'}
         <h3>All measurements</h3>
@@ -4324,6 +4831,35 @@ ol.rsteps li b { font-weight: 600; } ol.rsteps li span { color: #3e4554; }
 .rdiff b { font-size: 9pt; }
 dl.gloss dt { font-weight: 650; font-size: 9pt; margin-top: 3mm; }
 dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
+.lb-notice { font-size: 8.4pt; color: #3e4554; border: 0.3mm solid #e3e6ec; border-left: 0.9mm solid #c47a0a; border-radius: 1.6mm; padding: 2.2mm 3mm; margin: 0 0 4mm; }
+.lb-sec + .lb-sec { margin-top: 5mm; }
+.mini-h { font-size: 7.4pt; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: #5b6272; margin: 0 0 1.6mm; }
+.lb-lead { font-size: 8.4pt; color: #3e4554; margin: 0 0 2mm; line-height: 1.45; }
+.lb-row { display: grid; grid-template-columns: 34mm 1fr 26mm; gap: 3mm; align-items: center; padding: 1.3mm 0; border-bottom: 0.3mm solid #eef0f4; break-inside: avoid; }
+.lb-name { font-size: 8.4pt; font-weight: 600; line-height: 1.2; }
+.lb-name small { display: block; font-weight: 400; color: #8a91a1; font-size: 7pt; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.lb-bars { display: flex; flex-direction: column; gap: 0.9mm; }
+.lb-bar { display: grid; grid-template-columns: 1fr 9mm; gap: 2mm; align-items: center; }
+.lb-track { height: 1.9mm; border-radius: 1mm; background: #eceef2; overflow: hidden; }
+.lb-fill { height: 100%; border-radius: 1mm; } .lb-fill.peak { background: #c47a0a; } .lb-fill.loud { background: #3d5afe; }
+.lb-val { font: 7pt 'JetBrains Mono', ui-monospace, monospace; color: #5b6272; text-align: right; }
+.lb-tag { font-size: 7.4pt; color: #8a91a1; text-align: right; } .lb-tag.cost { color: #a86707; font-weight: 600; } .lb-tag.eff { color: #0d8a59; font-weight: 600; }
+.lb-legend { display: flex; gap: 5mm; font-size: 7.2pt; color: #5b6272; margin-top: 1.6mm; }
+.lb-legend i { display: inline-block; width: 2.4mm; height: 2.4mm; border-radius: 0.6mm; margin-right: 1.2mm; vertical-align: -0.3mm; }
+.lb-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; }
+.mv-row { display: grid; grid-template-columns: 30mm 1fr 21mm; gap: 2.5mm; align-items: center; padding: 1.4mm 0; border-bottom: 0.3mm solid #eef0f4; break-inside: avoid; }
+.mv-row.top .lb-name { color: #0d8a59; }
+.mv-axis { position: relative; height: 2.2mm; border-radius: 1.1mm; background: #eceef2; }
+.mv-axis::after { content: ''; position: absolute; left: 50%; top: -0.6mm; bottom: -0.6mm; width: 0.3mm; background: #c9ced8; }
+.mv-fill { position: absolute; top: 0; bottom: 0; border-radius: 1.1mm; } .mv-fill.good { left: 50%; background: #12a26a; } .mv-fill.bad { right: 50%; background: #d43c4a; }
+.mv-val { font: 7.6pt 'JetBrains Mono', ui-monospace, monospace; text-align: right; } .mv-val.good { color: #0d8a59; } .mv-val.bad { color: #c0303e; } .mv-val.flat { color: #8a91a1; }
+.mv-how { display: none; }
+.lb-spot { font-size: 7.8pt; color: #3e4554; padding: 1.1mm 0; border-bottom: 0.3mm solid #eef0f4; } .lb-spot b { font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 600; color: #161a22; margin-right: 2mm; } .lb-spot.dip b { color: #a86707; }
+.mv-row.top .mv-how { display: block; grid-column: 1 / -1; font-size: 7.2pt; color: #5b6272; margin-top: -0.4mm; }
+.verdict-box { border: 0.3mm solid #e3e6ec; border-radius: 2mm; padding: 2.6mm 3.2mm; margin: 0 0 4mm; }
+.verdict-box .vh { font-weight: 650; font-size: 9.4pt; margin-bottom: 1mm; }
+.verdict-box ul { margin: 1mm 0 0; padding-left: 4.5mm; font-size: 8.4pt; color: #3e4554; }
+.verdict-box .vn { font-size: 7.6pt; color: #8a91a1; margin-top: 1.4mm; }
 `;
 
   $('exportPdfBtn').addEventListener('click', async () => {
