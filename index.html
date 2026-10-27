@@ -545,6 +545,115 @@
     .mv-how { grid-column: 1 / -1; margin-top: 0; }
     .lb-cols { grid-template-columns: 1fr; gap: 22px; }
   }
+
+  /* ---------- Site navigation ---------- */
+  .site-nav { display: flex; gap: 2px; margin-left: 18px; }
+  .site-nav a { color: var(--text-dim); text-decoration: none; font-size: 13.5px; font-weight: 550; padding: 6px 10px; border-radius: 7px; }
+  .site-nav a:hover { color: var(--text); background: var(--surface-2); }
+  .site-nav a.active { color: var(--text); background: var(--surface-3); }
+  .hero-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; margin-top: 14px !important; font-size: 13.5px; }
+  .hero-links a { color: var(--accent); text-decoration: none; font-weight: 550; }
+  .hero-links a:hover { text-decoration: underline; }
+  @media (max-width: 720px) {
+    .site-nav { margin-left: 6px; }
+    .site-nav a { padding: 6px 7px; font-size: 13px; }
+    .topbar .file-chip { display: none; }
+  }
+  @media (max-width: 400px) { .brand > div { display: none; } }
+
+  /* ---------- Learn ---------- */
+  .page { padding: 28px 0 60px; }
+  .doc { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 44px; max-width: 1080px; margin: 0 auto; }
+  .doc-toc { position: sticky; top: 76px; align-self: start; max-height: calc(100vh - 96px); overflow: auto; }
+  .toc-title { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-faint); font-weight: 650; margin: 6px 0 10px; }
+  .doc-toc ol { list-style: none; margin: 0; padding: 0; counter-reset: c; }
+  .doc-toc li { counter-increment: c; }
+  .doc-toc a { display: flex; gap: 10px; padding: 6px 10px; border-radius: 7px; color: var(--text-dim); text-decoration: none; font-size: 13.5px; line-height: 1.35; }
+  .doc-toc a::before { content: counter(c, decimal-leading-zero); font-family: var(--mono); font-size: 11.5px; color: var(--text-faint); padding-top: 1px; }
+  .doc-toc a:hover { background: var(--surface-2); color: var(--text); }
+  .doc-toc a.active { background: var(--accent-soft); color: var(--text); }
+  .doc-toc a.active::before { color: var(--accent); }
+  .doc-body { max-width: 760px; }
+  .doc-head h1, .lp h1 { font-size: 38px; line-height: 1.12; letter-spacing: -0.025em; margin: 6px 0 14px; }
+  .lede { font-size: 17px; line-height: 1.6; color: var(--text-dim); margin: 0 0 8px; }
+  .chapter { padding-top: 44px; margin-top: 40px; border-top: 1px solid var(--border); scroll-margin-top: 64px; }
+  .ch-num { font-family: var(--mono); font-size: 12px; color: var(--accent); font-weight: 600; letter-spacing: .06em; }
+  .chapter h2 { font-size: 26px; letter-spacing: -0.015em; margin: 4px 0 14px; line-height: 1.2; }
+  .chapter h3, .lp h3 { font-size: 17px; margin: 28px 0 8px; }
+  .chapter p, .chapter li, .lp p, .lp li { font-size: 15.5px; line-height: 1.7; }
+  .chapter p { margin: 0 0 14px; }
+  .chapter a, .lp-section a, .lp-hero a:not(.dl-btn):not(.btn) { color: var(--accent); }
+  .small { font-size: 13px !important; } .muted { color: var(--text-faint); }
+  .terms { margin: 10px 0 18px; display: grid; grid-template-columns: 190px 1fr; gap: 10px 22px; }
+  .terms dt { font-weight: 650; font-size: 14.5px; padding-top: 2px; }
+  .terms dd { margin: 0; color: var(--text-dim); font-size: 15px; line-height: 1.65; }
+  .terms.compact { grid-template-columns: 150px 1fr; gap: 6px 18px; }
+  .list { padding-left: 20px; margin: 8px 0 16px; } .list li { margin-bottom: 8px; color: var(--text-dim); } .list li b { color: var(--text); }
+  .callout { border: 1px solid var(--border); background: var(--surface); border-left: 3px solid var(--accent); border-radius: 10px; padding: 14px 16px; margin: 18px 0; font-size: 15px; line-height: 1.65; color: var(--text-dim); }
+  .callout b { color: var(--text); }
+  .callout ul { margin: 8px 0 0; padding-left: 18px; } .callout li { margin-bottom: 4px; font-size: 15px; }
+  .callout.tip { border-left-color: var(--ok); } .callout.warn { border-left-color: var(--warn); }
+  .shot { margin: 20px 0 22px; }
+  .shot img { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); }
+  .shot figcaption { font-size: 13px; color: var(--text-faint); margin-top: 8px; line-height: 1.5; }
+  .fig-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .fig-row .shot { margin: 14px 0; }
+  .chapter .table-wrap { margin: 14px 0 10px; }
+  .chapter table.data td { font-family: var(--font); color: var(--text-dim); vertical-align: top; line-height: 1.5; }
+  .chapter table.data td:first-child { color: var(--text); font-weight: 550; white-space: nowrap; }
+  .chapter table.data td.num { font-family: var(--mono); color: var(--text); white-space: nowrap; }
+  ol.wf-steps { list-style: none; counter-reset: s; padding: 0; margin: 14px 0; }
+  ol.wf-steps > li { counter-increment: s; position: relative; padding: 0 0 18px 44px; color: var(--text-dim); }
+  ol.wf-steps > li::before { content: counter(s); position: absolute; left: 0; top: 1px; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.wf-steps > li > b { color: var(--text); }
+  ol.wf-steps.compact > li { padding-bottom: 10px; }
+  .checklist { list-style: none; padding: 0; margin: 12px 0 18px; columns: 2; column-gap: 28px; }
+  .checklist li { position: relative; padding: 0 0 10px 28px; break-inside: avoid; color: var(--text-dim); font-size: 15px; }
+  .checklist li::before { content: ''; position: absolute; left: 0; top: 4px; width: 16px; height: 16px; border-radius: 5px; border: 1.5px solid var(--border-strong); }
+  code { font-family: var(--mono); font-size: .88em; background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px; word-break: break-all; }
+  .doc-cta { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; margin-top: 36px; padding: 20px 22px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); }
+  .doc-cta b { display: block; font-size: 16px; margin-bottom: 2px; } .doc-cta span { color: var(--text-dim); font-size: 14px; }
+  .cta-btns { display: flex; gap: 10px; flex-wrap: wrap; } .cta-btns .btn { text-decoration: none; }
+
+  /* ---------- Liminal page ---------- */
+  .lp { max-width: 1120px; margin: 0 auto; }
+  .lp-hero { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 40px; align-items: center; padding: 18px 0 30px; }
+  .lp-hero-shot { margin: 0; } .lp-hero-shot img { width: 100%; height: auto; display: block; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .dl-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 22px 0 12px; }
+  .dl-btn { display: flex; align-items: center; gap: 12px; padding: 11px 18px 11px 14px; border-radius: 10px; background: var(--accent-strong); color: #fff; text-decoration: none; box-shadow: var(--shadow); }
+  .dl-btn:hover { filter: brightness(1.08); }
+  .dl-btn + .dl-btn { background: var(--surface-3); color: var(--text); }
+  .dl-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+  .dl-btn b { display: block; font-size: 14.5px; } .dl-btn small { display: block; font-size: 12px; opacity: .8; }
+  .lp-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 18px 0 10px; }
+  .lp-f { border: 1px solid var(--border); background: var(--surface); border-radius: 12px; padding: 16px 16px 6px; }
+  .lp-f h3 { margin: 0 0 6px; font-size: 15px; } .lp-f p { font-size: 14px !important; line-height: 1.6; color: var(--text-dim); }
+  .lp-section { margin-top: 44px; } .lp-section h2 { font-size: 24px; letter-spacing: -0.015em; margin: 0 0 10px; }
+  .lp-section p { color: var(--text-dim); max-width: 760px; }
+  .lp-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } .lp-gallery .shot { margin: 6px 0; }
+  .lp-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .lp .doc-cta { margin-top: 48px; }
+
+  @media (max-width: 980px) {
+    .doc { grid-template-columns: 1fr; gap: 0; }
+    .doc-toc { position: static; max-height: none; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 8px 10px; margin-bottom: 10px; }
+    .doc-toc ol { columns: 2; column-gap: 8px; }
+    .lp-hero { grid-template-columns: 1fr; gap: 24px; }
+    .lp-features { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .page { padding-top: 18px; }
+    .doc-head h1, .lp h1 { font-size: 29px; }
+    .lede { font-size: 16px; }
+    .chapter { padding-top: 30px; margin-top: 28px; }
+    .chapter h2 { font-size: 22px; }
+    .doc-toc ol { columns: 1; }
+    .terms, .terms.compact { grid-template-columns: 1fr; gap: 2px; } .terms dd { margin-bottom: 10px; }
+    .fig-row, .lp-gallery, .lp-cols, .lp-features { grid-template-columns: 1fr; }
+    .checklist { columns: 1; }
+    .chapter table.data td:first-child { white-space: normal; }
+    .dl-btn { flex: 1 1 100%; }
+  }
 </style>
 </head>
 <body>
@@ -560,6 +669,11 @@
     <div class="name" id="fileName"></div>
     <div class="meta num" id="fileMeta"></div>
   </div>
+  <nav class="site-nav" aria-label="Site">
+    <a href="#" data-route="analyse">Analyse</a>
+    <a href="#learn" data-route="learn">Learn</a>
+    <a href="#liminal" data-route="liminal">Liminal</a>
+  </nav>
   <div class="spacer"></div>
   <button class="btn hidden" id="openAnotherBtn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>
@@ -596,6 +710,7 @@
       <div class="eyebrow">Mix &amp; master analysis for streaming</div>
       <h1>Make your master compete at −14.</h1>
       <p>Spotify, Apple Music and YouTube play everything at about the same loudness. MasterScope shows what's stopping your mix from sounding as big and polished as the competition at −14 LUFS, and lets you hear the fix.</p>
+      <p class="hero-links"><a href="#learn">New to mastering? Start with Learn →</a><a href="#liminal">Get Liminal, the limiter that lands on your target →</a></p>
     </div>
     <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose an audio file to analyse">
       <div class="dz-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
@@ -657,6 +772,375 @@
       <div class="panel-head"><h2>Settings</h2></div>
       <div class="kv" id="sessSettings"></div>
     </section>
+  </section>
+
+  <!-- ================= Learn ================= -->
+  <section id="learnPage" class="hidden page">
+    <div class="doc">
+      <aside class="doc-toc" aria-label="Chapters">
+        <div class="toc-title">Learn</div>
+        <ol id="learnToc">
+          <li><a href="#learn/streaming">How streaming plays your music</a></li>
+          <li><a href="#learn/loudness">Measuring loudness</a></li>
+          <li><a href="#learn/peaks">Peaks: sample, true and codec</a></li>
+          <li><a href="#learn/density">Density and PLR</a></li>
+          <li><a href="#learn/tone">Tonal balance</a></li>
+          <li><a href="#learn/lowend">The low end</a></li>
+          <li><a href="#learn/stereo">Stereo and mono</a></li>
+          <li><a href="#learn/dynamics">Dynamics in the mix</a></li>
+          <li><a href="#learn/limiter">How a limiter works</a></li>
+          <li><a href="#learn/workflow">A mastering workflow</a></li>
+          <li><a href="#learn/delivery">Exporting and delivery</a></li>
+          <li><a href="#learn/checklist">Release checklist</a></li>
+          <li><a href="#learn/glossary">Glossary</a></li>
+        </ol>
+      </aside>
+
+      <article class="doc-body">
+        <header class="doc-head">
+          <div class="eyebrow">Learn</div>
+          <h1>Mixing and mastering for streaming</h1>
+          <p class="lede">Everything you need to finish a track that holds its own next to commercial releases: how loudness is measured, what streaming services do to your music, how to get a fuller mix, and how to master and deliver it. Each chapter shows what to look for in MasterScope and what to do about it in Liminal.</p>
+        </header>
+
+        <!-- 1 -->
+        <section class="chapter" id="ch-streaming">
+          <div class="ch-num">01</div>
+          <h2>How streaming plays your music</h2>
+          <p>Spotify, Apple Music, YouTube, Tidal and the other big services measure the loudness of every track and turn it up or down so that everything plays at about the same level. This is called <b>loudness normalisation</b>. Spotify, for example, adjusts tracks to −14 LUFS by default.</p>
+          <p>That changes the old rules. A master pushed to −8 LUFS doesn't play louder on Spotify than one at −14: it is turned down 6 dB, and all that is left of the extra loudness is the limiting that was used to get there. What decides how big a track sounds next to others is no longer how loud the file is, but how full and clear it is at the same loudness.</p>
+          <div class="table-wrap"><table class="data">
+            <thead><tr><th>Service</th><th>Default level</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>Spotify</td><td class="num">−14 LUFS</td><td>Premium listeners can choose Loud (−11) or Quiet (−19). Quiet tracks are only turned up as far as their peaks allow, keeping 1 dB of headroom.</td></tr>
+              <tr><td>Apple Music</td><td class="num">about −16 LUFS</td><td>Applied when Sound Check is on.</td></tr>
+              <tr><td>YouTube</td><td class="num">about −14 LUFS</td><td>Turns loud tracks down, but doesn't turn quiet ones up.</td></tr>
+              <tr><td>Tidal, Amazon Music</td><td class="num">about −14 LUFS</td><td></td></tr>
+              <tr><td>Deezer</td><td class="num">about −15 LUFS</td><td></td></tr>
+              <tr><td>SoundCloud, Bandcamp, DJ software, downloads</td><td class="num">none</td><td>Files play at the level you made them.</td></tr>
+            </tbody>
+          </table></div>
+          <p class="small muted">Services publish and change their policies from time to time, and listeners can switch normalisation off. Spotify's figures are from its <a href="https://support.spotify.com/us/artists/article/loudness-normalization/" target="_blank" rel="noopener">loudness normalisation guide</a>; the others are widely reported defaults.</p>
+          <div class="callout key"><b>What this means for you</b><ul>
+            <li>On streaming, extra loudness is taken away again. Density (how full the track sounds) is what you keep.</li>
+            <li>A track that can't reach −14 without its peaks going over −1 dBTP plays quieter than everything around it on Spotify.</li>
+            <li>Where nothing normalises (SoundCloud, DJ sets), a louder file does play louder. You can master for both: see <a href="#learn/density">Density and PLR</a>.</li>
+          </ul></div>
+          <figure class="shot"><img src="img/ms-platforms.webp" alt="MasterScope's streaming platforms panel showing how much each service turns a track up or down" loading="lazy" width="1600" height="537"><figcaption>MasterScope's Loudness tab shows how much each service will turn your track up or down, and where its peaks land afterwards.</figcaption></figure>
+        </section>
+
+        <!-- 2 -->
+        <section class="chapter" id="ch-loudness">
+          <div class="ch-num">02</div>
+          <h2>Measuring loudness: LUFS</h2>
+          <p><b>LUFS</b> (loudness units relative to full scale) measures loudness the way we hear it, following the ITU-R BS.1770 standard. Before measuring, the signal is filtered to match the ear: very low bass counts for less, and the upper mids and highs count for a little more. That is why a mix heavy in sub bass can read surprisingly quiet, and why a little more presence reads louder.</p>
+          <dl class="terms">
+            <dt>Integrated loudness</dt><dd>The loudness of the whole track: the number streaming services normalise to. Silence and very quiet passages are left out (anything below −70 LUFS, then anything more than 10 LU below the average), so adding silence or a quiet intro doesn't change it.</dd>
+            <dt>Short-term loudness</dt><dd>Loudness over a sliding 3-second window. It shows how loud each section is. The loudest short-term reading is how hard your chorus or drop hits.</dd>
+            <dt>Momentary loudness</dt><dd>The same over 0.4 seconds. It moves with individual hits and words.</dd>
+            <dt>Loudness range (LRA)</dt><dd>How much the short-term loudness varies across the song, in LU, ignoring the quietest 10% and loudest 5%. Roughly, under 5 LU is very consistent and 6 to 10 is typical of songs with breakdowns.</dd>
+          </dl>
+          <figure class="shot"><img src="img/ms-timeline.webp" alt="MasterScope loudness timeline with momentary and short-term loudness, peak markers and energy dips" loading="lazy" width="1600" height="522"><figcaption>The loudness timeline. Blue is short-term, green is momentary and the dashed line is the integrated loudness. Ticks along the top mark the loudest peaks; shaded spans are stretches where the energy drops well below the average.</figcaption></figure>
+          <div class="callout tip"><b>Energy dips</b> are worth a look. A breakdown is meant to drop; a verse that sags 5 LU below the rest will feel small next to other releases at −14. More energy in the arrangement or a little level automation fixes it.</div>
+        </section>
+
+        <!-- 3 -->
+        <section class="chapter" id="ch-peaks">
+          <div class="ch-num">03</div>
+          <h2>Peaks: sample, true and codec</h2>
+          <p>Loudness is about the body of the sound; peaks are its highest points. Three readings matter, each stricter than the last.</p>
+          <dl class="terms">
+            <dt>Sample peak (dBFS)</dt><dd>The highest sample value in the file. 0 dBFS is the top of the scale.</dd>
+            <dt>True peak (dBTP)</dt><dd>The highest point of the reconstructed waveform, including peaks that fall between samples. These "inter-sample peaks" can be well over the sample peak on dense, bright masters. Measured by oversampling.</dd>
+            <dt>Codec peak (estimate)</dt><dd>The true peak after lossy encoding (AAC, Ogg, MP3). Encoders remove the very top of the spectrum, and that reshapes the waveform so its peaks rise, often by 1 to 2 dB on loud, bright or clipped masters. MasterScope and Liminal estimate it by filtering at 16 kHz and measuring the true peak.</dd>
+          </dl>
+          <p>The usual ceiling is <b>−1 dBTP</b>. Spotify recommends keeping true peak below −2 dBTP when your master is louder than −14 LUFS, because louder masters overshoot more when encoded. The codec estimate tells you directly: if it reads above −1 dBTP, the encoded version may distort wherever it plays at full level.</p>
+          <figure class="shot"><img src="img/liminal-main.webp" alt="Liminal's interface showing loudness, true peak out and codec peak readings" loading="lazy" width="1440" height="900"><figcaption>Liminal shows true peak and the codec peak estimate side by side in its Loudness panel (right), so you can see both while you work.</figcaption></figure>
+          <div class="callout warn"><b>A real example.</b> A master at −12.7 LUFS with true peak at −1.1 dBTP looked safe, but its codec peak was +1.3 dBTP: the clipper used on it left sharp, bright edges that the encoder reshaped. Lowering the ceiling by 2.4 dB brought the encoded peak to −1.1. Always check the codec reading on louder masters.</div>
+        </section>
+
+        <!-- 4 -->
+        <section class="chapter" id="ch-density">
+          <div class="ch-num">04</div>
+          <h2>Density and PLR</h2>
+          <p>The <b>peak-to-loudness ratio (PLR)</b> is true peak minus integrated loudness. It measures how far the peaks stand above the body of the track, so it is the clearest single number for density.</p>
+          <div class="table-wrap"><table class="data">
+            <thead><tr><th>PLR</th><th>Sound</th><th>Typical of</th></tr></thead>
+            <tbody>
+              <tr><td class="num">under 8 dB</td><td>Squashed: drums lose their snap, the track can sound smaller</td><td>Very loud club and EDM masters</td></tr>
+              <tr><td class="num">8 to 12 dB</td><td>Full and even, with punch intact</td><td>Most pop, hip-hop, dance and rock releases</td></tr>
+              <tr><td class="num">12 to 13 dB</td><td>Open and punchy, less dense</td><td>Acoustic, jazz, older-style masters</td></tr>
+              <tr><td class="num">over 13 dB</td><td>Can't reach −14 LUFS with peaks at −1 dBTP</td><td>Unmastered mixes</td></tr>
+            </tbody>
+          </table></div>
+          <p>Because PLR is peak minus loudness, choosing a PLR and a ceiling fixes the loudness: <b>target loudness = ceiling − PLR</b>. A PLR of 10 with a ceiling of −2 dBTP lands at −12 LUFS. A PLR of 13 with a ceiling of −1 lands at −14.</p>
+          <figure class="shot"><img src="img/ms-readiness.webp" alt="MasterScope's −14 readiness panel with the PLR bar" loading="lazy" width="1600" height="639"><figcaption>MasterScope's −14 readiness panel places your PLR on a bar from squashed to too dynamic, with the steps to get where you want.</figcaption></figure>
+          <h3>Does denser sound louder?</h3>
+          <p>A little, and only up to a point. LUFS already measures loudness the way we hear it, so at −14 two tracks are about equally loud. A denser master sounds fuller and more constant, which reads as "bigger" at low volume. Below a PLR of about 8, the drum hits lose impact and the track starts to sound smaller, even though the meter says it is just as loud. Judge density by ear at matched loudness, and compare against a reference in your genre.</p>
+          <h3>Louder masters by choice</h3>
+          <p>You don't have to master to exactly −14. A master at −12 with a PLR of 10 is turned down 2 dB on Spotify and sounds the same there as a −14 master with the same density, but it plays louder on SoundCloud and in DJ sets. So pick your PLR by ear, set the ceiling (−1 dBTP, or lower for louder masters and anything clipped), and let the loudness follow. Don't turn the master down after the limiter just to read −14: streaming services will do that for you, and the file will be quieter everywhere else.</p>
+        </section>
+
+        <!-- 5 -->
+        <section class="chapter" id="ch-tone">
+          <div class="ch-num">05</div>
+          <h2>Tonal balance</h2>
+          <p>Tonal balance is how the energy is spread from sub to air. MasterScope compares each octave with <b>pink noise</b>, which has equal energy per octave and sounds balanced to the ear, so a flat line means balanced and the bars show where your mix leans.</p>
+          <figure class="shot"><img src="img/ms-tonal.webp" alt="MasterScope tonal balance chart, octave bars relative to pink noise" loading="lazy" width="1600" height="629"><figcaption>Octave bars relative to pink noise. Most releases fall gently from bass to treble, a tilt of about 0 to −3 dB per octave.</figcaption></figure>
+          <dl class="terms">
+            <dt>Tilt</dt><dd>The overall slope from 63 Hz to 8 kHz. Steeper than about −3 dB per octave sounds dark and woolly; above 0 sounds bright and thin.</dd>
+            <dt>Low-mid build-up (250 to 500 Hz)</dt><dd>Where mud and boxiness live. Many parts overlap here; small cuts on the busiest ones clear space.</dd>
+            <dt>Presence (2 to 5 kHz)</dt><dd>Where the ear is most sensitive. A mix with too little presence sounds smaller at the same loudness. Most releases sit around 3 to 6 dB below the low mids here.</dd>
+            <dt>Sub (20 to 60 Hz)</dt><dd>Felt more than heard. Phones and small speakers can't play it, but it still takes up peak room.</dd>
+          </dl>
+          <figure class="shot"><img src="img/ms-spectrogram.webp" alt="MasterScope spectrogram of a full song" loading="lazy" width="1600" height="588"><figcaption>The spectrogram shows frequency over time. Horizontal lines are sustained notes or resonances, vertical stripes are hits. Click to play from any point.</figcaption></figure>
+          <div class="callout tip"><b>Use a reference.</b> Genre matters more than any rule of thumb. Load a released track you like on MasterScope's Compare tab: both play at −14 so loudness can't fool you, and MasterScope lists where your track differs most and whether the gap is tone, density or arrangement.</div>
+        </section>
+
+        <!-- 6 -->
+        <section class="chapter" id="ch-lowend">
+          <div class="ch-num">06</div>
+          <h2>The low end</h2>
+          <p>The kick and bass carry most of a track's energy, so they decide a lot about how clean and loud it can be.</p>
+          <ul class="list">
+            <li><b>Give the kick its own moment.</b> If the bass or 808 is still sounding when the kick hits, the two add up into bigger peaks and the low end blurs. Shorter bass notes or sidechain ducking from the kick fixes it.</li>
+            <li><b>Keep the low end in the centre.</b> Below about 150 Hz, stereo content loses weight on mono systems (phones, many club rigs) and sounds loose. Make it mono, or narrow the parts that sit there.</li>
+            <li><b>Measure before you cut.</b> Sub bass counts for little in LUFS but can take up peak room, so cutting it can help. It doesn't always: if your loudest peaks come from somewhere else, cutting the low end only makes the track thinner. MasterScope's <a href="#learn/dynamics">Louder at −14</a> panel shows which is true for your track.</li>
+          </ul>
+          <figure class="shot"><img src="img/ms-transients.webp" alt="MasterScope hits and transients panel showing kick rise and settle times" loading="lazy" width="1600" height="387"><figcaption>MasterScope's Dynamics tab measures how far each kick rises above what was already playing in the 50 to 90 Hz range, and how quickly the low end settles afterwards.</figcaption></figure>
+        </section>
+
+        <!-- 7 -->
+        <section class="chapter" id="ch-stereo">
+          <div class="ch-num">07</div>
+          <h2>Stereo and mono</h2>
+          <p>A wide mix sounds big on headphones, but much of the world listens in mono or near-mono: phone speakers, Bluetooth speakers, clubs. Anything that cancels in mono disappears there.</p>
+          <dl class="terms">
+            <dt>Phase correlation</dt><dd>+1 means the channels are identical (mono), 0 means unrelated, below 0 means parts cancel when summed. Most mixes sit between about +0.5 and +0.9.</dd>
+            <dt>Stereo width</dt><dd>The share of energy in the side (left minus right) signal. Bass should be close to 0%; pads, reverbs and doubles can be wide.</dd>
+          </dl>
+          <div class="fig-row">
+            <figure class="shot"><img src="img/ms-vectorscope.webp" alt="MasterScope vectorscope" loading="lazy" width="1600" height="512"><figcaption>The vectorscope: a tall, narrow shape is close to mono; sideways spread warns of phase problems.</figcaption></figure>
+            <figure class="shot"><img src="img/ms-stereofield.webp" alt="MasterScope stereo width by frequency" loading="lazy" width="1600" height="492"><figcaption>Width by frequency. Anything wide between 50 and 200 Hz is highlighted.</figcaption></figure>
+          </div>
+        </section>
+
+        <!-- 8 -->
+        <section class="chapter" id="ch-dynamics">
+          <div class="ch-num">08</div>
+          <h2>Dynamics in the mix</h2>
+          <p>A master can only be as dense as the mix allows cleanly. If a few parts poke out far above the rest, the master limiter has to pull the whole track down every time they hit, and that is what you hear as pumping and lost punch. Controlling those parts in the mix lets the limiter do less for the same loudness.</p>
+          <h3>The tools</h3>
+          <dl class="terms">
+            <dt>Compressor</dt><dd>Turns a part down when it goes over a threshold, by a ratio. Attack sets how quickly it reacts (slower lets the transient through), release how quickly it lets go. Use it to even out vocals, bass and buses.</dd>
+            <dt>Clipper</dt><dd>Shaves off the very tops of waveforms instantly. On a drum bus, a dB or two of clipping takes the sharpest transients off with little audible change. It adds bright harmonics, so watch the codec peak on the master.</dd>
+            <dt>De-esser</dt><dd>A compressor that only reacts to harsh "s" and "t" sounds, or any bright, spiky part: hats, a bright synth.</dd>
+            <dt>Saturation</dt><dd>Gentle distortion that adds harmonics and density to sustained parts without the pumping of heavy compression.</dd>
+          </dl>
+          <h3>Find what the limiter is fighting</h3>
+          <p>MasterScope's <b>Louder at −14</b> panel splits your track into six ranges and shows two things for each: its share of the height of the loudest peaks, and its share of the loudness. A range with a long amber bar and a short blue one spends peak room without adding much loudness. It then tests the fix on your actual audio: taking 4 dB off the loudest moments in one range at a time and measuring how much less limiting the track then needs.</p>
+          <figure class="shot"><img src="img/ms-louder_mix.webp" alt="MasterScope's Louder at −14 panel for a mix before mastering" loading="lazy" width="1600" height="1432"><figcaption>A mix before mastering. Presence and highs make 45% of the peak height but only 18% of the loudness; controlling the highs cuts the limiting by 30%, while controlling the bass would make it worse.</figcaption></figure>
+          <p>It also tells you whether those peaks are drum hits or sustained parts, and suggests the matching tool: a drum-bus clipper for hits, a de-esser or compression for a bright vocal or synth. For the clearest answer, analyse your mix with the master limiter switched off.</p>
+          <div class="callout tip"><b>Does the level going into the limiter matter?</b> Not for the sound. In a 32-bit floating-point DAW, turning up the input and lowering the threshold by the same amount gives an identical result. What matters is where the loudness comes from: tame peaks in the mix and the limiter has less to do. The exception is analogue-style plugins (tape, consoles, saturators), which do react to how hard they are driven.</div>
+        </section>
+
+        <!-- 9 -->
+        <section class="chapter" id="ch-limiter">
+          <div class="ch-num">09</div>
+          <h2>How a limiter works</h2>
+          <p>A mastering limiter does two jobs: it stops peaks going over a ceiling, and it lets you raise the overall level until the track is as dense as you want. Every limiter has the same core controls.</p>
+          <dl class="terms">
+            <dt>Threshold and makeup</dt><dd>Lowering the threshold makes the limiter work harder and, with makeup gain, raises the level. Liminal's Learn sets the threshold for you to land on a loudness target.</dd>
+            <dt>Ceiling</dt><dd>The highest level the output can reach, in dBTP. −1 is the usual choice; −2 or lower for louder masters, and lower still if the codec peak reads high.</dd>
+            <dt>Attack and lookahead</dt><dd>Lookahead lets the limiter see a peak coming and turn down smoothly before it arrives, instead of clipping it. Attack is how gradually it does so. Very short attack (under 1 ms) grabs the front of every drum hit and flattens the punch; around 5 to 10 ms keeps it.</dd>
+            <dt>Release</dt><dd>How quickly the gain recovers after a peak. Short release is denser but can distort or pump; long release is smoother but can duck the track after each hit. Adaptive release stretches it automatically on dense passages.</dd>
+            <dt>Stereo link</dt><dd>How much the two channels share gain reduction. 100% keeps the stereo image steady; lower lets each side be limited on its own.</dd>
+            <dt>Oversampling</dt><dd>Runs the limiter at a higher internal rate so it catches inter-sample peaks and reduces distortion, at the cost of CPU.</dd>
+          </dl>
+          <figure class="shot"><img src="img/liminal-bassfirst.webp" alt="Liminal in Lookahead mode with Bass first enabled" loading="lazy" width="1440" height="900"><figcaption>Liminal in Lookahead mode. The display shows the waveform after limiting, what was removed (red) and the gain reduction over time.</figcaption></figure>
+          <h3>Liminal's modes</h3>
+          <dl class="terms">
+            <dt>Lookahead</dt><dd>The default for mastering: smooth, transparent gain reduction with adjustable attack, release and lookahead.</dd>
+            <dt>Brickwall</dt><dd>Zero added latency and an absolute ceiling. Useful while tracking or for a final safety stage.</dd>
+            <dt>Soft Clip</dt><dd>Rounds the peaks off instead of turning the track down. It keeps the gain reduction low and the dynamics lively, but the clipped edges raise the codec peak, so it suits masters with headroom under the ceiling.</dd>
+            <dt>Multiband</dt><dd>Limits the lows and highs separately, so a big kick doesn't pull the vocal down with it.</dd>
+            <dt>Bass first</dt><dd>Takes up to a set amount off the low band before the main limiter, so the kick and bass don't trigger limiting across the whole mix. Use only as much as you need: on most mixes 2 to 3 dB is plenty.</dd>
+          </dl>
+          <div class="fig-row">
+            <figure class="shot"><img src="img/liminal-softclip.webp" alt="Liminal in Soft Clip mode" loading="lazy" width="1440" height="900"><figcaption>Soft Clip mode.</figcaption></figure>
+            <figure class="shot"><img src="img/liminal-multiband.webp" alt="Liminal in Multiband mode" loading="lazy" width="1440" height="900"><figcaption>Multiband mode.</figcaption></figure>
+          </div>
+          <div class="callout tip"><b>Listen at matched loudness.</b> Liminal's Match button plays your unlimited mix at the same loudness as the output, so you hear only what the limiter changes, not just "louder". Delta plays only what is being removed: if you can hear drums or vocals in it, the limiter is doing too much.</div>
+        </section>
+
+        <!-- 10 -->
+        <section class="chapter" id="ch-workflow">
+          <div class="ch-num">10</div>
+          <h2>A mastering workflow</h2>
+          <p>This is the loop that works with MasterScope and Liminal. It starts in the mix, because that is where the biggest gains are.</p>
+          <ol class="wf-steps">
+            <li><b>Analyse the mix.</b> Bounce it with no limiter on the master and open it in MasterScope. Fix anything in "What to work on" first: mud, harshness, wide bass, energy dips, and whatever the Louder at −14 panel says the limiter would be fighting.
+              <figure class="shot"><img src="img/ms-readiness_mix.webp" alt="MasterScope readiness for an unmastered mix" loading="lazy" width="1600" height="782"><figcaption>An unmastered mix: PLR 18.5 dB, so it needs about 5.5 dB of peak control to reach −14. The steps say what to control first.</figcaption></figure></li>
+            <li><b>Put Liminal last on the master.</b> Lookahead mode, attack around 10 ms, release around 30 ms with adaptive release on, stereo link 100%. Add Bass first only if the low end is triggering the limiter.</li>
+            <li><b>Set the ceiling.</b> −1 dBTP for a −14 master; −2 or lower for anything louder.</li>
+            <li><b>Choose your density and set the target.</b> Target = ceiling − PLR. For a full, competitive sound, aim for a PLR of 9 to 11.</li>
+            <li><b>Press Learn and play the song once.</b> Liminal listens, then renders what it heard at different thresholds and sets the one that lands on your target.
+              <div class="fig-row">
+                <figure class="shot"><img src="img/liminal-capturing.webp" alt="Liminal while Learn is listening" loading="lazy" width="1440" height="900"><figcaption>Learn listening.</figcaption></figure>
+                <figure class="shot"><img src="img/liminal-learned.webp" alt="Liminal after Learn with the Report button" loading="lazy" width="1440" height="900"><figcaption>Done: the threshold is set and the Report button appears.</figcaption></figure>
+              </div></li>
+            <li><b>Save the report.</b> Press Report and save the .json, then drop it on MasterScope to see the result, the gain reduction over time and your settings. No second play-through needed. (Record does the same for a live play-through after you change settings by hand.)
+              <figure class="shot"><img src="img/ms-session-top.webp" alt="A Liminal Learn report open in MasterScope" loading="lazy" width="1600" height="987"><figcaption>A Learn report in MasterScope: loudness, peaks, codec estimate, PLR and gain reduction, plus a timeline and the settings used.</figcaption></figure></li>
+            <li><b>Listen with Match and Delta.</b> If the drums lose their snap, ease the target by 1 dB, lengthen the attack, or go back and control the peaks in the mix.</li>
+            <li><b>Export and check the final file.</b> Open the bounced master in MasterScope: true peak, codec peak, density and tone. Then load a reference on the Compare tab.
+              <figure class="shot"><img src="img/ms-compare.webp" alt="MasterScope comparing a mix with a reference" loading="lazy" width="1600" height="1528"><figcaption>Compare explains why a reference may sound bigger at −14, then lists every difference.</figcaption></figure></li>
+          </ol>
+        </section>
+
+        <!-- 11 -->
+        <section class="chapter" id="ch-delivery">
+          <div class="ch-num">11</div>
+          <h2>Exporting and delivery</h2>
+          <ul class="list">
+            <li><b>Format.</b> WAV or AIFF at the sample rate you mixed at. 24-bit is best; 16-bit is fine for most distributors.</li>
+            <li><b>Dither once, at the end.</b> When reducing to 16-bit, add dither (Liminal's Dither switch) on the final export only. Never dither twice.</li>
+            <li><b>No changes after the limiter.</b> Don't normalise on export, and don't turn the master down afterwards unless you mean to. Every change after the limiter changes the peaks it worked to control.</li>
+            <li><b>Check the encoded peaks.</b> Keep the codec estimate at or below −1 dBTP. If it is higher, lower the ceiling and Learn again at the same PLR, or tame the brightest peaks in the mix.</li>
+            <li><b>One master or two?</b> One master at your chosen density works everywhere. If you want a very loud club version, make it a separate file and check its codec peak too.</li>
+            <li><b>Leave a little silence</b> at the start and end so nothing is cut off, and let reverb tails finish naturally.</li>
+          </ul>
+        </section>
+
+        <!-- 12 -->
+        <section class="chapter" id="ch-checklist">
+          <div class="ch-num">12</div>
+          <h2>Release checklist</h2>
+          <ul class="checklist">
+            <li>Integrated loudness where you chose it (−14, or louder by choice)</li>
+            <li>True peak at or below −1 dBTP (−2 for louder masters)</li>
+            <li>Codec peak estimate at or below −1 dBTP</li>
+            <li>PLR in the range you want, chosen by ear at matched loudness</li>
+            <li>No clipped samples, no DC offset</li>
+            <li>Tonal balance close to a good reference in your genre</li>
+            <li>Bass centred; phase correlation positive; nothing disappears in mono</li>
+            <li>Drums still punch after limiting (listen with Match and Delta)</li>
+            <li>Sections sit where you intend: no unintended energy dips</li>
+            <li>Correct format, sample rate and bit depth, dithered once</li>
+            <li>Listened on headphones, a phone speaker and a car or club system</li>
+          </ul>
+          <p>MasterScope's PDF report collects all of these in one place, so it is also a good document to keep with each release.</p>
+        </section>
+
+        <!-- 13 -->
+        <section class="chapter" id="ch-glossary">
+          <div class="ch-num">13</div>
+          <h2>Glossary</h2>
+          <dl class="terms compact">
+            <dt>dBFS</dt><dd>Decibels relative to full scale, the top of the digital range (0 dBFS).</dd>
+            <dt>dBTP</dt><dd>Decibels true peak: the waveform's real peak including inter-sample peaks.</dd>
+            <dt>LUFS / LU</dt><dd>Loudness units relative to full scale, and the difference between two loudness readings (1 LU = 1 dB).</dd>
+            <dt>PLR</dt><dd>Peak-to-loudness ratio: true peak minus integrated loudness.</dd>
+            <dt>Crest factor</dt><dd>Peak minus RMS level; a rougher cousin of PLR.</dd>
+            <dt>Gain reduction (GR)</dt><dd>How much a compressor or limiter is turning the signal down, in dB.</dd>
+            <dt>Headroom</dt><dd>The space between the highest peak and the ceiling or 0 dBFS.</dd>
+            <dt>Inter-sample peak</dt><dd>A peak between two samples, higher than either, that appears when the signal is converted back to analogue or resampled.</dd>
+            <dt>K-weighting</dt><dd>The filter LUFS uses to match the ear before measuring loudness.</dd>
+            <dt>Lookahead</dt><dd>A short delay that lets a limiter react before a peak arrives.</dd>
+            <dt>Mid/side</dt><dd>Splitting stereo into what is shared (mid) and what differs (side) between the channels.</dd>
+            <dt>Normalisation</dt><dd>A service turning tracks up or down to a common loudness.</dd>
+            <dt>Pink noise</dt><dd>Noise with equal energy per octave; sounds balanced, and is the reference for tonal balance.</dd>
+            <dt>Sidechain</dt><dd>Using one signal (often the kick) to control a processor on another (often the bass).</dd>
+          </dl>
+          <div class="doc-cta">
+            <div><b>Put it into practice</b><span>Open a mix in MasterScope, or get Liminal for your DAW.</span></div>
+            <div class="cta-btns"><a class="btn primary" href="#">Analyse a track</a><a class="btn" href="#liminal">Get Liminal</a></div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </section>
+  <!-- ================= Liminal ================= -->
+  <section id="liminalPage" class="hidden page">
+    <div class="lp">
+      <div class="lp-hero">
+        <div class="lp-hero-text">
+          <div class="eyebrow">Liminal by MasterScope · version 5.5</div>
+          <h1>The mastering limiter that lands on your target.</h1>
+          <p class="lede">Press Learn, play your song once, and Liminal sets the threshold that hits your loudness at your ceiling, then hands you a report to open in MasterScope. Transparent lookahead limiting, a soft clipper, multiband and Bass first, with true-peak and codec-peak metering built in.</p>
+          <div class="dl-row">
+            <a class="dl-btn" href="downloads/Liminal-Windows.jpg">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5l7.5-1v7H3zM11.5 4.4L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zM11.5 12.5H21V21l-9.5-1.4z"/></svg>
+              <span><b>Download for Windows</b><small>VST3 · Windows 10 and 11, 64-bit</small></span>
+            </a>
+            <a class="dl-btn" href="downloads/Liminal-macOS.jpg">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9-.7 0-1.8-.9-3-.8-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.6s-2.5-1-2.5-3.8zM14.1 5.8c.6-.8 1.1-1.8 1-2.8-.9 0-2 .6-2.7 1.4-.6.7-1.1 1.7-1 2.7 1 .1 2-.5 2.7-1.3z"/></svg>
+              <span><b>Download for macOS</b><small>VST3 and AU · Apple silicon and Intel</small></span>
+            </a>
+          </div>
+          <p class="small muted">Works in any DAW that loads VST3 (and AU on Mac): Ableton Live, FL Studio, Cubase, Reaper, Studio One, Bitwig, Logic and more.</p>
+        </div>
+        <figure class="lp-hero-shot"><img src="img/liminal-learned.webp" alt="Liminal after Learn, in Lookahead mode" width="1440" height="900"></figure>
+      </div>
+
+      <div class="lp-features">
+        <div class="lp-f"><h3>Learn, in one listen</h3><p>Pick a loudness target, press Learn and play the song. Liminal renders what it heard through hidden copies of itself and sets the threshold that lands on the target. Undo puts it back.</p></div>
+        <div class="lp-f"><h3>A report with every Learn</h3><p>Press Report to save the result as a session file: loudness, true peak, codec peak, PLR, gain reduction over time and your settings. Drop it on MasterScope to read it, or export a PDF or CSV.</p></div>
+        <div class="lp-f"><h3>Four modes</h3><p>Lookahead for transparent mastering, Brickwall for zero latency, Soft Clip for lively, low-gain-reduction loudness, and Multiband so a big kick doesn't pull the vocal down.</p></div>
+        <div class="lp-f"><h3>Bass first</h3><p>Takes a set amount off the low band before the main limiter, so the kick and bass stop triggering limiting across the whole mix.</p></div>
+        <div class="lp-f"><h3>Peaks you can trust</h3><p>True peak measured with oversampling, plus a codec peak estimate that shows where the peaks land after AAC or MP3 encoding, so loud masters don't distort on SoundCloud or in DJ sets.</p></div>
+        <div class="lp-f"><h3>Hear only what changes</h3><p>Match plays your mix at the output's loudness, so louder never fools you. Delta plays only what the limiter removes.</p></div>
+        <div class="lp-f"><h3>Made for streaming</h3><p>Platform targets for Spotify, Apple Music and more, PLR readout, adaptive release, stereo link, up to 4x oversampling (including only on export) and dither for 16 and 24-bit.</p></div>
+        <div class="lp-f"><h3>Everyday comforts</h3><p>Factory presets built around −14 mastering, your own presets, A/B, full undo and redo, light and dark themes, and plain-English tips on every control.</p></div>
+      </div>
+
+      <div class="lp-section">
+        <h2>Works with MasterScope</h2>
+        <p>Liminal and MasterScope speak the same language. Learn's report opens in MasterScope with the result, a timeline of loudness and gain reduction, and your settings, and MasterScope's analysis tells you what to fix in the mix before Liminal ever has to work hard. The <a href="#learn/workflow">mastering workflow</a> on the Learn page walks through it step by step.</p>
+        <figure class="shot"><img src="img/ms-session-top.webp" alt="A Liminal Learn report open in MasterScope" loading="lazy" width="1600" height="987"><figcaption>A Liminal Learn report in MasterScope.</figcaption></figure>
+      </div>
+
+      <div class="lp-section">
+        <h2>Gallery</h2>
+        <div class="lp-gallery">
+          <figure class="shot"><img src="img/liminal-bassfirst.webp" alt="Liminal in Lookahead mode with Bass first" loading="lazy" width="1440" height="900"><figcaption>Lookahead with Bass first.</figcaption></figure>
+          <figure class="shot"><img src="img/liminal-softclip.webp" alt="Liminal in Soft Clip mode" loading="lazy" width="1440" height="900"><figcaption>Soft Clip mode.</figcaption></figure>
+          <figure class="shot"><img src="img/liminal-multiband.webp" alt="Liminal in Multiband mode" loading="lazy" width="1440" height="900"><figcaption>Multiband mode.</figcaption></figure>
+          <figure class="shot"><img src="img/liminal-light.webp" alt="Liminal in the light theme, Brickwall mode" loading="lazy" width="1440" height="900"><figcaption>Brickwall mode, light theme.</figcaption></figure>
+        </div>
+      </div>
+
+      <div class="lp-section lp-cols">
+        <div>
+          <h2>Install on Windows</h2>
+          <ol class="wf-steps compact">
+            <li>Run the installer, or copy <code>Liminal.vst3</code> to <code>C:\Program Files\Common Files\VST3</code>.</li>
+            <li>Open your DAW and rescan plug-ins. In Ableton Live: Settings, Plug-Ins, Rescan.</li>
+            <li>Put Liminal last on your master channel.</li>
+          </ol>
+        </div>
+        <div>
+          <h2>Install on macOS</h2>
+          <ol class="wf-steps compact">
+            <li>Run the installer, or copy <code>Liminal.vst3</code> to <code>/Library/Audio/Plug-Ins/VST3</code> and <code>Liminal.component</code> to <code>/Library/Audio/Plug-Ins/Components</code>.</li>
+            <li>Open your DAW and rescan plug-ins. Logic checks Audio Units when it starts.</li>
+            <li>Put Liminal last on your master channel.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="lp-section">
+        <h2>What's new in 5.5</h2>
+        <ul class="list">
+          <li><b>Learn makes the report too.</b> One play-through gives you the threshold and the session report. Measured against an actual render at the learned setting, they agree to 0.01 LU.</li>
+          <li><b>Record starts clean.</b> The first row of a recorded session no longer carries readings from the previous play-through.</li>
+        </ul>
+      </div>
+
+      <div class="doc-cta">
+        <div><b>New to mastering?</b><span>Learn how loudness, peaks and density work, and how to use Liminal and MasterScope together.</span></div>
+        <div class="cta-btns"><a class="btn primary" href="#learn">Start learning</a><a class="btn" href="#">Analyse a track</a></div>
+      </div>
+    </div>
   </section>
 
   <!-- ================= App ================= -->
@@ -2496,6 +2980,13 @@ const DSP = (() => {
   }
 
   function showView(which) {
+    currentView = which;
+    $('learnPage').classList.toggle('hidden', which !== 'learn');
+    $('liminalPage').classList.toggle('hidden', which !== 'liminal');
+    document.querySelectorAll('.site-nav a').forEach(a => a.classList.toggle('active',
+      a.dataset.route === which || (a.dataset.route === 'analyse' && ['landing', 'app', 'progress', 'session'].includes(which))));
+    // analysing a file leaves the Learn and Liminal pages: drop their address so the nav matches
+    if (!['learn', 'liminal'].includes(which) && /^#(learn|liminal)/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
     $('landing').classList.toggle('hidden', which !== 'landing');
     $('progress').classList.toggle('hidden', which !== 'progress');
     $('app').classList.toggle('hidden', which !== 'app');
@@ -2507,6 +2998,37 @@ const DSP = (() => {
     $('openAnotherBtn').classList.toggle('hidden', !inApp && which !== 'session');
     document.body.classList.toggle('has-transport', inApp);
   }
+
+  // ===================================================================
+  // Pages: #learn (optionally #learn/<chapter>), #liminal, otherwise the analyser
+  // ===================================================================
+  let currentView = 'landing', lastAnalyseView = 'landing';
+  function route() {
+    const h = location.hash.replace(/^#/, ''), [page, sub] = h.split('/');
+    if (page === 'learn' || page === 'liminal') {
+      if (!['learn', 'liminal'].includes(currentView)) lastAnalyseView = currentView;
+      if (isPlaying) pause();
+      showView(page);
+      const target = page === 'learn' && sub ? document.getElementById('ch-' + sub) : null;
+      requestAnimationFrame(() => target ? target.scrollIntoView({ block: 'start' }) : window.scrollTo(0, 0));
+    } else if (['learn', 'liminal'].includes(currentView)) {
+      showView(S.buffer && lastAnalyseView !== 'landing' ? lastAnalyseView : (S.buffer ? 'app' : 'landing'));
+      window.scrollTo(0, 0);
+    }
+  }
+  window.addEventListener('hashchange', route);
+  document.querySelector('.brand').addEventListener('click', () => { if (location.hash) location.hash = ''; else route(); });
+  document.querySelector('.brand').style.cursor = 'pointer';
+  // "Analyse" with nothing open goes back to the drop zone
+  document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); if (location.hash) history.pushState(null, '', location.pathname + location.search); route(); if (['learn', 'liminal'].includes(currentView)) showView(S.buffer ? 'app' : 'landing'); window.scrollTo(0, 0); }));
+  // highlight the chapter being read
+  (function tocSpy() {
+    const links = [...document.querySelectorAll('#learnToc a')];
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => { if (en.isIntersecting) { const id = en.target.id.replace('ch-', ''); links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#learn/' + id)); } });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('#learnPage .chapter').forEach(c => io.observe(c));
+  })();
 
   // ===================================================================
   // Analysis pipeline
@@ -3703,7 +4225,7 @@ const DSP = (() => {
   });
 
   document.addEventListener('keydown', e => {
-    if (!S.buffer || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!S.buffer || e.metaKey || e.ctrlKey || e.altKey || $('app').classList.contains('hidden')) return;
     const tag = e.target && e.target.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target && e.target.isContentEditable)) return;
     if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
@@ -4948,6 +5470,8 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
     try { win.paginate(); } catch (e) {}
     win.focus(); win.print();
   });
+
+  route();   // open #learn or #liminal directly from a link
 
   // expose a small hook for automated checks
   window.__masterscope = { S, setTab, openFile, DSP };
