@@ -4233,13 +4233,14 @@ const DSP = (() => {
     const ceil = isFinite(set.ceiling) ? set.ceiling : -1;
     const created = s.created ? new Date(s.created) : null;
     $('sessTitle').textContent = name.replace(/\.json$/i, '');
-    $('sessMeta').textContent = [s.plugin || 'Liminal', created && !isNaN(created) ? created.toLocaleString() : '', isFinite(s.durationSec) ? fmtTime(s.durationSec) + ' recorded' : '', s.sampleRate ? (s.sampleRate / 1000) + ' kHz' : ''].filter(Boolean).join(' · ');
-    $('sessSub').textContent = `Target ${fmt(target)} LUFS · ceiling ${fmt(ceil)} dBTP`;
+    $('sessMeta').textContent = [s.plugin || 'Liminal', created && !isNaN(created) ? created.toLocaleString() : '', isFinite(s.durationSec) ? fmtTime(s.durationSec) + (s.source === 'learn' ? ' rendered by Learn' : ' recorded') : '', s.sampleRate ? (s.sampleRate / 1000) + ' kHz' : ''].filter(Boolean).join(' · ');
+    $('sessSub').textContent = `Target ${fmt(target)} LUFS · ceiling ${fmt(ceil)} dBTP` + (s.source === 'learn' ? ' · from Learn: what it heard, rendered at the threshold it set' : '');
+    document.querySelector('#session .eyebrow').textContent = s.source === 'learn' ? 'Liminal Learn report' : 'Liminal session';
 
     const I = sum.integrated, d = I - target;
     const iStatus = !isFinite(I) ? '' : Math.abs(d) <= 1 ? 'ok' : 'warn';
     const tp = sum.truePeakOut, tpStatus = !isFinite(tp) ? '' : tp > ceil + 0.05 ? 'danger' : 'ok';
-    const cp = sum.codecPeak, cpStatus = !isFinite(cp) ? '' : cp > 0 ? 'danger' : cp > -0.5 ? 'warn' : 'ok';
+    const cp = sum.codecPeak, cpStatus = !isFinite(cp) ? '' : cp > 0 ? 'danger' : cp > -0.9 ? 'warn' : 'ok';
     const plr = sum.plr, plrStatus = !isFinite(plr) ? '' : plr < 8 ? 'warn' : 'ok';
     const gra = sum.grAvg, graStatus = !isFinite(gra) ? '' : gra > 4 ? 'warn' : 'ok';
     const pct = sum.grPercent, pctStatus = !isFinite(pct) ? '' : pct > 50 ? 'warn' : 'ok';
@@ -4256,7 +4257,7 @@ const DSP = (() => {
 
     const F = [];
     if (isFinite(I)) {
-      if (Math.abs(d) <= 1) F.push({ status: 'ok', title: `Loudness is on target (${fmt(I)} LUFS)`, body: 'Streaming services will play it at about the level you mastered it.' });
+      if (Math.abs(d) <= 1) F.push({ status: 'ok', title: `Loudness is on target (${fmt(I)} LUFS)`, body: I > -13.5 ? `Streaming services turn it down ${(I + 14).toFixed(1)} dB to about −14 and it keeps its density; it plays at this level wherever nothing normalises (SoundCloud, Bandcamp, DJ sets).` : 'Streaming services will play it at about the level you mastered it.' });
       else if (d < -1) F.push({ status: 'warn', title: `${fmt(-d)} LU quieter than the target`, body: `Services only turn quiet tracks up if there is headroom, so it may play quieter than the competition. Lower Threshold, or press Learn in Liminal to land on ${fmt(target)} LUFS.` });
       else F.push({ status: d > 2 ? 'warn' : 'info', title: `${fmt(d)} LU louder than the target`, body: `Services will turn it down by about ${fmt(d)} dB, so the extra limiting buys no loudness, only less punch. Consider raising Threshold, or use Learn.` });
     }
@@ -4362,7 +4363,7 @@ const DSP = (() => {
     const created = s.created ? new Date(s.created) : new Date();
     const dateStr = (isNaN(created) ? new Date() : created).toLocaleString(undefined, { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' });
     const name = lastSessionName || 'Liminal session';
-    const metaLine = [s.plugin || 'Liminal', isFinite(s.durationSec) ? fmtTime(s.durationSec) + ' recorded' : '', s.sampleRate ? (s.sampleRate / 1000) + ' kHz' : ''].filter(Boolean).join(' · ');
+    const metaLine = [s.plugin || 'Liminal', isFinite(s.durationSec) ? fmtTime(s.durationSec) + (s.source === 'learn' ? ' rendered by Learn' : ' recorded') : '', s.sampleRate ? (s.sampleRate / 1000) + ' kHz' : ''].filter(Boolean).join(' · ');
 
     // Headline verdict
     const F = lastSessionFindings || [];
