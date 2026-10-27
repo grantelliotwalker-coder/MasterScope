@@ -654,6 +654,34 @@
     .chapter table.data td:first-child { white-space: normal; }
     .dl-btn { flex: 1 1 100%; }
   }
+
+  /* ---------- Wide screens: use the full width ---------- */
+  @media (min-width: 1360px) {
+    body.wide-page main { max-width: none; padding-left: 40px; padding-right: 40px; }
+    .doc { max-width: none; grid-template-columns: 240px minmax(0, 1fr); gap: 56px; }
+    .doc-body { max-width: none; }
+    .doc-head .lede { max-width: 980px; }
+    .chapter { display: flow-root; }
+    /* text on the left, screenshots alongside on the right */
+    .chapter > .shot, .chapter > .fig-row, ol.wf-steps > li > .shot, ol.wf-steps > li > .fig-row {
+      float: right; clear: right; width: 50%; margin: 6px 0 24px 40px; }
+    .chapter > .fig-row, ol.wf-steps > li > .fig-row { grid-template-columns: 1fr; gap: 0; }
+    .chapter > .fig-row .shot, ol.wf-steps > li > .fig-row .shot { margin: 0 0 18px; }
+    .chapter > h2, .chapter > .ch-num { clear: both; }
+    .chapter > .shot:first-of-type { margin-top: 10px; }
+    ol.wf-steps > li { display: flow-root; }
+    .lp { max-width: 1760px; }
+    .lp-gallery { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (min-width: 2200px) {
+    .chapter > .shot, .chapter > .fig-row, ol.wf-steps > li > .shot, ol.wf-steps > li > .fig-row { width: 55%; }
+  }
+  @media (min-width: 1360px) {
+    .callout, .chapter .table-wrap, .doc-cta { display: flow-root; }
+    .callout { overflow: hidden; }
+    ol.wf-steps > li > .fig-row { grid-template-columns: 1fr 1fr; gap: 16px; width: 55%; }
+    ol.wf-steps > li > .fig-row .shot { margin: 0; }
+  }
 </style>
 </head>
 <body>
@@ -2981,6 +3009,7 @@ const DSP = (() => {
 
   function showView(which) {
     currentView = which;
+    document.body.classList.toggle('wide-page', which === 'learn' || which === 'liminal');
     $('learnPage').classList.toggle('hidden', which !== 'learn');
     $('liminalPage').classList.toggle('hidden', which !== 'liminal');
     document.querySelectorAll('.site-nav a').forEach(a => a.classList.toggle('active',
@@ -3021,13 +3050,44 @@ const DSP = (() => {
   document.querySelector('.brand').style.cursor = 'pointer';
   // "Analyse" with nothing open goes back to the drop zone
   document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); if (location.hash) history.pushState(null, '', location.pathname + location.search); route(); if (['learn', 'liminal'].includes(currentView)) showView(S.buffer ? 'app' : 'landing'); window.scrollTo(0, 0); }));
-  // highlight the chapter being read
+  // On wide screens screenshots sit beside the text: each one moves to the start of its
+  // chapter (or workflow step) and floats right, so the text runs alongside it. A comment
+  // marker remembers where it came from, so narrow screens get the original order back.
+  (function sideFigures() {
+    const mq = window.matchMedia('(min-width: 1360px)');
+    const figs = [...document.querySelectorAll('#learnPage .chapter > .shot, #learnPage .chapter > .fig-row, #learnPage ol.wf-steps > li > .shot, #learnPage ol.wf-steps > li > .fig-row')];
+    const marks = figs.map(f => { const m = document.createComment('fig'); f.before(m); return m; });
+    const apply = () => {
+      figs.forEach((f, i) => {
+        if (mq.matches) {
+          const host = f.parentElement.tagName === 'LI' ? f.parentElement : f.parentElement;
+          const anchor = host.tagName === 'LI' ? host.firstChild : host.querySelector(':scope > h2').nextSibling;
+          // keep figures of one chapter in their original order
+          const prev = figs[i - 1];
+          if (prev && prev.parentElement === host && mq.matches) prev.after(f); else host.insertBefore(f, anchor);
+        } else marks[i].after(f);
+      });
+    };
+    apply();
+    mq.addEventListener('change', apply);
+  })();
+
+  // highlight the chapter being read: the last one whose top has passed a third of the way down
   (function tocSpy() {
-    const links = [...document.querySelectorAll('#learnToc a')];
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(en => { if (en.isIntersecting) { const id = en.target.id.replace('ch-', ''); links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#learn/' + id)); } });
-    }, { rootMargin: '-20% 0px -70% 0px' });
-    document.querySelectorAll('#learnPage .chapter').forEach(c => io.observe(c));
+    const links = [...document.querySelectorAll('#learnToc a')], chapters = [...document.querySelectorAll('#learnPage .chapter')];
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      if ($('learnPage').classList.contains('hidden')) return;
+      const line = window.innerHeight / 3;
+      let cur = null;
+      chapters.forEach(c => { if (c.getBoundingClientRect().top <= line) cur = c; });
+      const id = cur ? '#learn/' + cur.id.replace('ch-', '') : null;
+      links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === id));
+    };
+    window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+    window.addEventListener('hashchange', () => setTimeout(update, 50));
+    setTimeout(update, 50);
   })();
 
   // ===================================================================
