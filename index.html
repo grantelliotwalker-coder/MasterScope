@@ -3,12 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MasterScope – Mix &amp; Master Analysis</title>
-<meta name="description" content="Analyse a mix or master in your browser: loudness, true peak, tonal balance, stereo image and dynamics.">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%236f86ff'/%3E%3Cpath d='M10 34 L18 34 L22 22 L28 44 L33 14 L39 50 L44 26 L48 34 L54 34' fill='none' stroke='white' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<title>MasterScope – Is your track ready to release?</title>
+<meta name="description" content="Drop your track and know if it's ready for Spotify, Apple Music, YouTube, SoundCloud and the club. Free, no account, and your audio never leaves your computer. Plus Liminal, a free mastering limiter.">
+<meta name="theme-color" content="#07080f">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MasterScope">
+<meta property="og:title" content="Drop your track. Know if it's ready.">
+<meta property="og:description" content="Free mix and master analysis that tells you what to fix, plus Liminal, a free mastering limiter. No account. Your audio never leaves your computer.">
+<meta property="og:url" content="https://masterscope.gwstudio.com.au/">
+<meta property="og:image" content="https://masterscope.gwstudio.com.au/img/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://masterscope.gwstudio.com.au/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%236f86ff'/%3E%3Ccircle cx='32' cy='32' r='24' fill='%233d5afe'/%3E%3Ccircle cx='32' cy='32' r='24' fill='none' stroke='%23fff' stroke-width='3'/%3E%3Cpath d='M32 2v10M32 52v10M2 32h10M52 32h10' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M13 34 L19 34 L23 23 L28 43 L33 17 L38 47 L42 27 L45 34 L51 34' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0d0f14;
@@ -682,6 +693,160 @@
     ol.wf-steps > li > .fig-row { grid-template-columns: 1fr 1fr; gap: 16px; width: 55%; }
     ol.wf-steps > li > .fig-row .shot { margin: 0; }
   }
+/* Liminal report comparison */
+.cmp-table table{width:100%;border-collapse:collapse;font-size:14px}
+.cmp-table th,.cmp-table td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:left}
+.cmp-table th{color:var(--text-faint);font-weight:500;font-size:12px}
+.cmp-table .n{text-align:right;font-variant-numeric:tabular-nums}
+.cmp-table td.ok{color:var(--ok);font-weight:600}.cmp-table td.warn{color:var(--warn);font-weight:600}
+.btn.small{padding:4px 10px;font-size:12px}
+
+/* ===================== Landing (v1) ===================== */
+body.landing-page main { max-width: none; padding: 0; }
+#landing { --lp-bg: #07080f; --lp-ink: #f4ede4; --lp-dim: #c7bfb4; --lp-faint: #a39bb0; --lp-card: #12131d; --lp-line: #262433; --lp-hot: #ec6a3a; --lp-gold: #fbb33c; --lp-ok: #3ecf8e; --lp-blue: #a9b8ff;
+  background: var(--lp-bg); color: var(--lp-ink); font-family: Inter, system-ui, sans-serif; }
+#landing a { color: #fcd9a8; }
+#landing a:hover { color: #fff; }
+.lp-hero { position: relative; min-height: calc(100vh - 56px); display: flex; flex-direction: column; overflow: hidden; }
+.lp-ridges { order: 2; position: relative; flex: 1 0 auto; width: 100%; height: clamp(240px, 40vh, 460px); margin-top: 8px; display: block; background: transparent; border: 0; border-radius: 0; }
+.lp-ridge-note { order: 3; }
+.lp-hero-in { order: 1; position: relative; width: 100%; max-width: 1000px; margin: 0 auto; box-sizing: border-box; padding: 44px 24px 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 22px; }
+.lp-hook { margin: 0; font-size: 19px; font-weight: 600; color: var(--lp-gold); }
+.lp-hero h1 { margin: 0; font-size: clamp(44px, 6.8vw, 96px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 800; }
+.lp-lede { margin: 0; font-size: clamp(17px, 1.6vw, 20px); line-height: 1.5; color: var(--lp-dim); max-width: 700px; }
+.lp-ctas { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 14px; }
+.lp-btn { display: inline-flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 26px; border-radius: 999px; border: 1px solid #4a3f52; background: transparent; color: var(--lp-ink); font: 600 17px Inter, system-ui, sans-serif; text-decoration: none; cursor: pointer; transition: transform .15s ease, background .15s ease; }
+#landing a.lp-btn { color: var(--lp-ink); }
+.lp-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.05); }
+.lp-btn.primary { background: var(--lp-ink); color: var(--lp-bg); border-color: var(--lp-ink); font-weight: 700; font-size: 18px; min-height: 60px; padding: 0 30px; }
+.lp-btn.primary:hover { background: #fff; }
+.lp-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.lp-btn:focus-visible { outline: 3px solid var(--lp-gold); outline-offset: 3px; }
+body.dragging .lp-btn.primary { box-shadow: 0 0 0 6px rgba(251,179,60,0.35); }
+.lp-trust { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 22px; font-size: 14px; color: var(--lp-faint); }
+.lp-trust li { display: inline-flex; align-items: center; gap: 8px; }
+.lp-trust svg { width: 16px; height: 16px; fill: none; stroke: var(--lp-ok); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.lp-progress { width: min(520px, 100%); display: flex; flex-direction: column; gap: 8px; text-align: left; }
+.lp-pfile { font-weight: 650; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lp-pbar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); overflow: hidden; }
+.lp-pbar div { height: 100%; width: 0; background: var(--lp-gold); transition: width .25s ease; }
+.lp-pstep { font-size: 13px; color: var(--lp-faint); }
+.lp-ridge-note { position: relative; margin: 10px 0 0; padding: 0 24px 22px; text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lp-faint); }
+.lp-wrap { width: 100%; max-width: 1240px; margin: 0 auto; box-sizing: border-box; padding: 0 24px 40px; }
+.lp-section { padding: 88px 0 0; }
+.lp-head { display: flex; flex-direction: column; gap: 12px; max-width: 780px; margin-bottom: 28px; }
+.lp-head h2, .lp-why h2, .lp-final h2 { margin: 0; font-size: clamp(32px, 4vw, 52px); letter-spacing: -0.03em; font-weight: 800; line-height: 1.05; }
+.lp-head p, .lp-why p, .lp-final p { margin: 0; font-size: 17px; line-height: 1.6; color: var(--lp-dim); }
+.lp-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.lp-card { border-radius: 18px; background: var(--lp-card); border: 1px solid var(--lp-line); padding: 26px; display: flex; flex-direction: column; gap: 10px; }
+.lp-card .k { font-size: 13px; font-weight: 600; color: var(--lp-faint); }
+.lp-card .from { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #8a8296; }
+.lp-card .big { font-family: 'JetBrains Mono', monospace; font-size: 46px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.lp-card .big.txt { font-family: Inter, sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+.lp-card .v { font-size: 14px; font-weight: 600; }
+.lp-card .v.ok { color: var(--lp-ok); }
+.lp-card.invert { background: var(--lp-ink); color: var(--lp-bg); border-color: var(--lp-ink); }
+.lp-card.invert .k { color: #5a5160; }
+.lp-card.invert .v { color: #3a3240; font-weight: 500; }
+.lp-strip { position: relative; height: 150px; margin-top: 8px; }
+.lp-band { position: absolute; top: 18px; height: 54px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; padding: 0 12px; box-sizing: border-box; overflow: hidden; font-size: 13px; line-height: 1.25; }
+.lp-band b { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lp-band span { opacity: .8; white-space: nowrap; }
+.lp-axis { position: absolute; left: 0; right: 0; top: 104px; height: 1px; background: var(--lp-line); }
+.lp-tick { position: absolute; top: 110px; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--lp-faint); }
+.lp-marker { position: absolute; top: 0; bottom: 30px; width: 2px; background: var(--lp-gold); transform: translateX(-1px); transition: left 1.2s cubic-bezier(.2,.8,.2,1); }
+.lp-marker span { position: absolute; top: -6px; left: 8px; white-space: nowrap; background: var(--lp-gold); color: #1a1208; font-weight: 700; font-size: 12.5px; padding: 3px 8px; border-radius: 6px; }
+.lp-marker.flip span { left: auto; right: 8px; }
+.lp-small { font-size: 13px; color: var(--lp-faint); margin: 6px 0 0; }
+.lp-tags { display: inline-flex; gap: 8px; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--lp-faint); }
+.lp-tags b { padding: 4px 10px; border-radius: 999px; font-weight: 600; }
+.lp-tags b.ms { background: #3a1f17; color: var(--lp-gold); }
+.lp-tags b.lm { background: #1b2140; color: var(--lp-blue); }
+.lp-loop { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.lp-loop li { border-radius: 18px; background: var(--lp-card); border: 1px solid var(--lp-line); padding: 24px; display: flex; flex-direction: column; gap: 10px; transition: border-color .4s ease, transform .4s ease, box-shadow .4s ease; }
+.lp-loop li .n { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
+.lp-loop li.ms .n { color: var(--lp-gold); }
+.lp-loop li.lm .n { color: var(--lp-blue); }
+.lp-loop li h3 { margin: 0; font-size: 21px; font-weight: 700; }
+.lp-loop li p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--lp-dim); }
+.lp-loop li.lit.ms { border-color: var(--lp-gold); box-shadow: 0 0 0 1px var(--lp-gold), 0 18px 40px rgba(251,179,60,0.12); transform: translateY(-3px); }
+.lp-loop li.lit.lm { border-color: var(--lp-blue); box-shadow: 0 0 0 1px var(--lp-blue), 0 18px 40px rgba(169,184,255,0.12); transform: translateY(-3px); }
+.lp-again { margin-top: 16px; border-radius: 14px; border: 1px dashed #4a3f52; padding: 16px 20px; display: flex; align-items: center; gap: 12px; font-size: 15px; color: var(--lp-dim); }
+.lp-again svg { flex: none; width: 20px; height: 20px; fill: none; stroke: var(--lp-gold); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lp-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 40px 32px; }
+.lp-steps .n { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--lp-hot); font-weight: 700; }
+.lp-steps h3 { margin: 10px 0 8px; font-size: 22px; letter-spacing: -0.02em; line-height: 1.2; }
+.lp-steps p { margin: 0 0 10px; font-size: 16px; line-height: 1.55; color: var(--lp-dim); }
+.lp-steps a { font-weight: 600; text-decoration: none; }
+.lp-why > div { border-radius: 24px; padding: 44px 40px; background: linear-gradient(0deg, transparent, transparent), #12131d; border: 1px solid var(--lp-line); display: flex; flex-direction: column; gap: 14px; max-width: 900px; }
+.lp-faq { display: flex; flex-direction: column; border-top: 1px solid var(--lp-line); }
+.lp-faq details { border-bottom: 1px solid var(--lp-line); }
+.lp-faq summary { list-style: none; cursor: pointer; padding: 20px 4px; font-size: 18px; font-weight: 650; display: flex; justify-content: space-between; gap: 16px; }
+.lp-faq summary::-webkit-details-marker { display: none; }
+.lp-faq summary::after { content: '+'; color: var(--lp-faint); font-weight: 400; font-size: 22px; line-height: 1; }
+.lp-faq details[open] summary::after { content: '−'; }
+.lp-faq p { margin: 0 4px 20px; font-size: 16px; line-height: 1.6; color: var(--lp-dim); max-width: 820px; }
+.lp-final { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 28px; padding: 88px 0 24px; }
+.lp-final > div:first-child { display: flex; flex-direction: column; gap: 10px; flex: 1 1 420px; }
+body.landing-page footer { background: #07080f; color: #8a8296; }
+footer { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; }
+.foot-links { display: inline-flex; gap: 16px; }
+.foot-links a { color: inherit; }
+@media (max-width: 720px) {
+  .lp-hero-in { padding-top: 40px; gap: 18px; }
+  .lp-hook { font-size: 16px; }
+  .lp-section { padding-top: 64px; }
+  .lp-strip { height: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 8px; }
+  .lp-band { position: static; width: auto !important; }
+  .lp-axis, .lp-tick { display: none; }
+  .lp-marker { position: static; height: auto; width: auto; background: none; transform: none; }
+  .lp-marker span { position: static; display: inline-block; }
+  .lp-why > div { padding: 28px 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .lp-btn, .lp-loop li, .lp-marker { transition: none; } }
+
+/* Release ready */
+.release-list { display: flex; flex-direction: column; border-top: 1px solid var(--border); }
+.rel-row { display: grid; grid-template-columns: minmax(150px, 220px) 1fr auto; gap: 16px; align-items: start; padding: 14px 2px; border-bottom: 1px solid var(--border); }
+.rel-name { display: flex; gap: 10px; align-items: flex-start; }
+.rel-name b { display: block; font-size: 15px; }
+.rel-name small { color: var(--text-faint); font-size: 12px; }
+.rel-ic { flex: none; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; }
+.rel-ic svg { width: 12px; height: 12px; }
+.rel-row.ok .rel-ic { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+.rel-row.warn .rel-ic { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); }
+.rel-row.danger .rel-ic { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
+.rel-why p { margin: 0 0 4px; font-size: 13.5px; color: var(--text-dim); line-height: 1.5; }
+.rel-why a { color: var(--accent); font-weight: 600; text-decoration: none; white-space: nowrap; }
+.rel-verdict { font-weight: 700; font-size: 13px; padding: 4px 10px; border-radius: 999px; }
+.rel-row.ok .rel-verdict { color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); }
+.rel-row.warn .rel-verdict { color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); }
+.rel-row.danger .rel-verdict { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+@media (max-width: 640px) { .rel-row { grid-template-columns: 1fr auto; } .rel-why { grid-column: 1 / -1; grid-row: 2; } }
+/* Liminal suggestions */
+.sugg-list { display: flex; flex-direction: column; gap: 10px; }
+.sugg { border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; display: grid; grid-template-columns: minmax(180px, 260px) 1fr; gap: 6px 16px; }
+.sugg-set b { display: block; font-size: 14px; }
+.sugg-set span { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: var(--text-dim); }
+.sugg-set em { font-style: normal; color: var(--accent); font-weight: 600; }
+.sugg-set i { font-style: normal; color: var(--text-faint); }
+.sugg p { margin: 0; font-size: 13.5px; color: var(--text-dim); line-height: 1.5; }
+@media (max-width: 640px) { .sugg { grid-template-columns: 1fr; } }
+/* Sponsors: clearly labelled, never in the way */
+.sponsor { margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); text-decoration: none; font-size: 13.5px; }
+.sponsor:hover { border-color: var(--accent); }
+.sp-tag { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); border: 1px solid var(--border); border-radius: 6px; padding: 2px 6px; }
+.sponsor span { color: var(--text-dim); }
+.sponsor .sp-cta { margin-left: auto; color: var(--accent); font-weight: 600; }
+/* Advertise and Privacy pages */
+.doc-page { max-width: 820px; margin: 0 auto; padding: 32px 0 40px; }
+.doc-page h1 { font-size: clamp(32px, 4vw, 46px); letter-spacing: -0.03em; margin: 8px 0 14px; }
+.doc-page h2 { font-size: 22px; margin: 34px 0 10px; }
+.doc-page p, .doc-page li { font-size: 16px; line-height: 1.65; color: var(--text-dim); }
+.doc-page .lede { font-size: 18px; color: var(--text); }
+.doc-page .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
+.doc-page .cards div { border: 1px solid var(--border); border-radius: 14px; padding: 16px; background: var(--surface); }
+.doc-page .cards b { display: block; margin-bottom: 6px; color: var(--text); }
 </style>
 </head>
 <body>
@@ -727,6 +892,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>
       <span class="lbl">Export PDF</span>
     </button>
+    <button class="btn sm ghost" id="shareCardBtn" title="Download or share an image of this track's numbers"><span class="lbl">Share card</span></button>
     <button class="btn sm ghost" id="exportTxtBtn" title="Download the numbers and findings as plain text"><span class="lbl">Text</span><span class="sr-only">Export text report</span></button>
   </div>
 </nav>
@@ -734,27 +900,89 @@
 <main>
   <!-- ================= Landing ================= -->
   <section id="landing">
-    <div class="hero">
-      <div class="eyebrow">Mix &amp; master analysis for streaming</div>
-      <h1>Make your master compete at −14.</h1>
-      <p>Spotify, Apple Music and YouTube play everything at about the same loudness. MasterScope shows what's stopping your mix from sounding as big and polished as the competition at −14 LUFS, and lets you hear the fix.</p>
-      <p class="hero-links"><a href="#learn">New to mastering? Start with Learn →</a><a href="#liminal">Get Liminal, the limiter that lands on your target →</a></p>
-    </div>
-    <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose an audio file to analyse">
-      <div class="dz-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
-      <div class="dz-title">Drop an audio file here</div>
-      <div class="dz-sub">WAV, AIFF, FLAC or MP3. Lossless files give the most accurate results. You can also drop a Liminal session file (.json).</div>
-      <button class="btn primary" type="button" tabindex="-1">Choose file</button>
-    </div>
-    <div class="steps">
-      <div><b>1</b>Open your track</div>
-      <div><b>2</b>See what stands between it and −14</div>
-      <div><b>3</b>Hear it mastered, then fix your mix</div>
+    <div class="lp-hero">
+      <canvas id="lpRidges" class="lp-ridges" aria-hidden="true"></canvas>
+      <div class="lp-hero-in">
+        <p class="lp-hook">Sounds quieter and less competitive than the rest?</p>
+        <h1>Drop your track.<br>Know if it's ready.</h1>
+        <p class="lp-lede">MasterScope tells you what to fix, not just what's wrong. Then Liminal, your free mastering limiter, makes it competitive and release ready in one click.</p>
+        <div class="lp-ctas" id="lpCtas">
+          <button class="lp-btn primary" id="dropzone" type="button" aria-label="Choose an audio file to analyse">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>Drop your track here
+          </button>
+          <button class="lp-btn" id="demoBtn" type="button">Try a demo song</button>
+        </div>
+        <div class="lp-progress hidden" id="lpProgress" role="status" aria-live="polite">
+          <div class="lp-pfile" id="lpProgressFile"></div>
+          <div class="lp-pbar"><div id="lpProgressBar"></div></div>
+          <div class="lp-pstep" id="lpProgressStep"></div>
+        </div>
+        <ul class="lp-trust">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>No account</li><li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Your audio never leaves your computer</li><li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Free</li>
+        </ul>
+      </div>
+      <p class="lp-ridge-note" id="lpRidgeNote">Drop a track anywhere on this page and this becomes your song's spectrum</p>
     </div>
 
-    <div class="section-title">What you get</div>
-    <div class="features" id="features"></div>
-    <p class="privacy">Everything runs in your browser. Your audio is never uploaded anywhere.</p>
+    <div class="lp-wrap">
+      <section class="lp-section" id="lpResults">
+        <div class="lp-head"><h2>Real results, real tracks.</h2><p>One mix, before and after one Learn in Liminal. Measured by MasterScope.</p></div>
+        <div class="lp-cards">
+          <div class="lp-card"><span class="k">Loudness</span><span class="from">−26.6 LUFS</span><span class="big" data-count-from="-26.6" data-count-to="-12.0">−12.0</span><span class="v ok">Competitive, on target</span></div>
+          <div class="lp-card"><span class="k">Density (PLR)</span><span class="from">18.5 dB</span><span class="big" data-count-from="18.5" data-count-to="10.2">10.2</span><span class="v ok">Punchy, like commercial releases</span></div>
+          <div class="lp-card"><span class="k">Peaks after Spotify and YouTube</span><span class="from">checked with the real encoders</span><span class="big" data-count-from="0" data-count-to="-1.1">−1.1</span><span class="v ok">Clean, release ready</span></div>
+          <div class="lp-card invert"><span class="k">What to fix in the mix</span><span class="big txt">Presence, 2.5 to 6 kHz</span><span class="v">Tame the snare and hats and the limiter works 22% less.</span></div>
+        </div>
+      </section>
+
+      <section class="lp-section" id="lpCompare">
+        <div class="lp-head"><h2>Why does it sound quieter than the rest?</h2><p>Streaming services turn every song to about the same loudness, so what you hear is density: how far the peaks stand above the body of the track (PLR). Too open sounds small next to commercial releases; too dense sounds squashed.</p></div>
+        <div class="lp-strip" id="lpStrip" aria-label="Typical density by style">
+          <div class="lp-axis"></div>
+          <div class="lp-marker hidden" id="lpMarker"><span id="lpMarkerLabel">Your track</span></div>
+        </div>
+        <p class="lp-small" id="lpStripNote">Typical ranges for released masters. Drop a track to see where yours lands.</p>
+      </section>
+
+      <section class="lp-section" id="lpLoop">
+        <div class="lp-head"><span class="lp-tags"><b class="ms">MasterScope</b>+<b class="lm">Liminal</b></span><h2>Two tools that check each other's work.</h2><p>MasterScope hears the result. Liminal does the mastering. Between them, every pass gets closer to release ready.</p></div>
+        <ol class="lp-loop">
+          <li class="ms"><span class="n">1 · MasterScope</span><h3>Analyse</h3><p>Drop your mix. It finds what's holding it back and what to fix first.</p></li>
+          <li class="lm"><span class="n">2 · Liminal</span><h3>Master in one click</h3><p>Press Learn and play the song. It sets itself for your target loudness or density.</p></li>
+          <li class="lm"><span class="n">3 · Liminal</span><h3>Send the report back</h3><p>One click exports your settings and exactly what the limiter did, second by second.</p></li>
+          <li class="ms"><span class="n">4 · MasterScope</span><h3>Fine-tune the settings</h3><p>It tells you what to change in Liminal (attack, release, mode, target) and hands you the preset to load straight back in.</p></li>
+        </ol>
+        <div class="lp-again"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg>Load the new preset, press Learn again, and go round once more. Each pass gets closer.</div>
+      </section>
+
+      <section class="lp-section lp-steps">
+        <div><span class="n">01</span><h3>What to fix, not just what's wrong</h3><p>It finds the part of the mix that's fighting the limiter, like a sharp snare or a boomy 808, and tells you what to change.</p></div>
+        <div><span class="n">02</span><h3>Master it in one click</h3><p>Liminal, your free mastering limiter: press Learn, play your song once, and it's competitive, release ready and clean after streaming.</p><a href="#liminal">Get Liminal →</a></div>
+        <div><span class="n">03</span><h3>Release ready, everywhere</h3><p>A pass or fix for Spotify, Apple Music, YouTube, SoundCloud and the club, with the reason behind every verdict.</p></div>
+        <div><span class="n">04</span><h3>Learn mastering properly</h3><p>Every verdict links to a plain-English chapter, so you get better at mixing and mastering along the way.</p><a href="#learn">Start learning →</a></div>
+      </section>
+
+      <section class="lp-section lp-why">
+        <div><h2>Why is it free?</h2><p>Because we wanted to put a genuinely powerful tool in everyone's hands, so anyone can learn and master the art of mastering. No paywalls, no account, no ads in the plug-in, and your audio never leaves your computer.</p></div>
+      </section>
+
+      <section class="lp-section" id="lpFaq">
+        <div class="lp-head"><h2>Questions</h2></div>
+        <div class="lp-faq">
+          <details><summary>Is it really free?</summary><p>Yes. MasterScope and the Liminal plug-in are free to use with no account and no time limits. The website carries a few music-related sponsors; the plug-in has none.</p></details>
+          <details><summary>Is my audio uploaded anywhere?</summary><p>No. MasterScope analyses your file inside your browser. Nothing is sent to a server, and the plug-in collects nothing.</p></details>
+          <details><summary>What files can I drop?</summary><p>WAV, AIFF, FLAC or MP3 (lossless files give the most accurate results), and Liminal's report files (.json).</p></details>
+          <details><summary>Does Liminal work in my DAW?</summary><p>Liminal is a VST3 plug-in for Windows 10 and 11 (64-bit), so it works in Ableton Live, FL Studio, Cubase, Reaper, Studio One, Bitwig and other VST3 hosts. A Mac version is on the way.</p></details>
+          <details><summary>Should I master to −14 LUFS?</summary><p>Not necessarily. Pick the density you like (a PLR around 9 to 11 for punchy, competitive music) and let the loudness follow. Services turn louder masters down, so the extra loudness only helps where nothing normalises, like SoundCloud and DJ sets. <a href="#learn/density">Read the chapter on density →</a></p></details>
+          <details><summary>How is this different from other limiters?</summary><p>Liminal learns the setting for your target from one play-through, checks the peaks through real streaming encoders, and sends a report to MasterScope, which tells you what to change next. Most tools only meter.</p></details>
+        </div>
+      </section>
+
+      <section class="lp-section lp-final">
+        <div><h2>Is your track ready?</h2><p>Find out in seconds. No account, and your audio never leaves your computer.</p></div>
+        <div class="lp-ctas"><button class="lp-btn primary" type="button" id="lpFinalDrop">Drop your track</button><a class="lp-btn" href="#liminal">Get the free limiter</a></div>
+      </section>
+    </div>
   </section>
 
   <!-- ================= Progress ================= -->
@@ -780,6 +1008,9 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>
           <span class="lbl">Export PDF</span>
         </button>
+        <button class="btn ghost" id="sessCard" title="Download a shareable image of this master's numbers"><span class="lbl">Master card</span></button>
+        <button class="btn ghost" id="sessCompare" title="Open a second Liminal report to compare with this one"><span class="lbl">Compare</span></button>
+        <input type="file" id="sessCompareFile" accept=".json,application/json" hidden>
         <button class="btn ghost" id="sessCsv" title="Download the per-second data as a spreadsheet (the same as saving .csv from the plugin)"><span class="lbl">CSV</span></button>
         <button class="btn ghost" id="sessBack">Back</button>
       </div>
@@ -787,6 +1018,14 @@
     <section class="panel">
       <div class="panel-head"><h2>Result</h2><span class="sub" id="sessSub"></span></div>
       <div class="tiles big cols-4" id="sessTiles"></div>
+    </section>
+    <section class="panel" id="sessSuggestPanel">
+      <div class="panel-head"><h2>Suggested changes in Liminal</h2><span class="sub">Based on what the limiter did in this report</span></div>
+      <div id="sessSuggest"></div>
+    </section>
+    <section class="panel hidden" id="sessComparePanel">
+      <div class="panel-head"><h2>Compared with <span id="sessCompareName"></span></h2><button class="btn ghost small" id="sessCompareClear">Remove</button></div>
+      <div class="cmp-table" id="sessCompareTable"></div>
     </section>
     <section class="panel">
       <div class="panel-head"><h2>What it means</h2></div>
@@ -880,10 +1119,13 @@
           <dl class="terms">
             <dt>Sample peak (dBFS)</dt><dd>The highest sample value in the file. 0 dBFS is the top of the scale.</dd>
             <dt>True peak (dBTP)</dt><dd>The highest point of the reconstructed waveform, including peaks that fall between samples. These "inter-sample peaks" can be well over the sample peak on dense, bright masters. Measured by oversampling.</dd>
-            <dt>Codec peak (estimate)</dt><dd>The true peak after lossy encoding (AAC, Ogg, MP3). Encoders remove the very top of the spectrum, and that reshapes the waveform so its peaks rise, often by 1 to 2 dB on loud, bright or clipped masters. MasterScope and Liminal estimate it by filtering at 16 kHz and measuring the true peak.</dd>
+            <dt>Codec peak</dt><dd>The true peak after lossy encoding (Opus on YouTube, Ogg Vorbis on Spotify, AAC on Apple Music, MP3 on SoundCloud and downloads). Encoders remove the very top of the spectrum and add their own noise, and that reshapes the waveform so its peaks rise, often by 1 to 2 dB on loud, bright or clipped masters. MasterScope estimates it by filtering at 16 kHz and measuring the true peak; Liminal goes further and runs your song through the real Opus and Vorbis encoders.</dd>
           </dl>
           <p>The usual ceiling is <b>−1 dBTP</b>. Spotify recommends keeping true peak below −2 dBTP when your master is louder than −14 LUFS, because louder masters overshoot more when encoded. The codec estimate tells you directly: if it reads above −1 dBTP, the encoded version may distort wherever it plays at full level.</p>
-          <figure class="shot"><img src="img/liminal-main.webp" alt="Liminal's interface showing loudness, true peak out and codec peak readings" loading="lazy" width="1440" height="900"><figcaption>Liminal shows true peak and the codec peak estimate side by side in its Loudness panel (right), so you can see both while you work.</figcaption></figure>
+          <h3>Liminal's ceiling modes</h3>
+          <p>Under its Ceiling fader Liminal has three ceiling modes. <b>True peak</b> is the classic ceiling. <b>Streaming</b> also keeps the peaks a listener gets after Opus and Vorbis encoding under the ceiling: when you press Learn, Liminal encodes and decodes your song with the real encoders, measures how far its peaks rise, and calibrates its limiter to that song. <b>All codecs</b> adds a 1 dB margin for MP3 and AAC, which overshoot a little more (across 26 test masters, 128 kbps MP3 peaked at most 1.5 dB above Opus and Vorbis, and under 1 dB nine times out of ten).</p>
+          <figure class="shot"><img src="img/liminal-learned.webp" alt="Liminal after Learn, showing true peak and the decoded codec peak" loading="lazy" width="1440" height="900"><figcaption>After Learn in Streaming mode the codec peak sits at the ceiling (−1.1 dB) while the true peak is lower (−2.5 dBTP): this bright, heavily limited mix overshoots almost 2 dB when encoded.</figcaption></figure>
+          <p>To hear it, press <b>Opus</b> in Liminal's Listen panel: the output plays through a real Opus encoder at 128 kbps, and the codec peak readout shows the decoded peak.</p>
           <div class="callout warn"><b>A real example.</b> A master at −12.7 LUFS with true peak at −1.1 dBTP looked safe, but its codec peak was +1.3 dBTP: the clipper used on it left sharp, bright edges that the encoder reshaped. Lowering the ceiling by 2.4 dB brought the encoded peak to −1.1. Always check the codec reading on louder masters.</div>
         </section>
 
@@ -903,6 +1145,7 @@
           </table></div>
           <p>Because PLR is peak minus loudness, choosing a PLR and a ceiling fixes the loudness: <b>target loudness = ceiling − PLR</b>. A PLR of 10 with a ceiling of −2 dBTP lands at −12 LUFS. A PLR of 13 with a ceiling of −1 lands at −14.</p>
           <figure class="shot"><img src="img/ms-readiness.webp" alt="MasterScope's −14 readiness panel with the PLR bar" loading="lazy" width="1600" height="639"><figcaption>MasterScope's −14 readiness panel places your PLR on a bar from squashed to too dynamic, with the steps to get where you want.</figcaption></figure>
+          <div class="callout tip"><b>Learn by density.</b> In Liminal, click the target and choose a density instead of a loudness (PLR 8 to 14). Learn then finds the threshold that gives your song that PLR at your ceiling, whatever loudness that turns out to be. Load a reference on the Optimise tab and press <i>Use its density</i> to match a track you like.</div>
           <h3>Does denser sound louder?</h3>
           <p>A little, and only up to a point. LUFS already measures loudness the way we hear it, so at −14 two tracks are about equally loud. A denser master sounds fuller and more constant, which reads as "bigger" at low volume. Below a PLR of about 8, the drum hits lose impact and the track starts to sound smaller, even though the meter says it is just as loud. Judge density by ear at matched loudness, and compare against a reference in your genre.</p>
           <h3>Louder masters by choice</h3>
@@ -992,12 +1235,17 @@
             <dt>Brickwall</dt><dd>Zero added latency and an absolute ceiling. Useful while tracking or for a final safety stage.</dd>
             <dt>Soft Clip</dt><dd>Rounds the peaks off instead of turning the track down. It keeps the gain reduction low and the dynamics lively, but the clipped edges raise the codec peak, so it suits masters with headroom under the ceiling.</dd>
             <dt>Multiband</dt><dd>Limits the lows and highs separately, so a big kick doesn't pull the vocal down with it.</dd>
+            <dt>Punch Guard</dt><dd>Liminal's Punch Guard mode: the lookahead limiter does the work but leaves the very tips of the peaks to an oversampled clipper. A clipper shaves a millisecond off a drum hit where a limiter turns the whole mix down around it for 50 ms or more, so at the same loudness the drums keep more snap. On test mixes, 2 to 3 dB of clip gave 1 to 1.5 dB more punch than Lookahead alone.</dd>
             <dt>Bass first</dt><dd>Takes up to a set amount off the low band before the main limiter, so the kick and bass don't trigger limiting across the whole mix. Use only as much as you need: on most mixes 2 to 3 dB is plenty.</dd>
           </dl>
           <div class="fig-row">
             <figure class="shot"><img src="img/liminal-softclip.webp" alt="Liminal in Soft Clip mode" loading="lazy" width="1440" height="900"><figcaption>Soft Clip mode.</figcaption></figure>
             <figure class="shot"><img src="img/liminal-multiband.webp" alt="Liminal in Multiband mode" loading="lazy" width="1440" height="900"><figcaption>Multiband mode.</figcaption></figure>
           </div>
+          <h3>Punch, and finding the best setup</h3>
+          <p>Liminal's Loudness panel shows <b>Punch</b>: how far the hits stand out from the music around them (the loudest 10 ms of each second against its average), with how much the limiter takes off compared with your mix. Losing under 2 dB is clean; over 4 dB and the drums lose their snap.</p>
+          <p>Rather than guess attack and release, press <b>Optimise</b>. It tries about 30 setups on the loudest 30 seconds Learn heard, learns every one to the same target and ceiling so they are equally loud, and ranks them by punch. Apply the one you like and Liminal re-learns it on the whole song.</p>
+          <figure class="shot"><img src="img/liminal-optimise.webp" alt="Liminal's Optimise tab ranking limiter setups by punch" loading="lazy" width="1440" height="900"><figcaption>Optimise: every setup at the same loudness and density, ranked by punch, with decoded peaks checked through real encoders.</figcaption></figure>
           <div class="callout tip"><b>Listen at matched loudness.</b> Liminal's Match button plays your unlimited mix at the same loudness as the output, so you hear only what the limiter changes, not just "louder". Delta plays only what is being removed: if you can hear drums or vocals in it, the limiter is doing too much.</div>
         </section>
 
@@ -1009,9 +1257,9 @@
           <ol class="wf-steps">
             <li><b>Analyse the mix.</b> Bounce it with no limiter on the master and open it in MasterScope. Fix anything in "What to work on" first: mud, harshness, wide bass, energy dips, and whatever the Louder at −14 panel says the limiter would be fighting.
               <figure class="shot"><img src="img/ms-readiness_mix.webp" alt="MasterScope readiness for an unmastered mix" loading="lazy" width="1600" height="782"><figcaption>An unmastered mix: PLR 18.5 dB, so it needs about 5.5 dB of peak control to reach −14. The steps say what to control first.</figcaption></figure></li>
-            <li><b>Put Liminal last on the master.</b> Lookahead mode, attack around 10 ms, release around 30 ms with adaptive release on, stereo link 100%. Add Bass first only if the low end is triggering the limiter.</li>
-            <li><b>Set the ceiling.</b> −1 dBTP for a −14 master; −2 or lower for anything louder.</li>
-            <li><b>Choose your density and set the target.</b> Target = ceiling − PLR. For a full, competitive sound, aim for a PLR of 9 to 11.</li>
+            <li><b>Put Liminal last on the master.</b> Start from the factory preset <i>Streaming: punchy (PLR 10)</i>, or Lookahead mode with attack around 10 ms and release around 60 ms. Add Bass first only if the low end is triggering the limiter.</li>
+            <li><b>Set the ceiling.</b> −1 dB with the ceiling mode on Streaming (or All codecs if the track goes to SoundCloud, DJ pools or Apple Music). Liminal keeps the decoded peaks under it, so you no longer need to guess how much lower to go for loud masters.</li>
+            <li><b>Choose your density.</b> Click the target and pick a PLR. For a full, competitive sound, aim for 9 to 11.</li>
             <li><b>Press Learn and play the song once.</b> Liminal listens, then renders what it heard at different thresholds and sets the one that lands on your target.
               <div class="fig-row">
                 <figure class="shot"><img src="img/liminal-capturing.webp" alt="Liminal while Learn is listening" loading="lazy" width="1440" height="900"><figcaption>Learn listening.</figcaption></figure>
@@ -1019,7 +1267,9 @@
               </div></li>
             <li><b>Save the report.</b> Press Report and save the .json, then drop it on MasterScope to see the result, the gain reduction over time and your settings. No second play-through needed. (Record does the same for a live play-through after you change settings by hand.)
               <figure class="shot"><img src="img/ms-session-top.webp" alt="A Liminal Learn report open in MasterScope" loading="lazy" width="1600" height="987"><figcaption>A Learn report in MasterScope: loudness, peaks, codec estimate, PLR and gain reduction, plus a timeline and the settings used.</figcaption></figure></li>
-            <li><b>Listen with Match and Delta.</b> If the drums lose their snap, ease the target by 1 dB, lengthen the attack, or go back and control the peaks in the mix.</li>
+            <li><b>Check the punch, then Optimise.</b> If the Punch reading shows the limiter taking more than 3 or 4 dB off the hits, press Optimise and try the top setup. Mix Doctor shows which part of the mix makes the peaks, so you know what to fix at the source.
+              <figure class="shot"><img src="img/liminal-doctor.webp" alt="Liminal's Mix Doctor tab" loading="lazy" width="1440" height="900"><figcaption>Mix Doctor: each range's share of the peaks against its share of the loudness, how much limiting a little peak control there would save, and the fix.</figcaption></figure></li>
+            <li><b>Listen with Match, Delta and Opus.</b> Match hears your mix at the same loudness, Delta only what the limiter removes, Opus what a streaming listener gets. The Spectrogram's Delta view shows which frequencies are being squashed.</li>
             <li><b>Export and check the final file.</b> Open the bounced master in MasterScope: true peak, codec peak, density and tone. Then load a reference on the Compare tab.
               <figure class="shot"><img src="img/ms-compare.webp" alt="MasterScope comparing a mix with a reference" loading="lazy" width="1600" height="1528"><figcaption>Compare explains why a reference may sound bigger at −14, then lists every difference.</figcaption></figure></li>
           </ol>
@@ -1033,8 +1283,8 @@
             <li><b>Format.</b> WAV or AIFF at the sample rate you mixed at. 24-bit is best; 16-bit is fine for most distributors.</li>
             <li><b>Dither once, at the end.</b> When reducing to 16-bit, add dither (Liminal's Dither switch) on the final export only. Never dither twice.</li>
             <li><b>No changes after the limiter.</b> Don't normalise on export, and don't turn the master down afterwards unless you mean to. Every change after the limiter changes the peaks it worked to control.</li>
-            <li><b>Check the encoded peaks.</b> Keep the codec estimate at or below −1 dBTP. If it is higher, lower the ceiling and Learn again at the same PLR, or tame the brightest peaks in the mix.</li>
-            <li><b>One master or two?</b> One master at your chosen density works everywhere. If you want a very loud club version, make it a separate file and check its codec peak too.</li>
+            <li><b>Check the encoded peaks.</b> Keep the codec peak at or below −1 dB. With Liminal's Streaming or All codecs ceiling mode, Learn takes care of it; otherwise lower the ceiling and Learn again at the same PLR, or tame the brightest peaks in the mix.</li>
+            <li><b>One master or two?</b> One master at your chosen density works everywhere. If you want more, Liminal's <b>Release pack</b> (Optimise tab) learns and writes four masters from one listen: Streaming −14 (safe on every codec), Club −9, Apple Music −16 and YouTube −14, each a 24-bit WAV with its report.</li>
             <li><b>Leave a little silence</b> at the start and end so nothing is cut off, and let reverb tails finish naturally.</li>
           </ul>
         </section>
@@ -1092,17 +1342,17 @@
     <div class="lp">
       <div class="lp-hero">
         <div class="lp-hero-text">
-          <div class="eyebrow">Liminal by MasterScope · version 5.5</div>
+          <div class="eyebrow">Liminal by MasterScope · version 1.0 · free</div>
           <h1>The mastering limiter that lands on your target.</h1>
-          <p class="lede">Press Learn, play your song once, and Liminal sets the threshold that hits your loudness at your ceiling, then hands you a report to open in MasterScope. Transparent lookahead limiting, a soft clipper, multiband and Bass first, with true-peak and codec-peak metering built in.</p>
+          <p class="lede">Press Learn, play your song once, and Liminal sets the threshold that hits your loudness or density at your ceiling, checks the peaks through real Opus and Vorbis encoders, and hands you a report for MasterScope. Free, with no ads and no paywalls.</p>
           <div class="dl-row">
             <a class="dl-btn" href="downloads/Liminal-Windows.jpg">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5l7.5-1v7H3zM11.5 4.4L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zM11.5 12.5H21V21l-9.5-1.4z"/></svg>
-              <span><b>Download for Windows</b><small>VST3 · Windows 10 and 11, 64-bit</small></span>
+              <span><b>Download for Windows</b><small>Version 1.0 · VST3 · Windows 10 and 11, 64-bit · free</small></span>
             </a>
             <a class="dl-btn" href="downloads/Liminal-macOS.jpg">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9-.7 0-1.8-.9-3-.8-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.6s-2.5-1-2.5-3.8zM14.1 5.8c.6-.8 1.1-1.8 1-2.8-.9 0-2 .6-2.7 1.4-.6.7-1.1 1.7-1 2.7 1 .1 2-.5 2.7-1.3z"/></svg>
-              <span><b>Download for macOS</b><small>VST3 and AU · Apple silicon and Intel</small></span>
+              <span><b>macOS</b><small>Coming soon · VST3 and AU</small></span>
             </a>
           </div>
           <p class="small muted">Works in any DAW that loads VST3 (and AU on Mac): Ableton Live, FL Studio, Cubase, Reaper, Studio One, Bitwig, Logic and more.</p>
@@ -1111,14 +1361,15 @@
       </div>
 
       <div class="lp-features">
-        <div class="lp-f"><h3>Learn, in one listen</h3><p>Pick a loudness target, press Learn and play the song. Liminal renders what it heard through hidden copies of itself and sets the threshold that lands on the target. Undo puts it back.</p></div>
-        <div class="lp-f"><h3>A report with every Learn</h3><p>Press Report to save the result as a session file: loudness, true peak, codec peak, PLR, gain reduction over time and your settings. Drop it on MasterScope to read it, or export a PDF or CSV.</p></div>
-        <div class="lp-f"><h3>Four modes</h3><p>Lookahead for transparent mastering, Brickwall for zero latency, Soft Clip for lively, low-gain-reduction loudness, and Multiband so a big kick doesn't pull the vocal down.</p></div>
-        <div class="lp-f"><h3>Bass first</h3><p>Takes a set amount off the low band before the main limiter, so the kick and bass stop triggering limiting across the whole mix.</p></div>
-        <div class="lp-f"><h3>Peaks you can trust</h3><p>True peak measured with oversampling, plus a codec peak estimate that shows where the peaks land after AAC or MP3 encoding, so loud masters don't distort on SoundCloud or in DJ sets.</p></div>
-        <div class="lp-f"><h3>Hear only what changes</h3><p>Match plays your mix at the output's loudness, so louder never fools you. Delta plays only what the limiter removes.</p></div>
-        <div class="lp-f"><h3>Made for streaming</h3><p>Platform targets for Spotify, Apple Music and more, PLR readout, adaptive release, stereo link, up to 4x oversampling (including only on export) and dither for 16 and 24-bit.</p></div>
-        <div class="lp-f"><h3>Everyday comforts</h3><p>Factory presets built around −14 mastering, your own presets, A/B, full undo and redo, light and dark themes, and plain-English tips on every control.</p></div>
+        <div class="lp-f"><h3>Learn, in one listen</h3><p>Pick a loudness or a density (PLR), press Learn and play the song. Liminal renders what it heard through hidden copies of itself and sets the threshold that lands on the target. Undo puts it back.</p></div>
+        <div class="lp-f"><h3>Safe after encoding</h3><p>The Streaming ceiling keeps the peaks a listener gets after Opus and Vorbis under your ceiling, measured on your song with the real encoders. All codecs adds a margin for MP3 and AAC.</p></div>
+        <div class="lp-f"><h3>Optimise</h3><p>Tries about 30 setups at your target, all equally loud, and ranks them by punch. Apply the best and Liminal re-learns it on the whole song.</p></div>
+        <div class="lp-f"><h3>Punch Guard</h3><p>A limiter into a clipper: the tips of the drum hits go to the clipper, so the mix isn't turned down around every hit. More snap at the same loudness.</p></div>
+        <div class="lp-f"><h3>Mix Doctor</h3><p>Shows which part of the mix makes the peaks the limiter fights, how much a little peak control there would save, and what to do about it.</p></div>
+        <div class="lp-f"><h3>See everything</h3><p>A rebuilt 8192-point spectrum (flat for pink noise, average, peak hold, input and reference overlays, note readout) and a 2D and 3D spectrogram with a Delta view of what limiting removes.</p></div>
+        <div class="lp-f"><h3>Hear what matters</h3><p>Match plays your mix at the output's loudness. Delta plays only what's removed. Opus plays the output through a real Opus encoder. Ref plays a reference track at your loudness.</p></div>
+        <div class="lp-f"><h3>Release pack</h3><p>Streaming, Club, Apple Music and YouTube masters written straight to disk from one listen, each a 24-bit WAV with its MasterScope report.</p></div>
+        <div class="lp-f"><h3>Any window size</h3><p>Stretch the window to any shape (extra room goes to the graphs) or press full screen. New instances open at the size you last used.</p></div>
       </div>
 
       <div class="lp-section">
@@ -1131,9 +1382,11 @@
         <h2>Gallery</h2>
         <div class="lp-gallery">
           <figure class="shot"><img src="img/liminal-bassfirst.webp" alt="Liminal in Lookahead mode with Bass first" loading="lazy" width="1440" height="900"><figcaption>Lookahead with Bass first.</figcaption></figure>
-          <figure class="shot"><img src="img/liminal-softclip.webp" alt="Liminal in Soft Clip mode" loading="lazy" width="1440" height="900"><figcaption>Soft Clip mode.</figcaption></figure>
-          <figure class="shot"><img src="img/liminal-multiband.webp" alt="Liminal in Multiband mode" loading="lazy" width="1440" height="900"><figcaption>Multiband mode.</figcaption></figure>
-          <figure class="shot"><img src="img/liminal-light.webp" alt="Liminal in the light theme, Brickwall mode" loading="lazy" width="1440" height="900"><figcaption>Brickwall mode, light theme.</figcaption></figure>
+          <figure class="shot"><img src="img/liminal-punchguard.webp" alt="Liminal in Punch Guard mode" loading="lazy" width="1440" height="900"><figcaption>Punch Guard mode.</figcaption></figure>
+          <figure class="shot"><img src="img/liminal-spectrogram.webp" alt="Liminal's 3D spectrogram" loading="lazy" width="1440" height="900"><figcaption>The 3D spectrogram.</figcaption></figure>
+          <figure class="shot"><img src="img/liminal-spectrum.webp" alt="Liminal's spectrum with the average curve" loading="lazy" width="1440" height="900"><figcaption>The rebuilt spectrum.</figcaption></figure>
+          <figure class="shot"><img src="img/liminal-optimise.webp" alt="Liminal's Optimise tab" loading="lazy" width="1440" height="900"><figcaption>Optimise, ranked by punch.</figcaption></figure>
+          <figure class="shot"><img src="img/liminal-light.webp" alt="Liminal in the light theme" loading="lazy" width="1440" height="900"><figcaption>Light theme.</figcaption></figure>
         </div>
       </div>
 
@@ -1157,10 +1410,18 @@
       </div>
 
       <div class="lp-section">
-        <h2>What's new in 5.5</h2>
+        <h2>What's in 1.0</h2>
         <ul class="list">
-          <li><b>Learn makes the report too.</b> One play-through gives you the threshold and the session report. Measured against an actual render at the learned setting, they agree to 0.01 LU.</li>
-          <li><b>Record starts clean.</b> The first row of a recorded session no longer carries readings from the previous play-through.</li>
+          <li><b>Codec-safe ceiling, measured with real encoders.</b> True peak, Streaming (Opus and Vorbis) or All codecs. Learn encodes your song, measures the decoded peaks and calibrates the limiter, so a loud master doesn't overshoot after upload.</li>
+          <li><b>Listen through Opus</b> in real time, with the real decoded peak on the meter.</li>
+          <li><b>Learn by density.</b> Aim for a PLR instead of a loudness, or match a reference track's density in one click.</li>
+          <li><b>Punch meter and Optimise.</b> See how much the limiter takes off the hits, then let Optimise find the setup that keeps the most.</li>
+          <li><b>Punch Guard mode,</b> a lookahead limiter into an oversampled clipper.</li>
+          <li><b>A detailed spectrum and a 2D and 3D spectrogram</b> (input, output or delta, with the 16 kHz codec line and gain reduction on the same time line).</li>
+          <li><b>Mix Doctor, reference track and release pack</b> inside the plug-in.</li>
+          <li><b>Stretch the window or go full screen.</b> New instances remember the size.</li>
+          <li><b>Factory presets</b> built around streaming-safe ceilings and density targets, and an About box with the licences.</li>
+          <li><b>A report with every Learn,</b> and Record for any play-through. Drop either on MasterScope, which suggests what to change and gives you a preset to load back in.</li>
         </ul>
       </div>
 
@@ -1170,6 +1431,50 @@
       </div>
     </div>
   </section>
+  <!-- ================= Advertise ================= -->
+  <section id="advertisePage" class="hidden page">
+    <div class="doc-page">
+      <div class="eyebrow">Advertise with MasterScope</div>
+      <h1>Reach people finishing and releasing music.</h1>
+      <p class="lede">MasterScope and the free Liminal limiter are used by producers at the moment they finish a track: checking it's ready, fixing the mix and mastering it for release. That's when they choose plug-ins, headphones, distribution and promotion.</p>
+      <h2>Where sponsors appear</h2>
+      <div class="cards">
+        <div><b>Matched to the result</b>When the analysis says what a mix needs (a de-esser, tighter low end, monitoring), a sponsor that solves it can appear right under the advice.</div>
+        <div><b>Release ready</b>Beside the platform-by-platform verdict: distribution, promotion, artwork and release tools.</div>
+        <div><b>Learn chapters</b>Sponsor one chapter of the mixing and mastering guide, such as monitoring, the low end or delivery.</div>
+        <div><b>Master cards</b>"Presented by" on the result cards people share on social media.</div>
+      </div>
+      <h2>How we do it</h2>
+      <ul>
+        <li>Few sponsors, chosen to be useful to the reader, and always labelled.</li>
+        <li>No tracking pixels or ad networks that follow visitors around. Audio never leaves the visitor's computer.</li>
+        <li>No ads inside the Liminal plug-in, ever.</li>
+      </ul>
+      <h2>Get in touch</h2>
+      <p id="advContact">Contact details are coming soon.</p>
+    </div>
+  </section>
+  <!-- ================= Privacy ================= -->
+  <section id="privacyPage" class="hidden page">
+    <div class="doc-page">
+      <div class="eyebrow">Privacy</div>
+      <h1>Your audio stays on your computer.</h1>
+      <p class="lede">MasterScope analyses files inside your web browser. Nothing you drop is uploaded to any server.</p>
+      <h2>What is stored</h2>
+      <ul>
+        <li><b>Version history:</b> the numbers from each file you analyse (never the audio) are saved in your browser's local storage so you can compare versions. Clear them any time from Compare, Version history, or by clearing your browser's site data.</li>
+        <li><b>Your theme choice</b> (dark or light), in local storage.</li>
+      </ul>
+      <h2>Visit counts</h2>
+      <p id="privAnalytics">This site does not currently count visits.</p>
+      <h2>Sponsors</h2>
+      <p>Sponsor links are ordinary links. Sponsors don't receive any information about you, and no advertising trackers are loaded.</p>
+      <h2>The Liminal plug-in</h2>
+      <p>Liminal collects nothing and has no ads. It only saves the files you ask it to save (presets, reports and the release pack) and remembers its window size.</p>
+      <h2>Contact</h2>
+      <p id="privContact">Contact details are coming soon.</p>
+    </div>
+  </section>
 
   <!-- ================= App ================= -->
   <section id="app" class="hidden">
@@ -1177,6 +1482,11 @@
     <!-- Overview -->
     <div class="tab-pane active" data-pane="overview">
       <div class="stack">
+        <section class="panel" data-help="release">
+          <div class="panel-head"><h2>Release ready?</h2><span class="sub">Platform by platform</span></div>
+          <div class="release-list" id="releaseReady"></div>
+          <div id="releaseSponsor"></div>
+        </section>
         <section class="panel" data-help="readiness">
           <div class="panel-head"><h2>−14 readiness</h2></div>
           <div id="readiness"></div>
@@ -1188,6 +1498,7 @@
         <section class="panel" data-help="actions">
           <div class="panel-head"><h2>What to work on</h2></div>
           <div class="findings" id="topActions"></div>
+          <div id="resultSponsor"></div>
           <details class="passed" id="passedWrap"><summary id="passedSummary">Checks that passed</summary><div class="findings" id="passedList"></div></details>
         </section>
         <section class="panel" data-help="overviewWave">
@@ -1451,7 +1762,7 @@
 <input type="file" id="refInput" accept="audio/*,.wav,.aif,.aiff,.flac,.mp3,.m4a" class="hidden">
 <input type="file" id="histInput" accept="application/json" class="hidden">
 
-<footer>MasterScope runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</footer>
+<footer><span>MasterScope runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="#learn">Learn</a><a href="#liminal">Liminal</a><a href="#advertise">Advertise</a><a href="#privacy">Privacy</a></span></footer>
 
 <script>
 // =====================================================================
@@ -2674,6 +2985,29 @@ const DSP = (() => {
   let liveTop = -Infinity;
   let exportDpr = 0; // set to 2 while rendering charts for the PDF report
 
+  // ===================================================================
+  // Site settings: fill these in to switch features on
+  // ===================================================================
+  const SITE = {
+    version: '1.0',
+    contactEmail: '',          // shown on the Advertise and Privacy pages, e.g. 'hello@yourdomain'
+    analytics: null,           // { provider: 'plausible', domain: 'masterscope.gwstudio.com.au' } for cookie-free visit counts
+    // Sponsors appear only when set. Each: { name, text, url, cta } (cta optional). Keys are the places they appear:
+    //   result (under What to work on), release (under Release ready), card (on shared master cards: "presented by")
+    //   learn: { '<chapter id>': {...} } for a sponsor on one Learn chapter
+    sponsors: { result: null, release: null, card: null, learn: {} },
+  };
+  if (SITE.analytics && SITE.analytics.provider === 'plausible') {
+    const sc = document.createElement('script'); sc.defer = true; sc.dataset.domain = SITE.analytics.domain;
+    sc.src = 'https://plausible.io/js/script.js'; document.head.appendChild(sc);
+  }
+  const track = (name, props) => { try { if (window.plausible) window.plausible(name, props ? { props } : undefined); } catch (e) {} };
+  function sponsorHtml(sp) {
+    if (!sp || !sp.name || !sp.url) return '';
+    const e = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    return `<a class="sponsor" href="${e(sp.url)}" target="_blank" rel="sponsored noopener"><span class="sp-tag">Sponsor</span><b>${e(sp.name)}</b><span>${e(sp.text || '')}</span>${sp.cta ? `<span class="sp-cta">${e(sp.cta)} →</span>` : ''}</a>`;
+  }
+
   const $ = id => document.getElementById(id);
   const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
   const tick = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
@@ -2780,6 +3114,9 @@ const DSP = (() => {
     reference: ['Compares your track with a released track or an earlier version. Both play matched to −14 LUFS.',
       'The table shows both sets of numbers side by side. The reference’s tonal curve also appears on the Tone tab.',
       'Choose a well-mastered reference in the same genre, so you’re comparing like with like.'],
+    release: ['A pass, check or fix for each place your track will play, with the reason.',
+      'Streaming services turn loud tracks down and quiet ones up only if there is peak room. Lossy encoders (Spotify, Apple Music, YouTube, SoundCloud) push peaks up, so the encoded peak matters more than the file\u2019s. Club play has no normalisation, so loudness and mono matter there.',
+      'Passes everywhere you release. A "check" is worth a listen; a "fix" will audibly hurt the track on that platform.'],
     history: ['Every file you analyse is logged in this browser. Only the numbers are stored, never the audio.',
       'Select two versions to see what changed between them.',
       'Export the history to keep a backup or move it to another browser.'],
@@ -2852,7 +3189,7 @@ const DSP = (() => {
     'Version history': 'Every file you analyse is saved in this browser (numbers only), so you can compare mixes and see what changed.',
     'PDF export': 'A designed, multi-page report with every measurement and graph, to keep or share with collaborators.',
   };
-  $('features').innerHTML = FEATURES.map(([ic, title, desc, tags]) => `
+  if ($('features')) $('features').innerHTML = FEATURES.map(([ic, title, desc, tags]) => `
     <div class="feature">
       <div class="f-head"><div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[ic]}</svg></div><h3>${title}</h3></div>
       <p>${desc}</p><ul>${tags.map(t => `<li${TIPS[t] ? ` class="has-tip" tabindex="0" data-tip="${esc(TIPS[t])}"` : ''}>${t}</li>`).join('')}</ul>
@@ -2910,7 +3247,7 @@ const DSP = (() => {
   // ===================================================================
   const fileInput = $('fileInput');
   $('dropzone').addEventListener('click', () => fileInput.click());
-  $('dropzone').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+  if ($('lpFinalDrop')) $('lpFinalDrop').addEventListener('click', () => fileInput.click());
   $('openAnotherBtn').addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', () => { if (fileInput.files[0]) openFile(fileInput.files[0]); fileInput.value = ''; });
   let dragDepth = 0;
@@ -2979,7 +3316,8 @@ const DSP = (() => {
   async function openFile(file) {
     if (/\.json$/i.test(file.name)) return openSession(file);
     stopEverything();
-    showView('progress');
+    const onLanding = currentView === 'landing' && window.LP;
+    if (onLanding) LP.startProgress(file.name); else showView('progress');
     $('progressFile').textContent = file.name;
     setProgress(0.02, 'Reading file…');
     await tick();
@@ -2994,9 +3332,11 @@ const DSP = (() => {
     try { decoded = await audioCtx.decodeAudioData(ab.slice(0)); }
     catch (e) { return failOpen('This file couldn’t be decoded. Try WAV, AIFF, FLAC or MP3.'); }
     if (decoded.duration < 3) return failOpen('That file is shorter than 3 seconds, too short to analyse.');
+    if (onLanding) await LP.morphTo(decoded);
     await analyse(decoded, file.name, info);
   }
   function failOpen(msg) {
+    if (window.LP) LP.endProgress();
     if (S.buffer && !chain) setupChain();
     showView(S.buffer ? 'app' : 'landing');
     toast(msg, 5000);
@@ -3005,17 +3345,22 @@ const DSP = (() => {
   function setProgress(frac, label) {
     $('progressBar').style.width = Math.round(frac * 100) + '%';
     $('progressStep').textContent = label;
+    if ($('lpProgressBar')) { $('lpProgressBar').style.width = Math.round(frac * 100) + '%'; $('lpProgressStep').textContent = label; }
   }
 
   function showView(which) {
     currentView = which;
     document.body.classList.toggle('wide-page', which === 'learn' || which === 'liminal');
+    document.body.classList.toggle('landing-page', which === 'landing');
     $('learnPage').classList.toggle('hidden', which !== 'learn');
     $('liminalPage').classList.toggle('hidden', which !== 'liminal');
+    $('advertisePage').classList.toggle('hidden', which !== 'advertise');
+    $('privacyPage').classList.toggle('hidden', which !== 'privacy');
+    if (which === 'landing' && window.LP) LP.onShow();
     document.querySelectorAll('.site-nav a').forEach(a => a.classList.toggle('active',
       a.dataset.route === which || (a.dataset.route === 'analyse' && ['landing', 'app', 'progress', 'session'].includes(which))));
     // analysing a file leaves the Learn and Liminal pages: drop their address so the nav matches
-    if (!['learn', 'liminal'].includes(which) && /^#(learn|liminal)/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
+    if (!['learn', 'liminal', 'advertise', 'privacy'].includes(which) && /^#(learn|liminal|advertise|privacy)/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
     $('landing').classList.toggle('hidden', which !== 'landing');
     $('progress').classList.toggle('hidden', which !== 'progress');
     $('app').classList.toggle('hidden', which !== 'app');
@@ -3034,22 +3379,22 @@ const DSP = (() => {
   let currentView = 'landing', lastAnalyseView = 'landing';
   function route() {
     const h = location.hash.replace(/^#/, ''), [page, sub] = h.split('/');
-    if (page === 'learn' || page === 'liminal') {
-      if (!['learn', 'liminal'].includes(currentView)) lastAnalyseView = currentView;
+    if (['learn', 'liminal', 'advertise', 'privacy'].includes(page)) {
+      if (!['learn', 'liminal', 'advertise', 'privacy'].includes(currentView)) lastAnalyseView = currentView;
       if (isPlaying) pause();
       showView(page);
       const target = page === 'learn' && sub ? document.getElementById('ch-' + sub) : null;
       requestAnimationFrame(() => target ? target.scrollIntoView({ block: 'start' }) : window.scrollTo(0, 0));
-    } else if (['learn', 'liminal'].includes(currentView)) {
+    } else if (['learn', 'liminal', 'advertise', 'privacy'].includes(currentView)) {
       showView(S.buffer && lastAnalyseView !== 'landing' ? lastAnalyseView : (S.buffer ? 'app' : 'landing'));
       window.scrollTo(0, 0);
     }
   }
   window.addEventListener('hashchange', route);
-  document.querySelector('.brand').addEventListener('click', () => { if (location.hash) location.hash = ''; else route(); });
+  document.querySelector('.brand').addEventListener('click', () => { if (location.hash) history.pushState(null, '', location.pathname + location.search); if (isPlaying) pause(); showView('landing'); window.scrollTo(0, 0); });
   document.querySelector('.brand').style.cursor = 'pointer';
   // "Analyse" with nothing open goes back to the drop zone
-  document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); if (location.hash) history.pushState(null, '', location.pathname + location.search); route(); if (['learn', 'liminal'].includes(currentView)) showView(S.buffer ? 'app' : 'landing'); window.scrollTo(0, 0); }));
+  document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); if (location.hash) history.pushState(null, '', location.pathname + location.search); route(); if (['learn', 'liminal', 'advertise', 'privacy'].includes(currentView)) showView(S.buffer ? 'app' : 'landing'); window.scrollTo(0, 0); }));
   // On wide screens screenshots sit beside the text: each one moves to the start of its
   // chapter (or workflow step) and floats right, so the text runs alongside it. A comment
   // marker remembers where it came from, so narrow screens get the original order back.
@@ -3394,6 +3739,49 @@ const DSP = (() => {
     return R.density === 'open' ? 'It fits −14, but it is more open than most competitive releases.' : R.density === 'squashed' ? 'Peaks are heavily limited for a −14 master.' : 'It will play at full level next to other releases.';
   }
 
+  // Release ready: one verdict per destination
+  function releaseChecks(m) {
+    const clip = (m.clippedSamples || 0) > 0 || m.samplePeak >= -0.01;
+    const cp = isFinite(m.codecPeak) ? m.codecPeak : m.truePeak + 0.5, tp = m.truePeak, L = m.lufs, plr = m.plr;
+    const peakCheck = (margin, name) => cp + margin <= -1 && tp <= -1 ? null
+      : cp + margin <= 0 ? { st: 'warn', why: `Peaks reach about ${fmtSigned(cp + margin)} dB after ${name} encoding. Usually fine; a −1.5 dB ceiling makes sure.`, learn: 'peaks' }
+      : { st: 'danger', why: `Peaks go over full scale after ${name} encoding (about ${fmtSigned(cp + margin)} dB), which distorts. Lower the ceiling, or use Liminal's Streaming ceiling mode.`, learn: 'peaks' };
+    const dense = plr < 7 ? { st: 'warn', why: `Very dense (PLR ${fmt(plr)}): at the same loudness as other songs it can sound flatter. Ease the limiting by a dB or two.`, learn: 'density' } : null;
+    const normalised = (target, name, upOnly) => {
+      if (!isFinite(L)) return null;
+      const up = target - L;
+      if (up > 1 && (upOnly || tp + up > -1)) return { st: 'warn', why: `Plays about ${fmt(upOnly ? up : Math.max(0, up - Math.max(0, tp + up + 1)))} dB quieter than other songs on ${name}${upOnly ? ', which never turns tracks up' : ', because there isn\u2019t peak room to turn it up'}. Master a little denser.`, learn: 'streaming' };
+      return null;
+    };
+    const rows = [
+      ['Spotify', 'Ogg Vorbis', [peakCheck(0, 'Vorbis'), normalised(-14, 'Spotify', false), dense]],
+      ['Apple Music', 'AAC', [peakCheck(0.3, 'AAC'), normalised(-16, 'Apple Music', false), dense]],
+      ['YouTube', 'Opus', [peakCheck(0, 'Opus'), normalised(-14, 'YouTube', true), dense]],
+      ['SoundCloud', 'MP3, no normalisation', [peakCheck(1, 'MP3'), isFinite(L) && L < -14 ? { st: 'warn', why: `Plays as-is at ${fmt(L)} LUFS, quieter than most uploads. Aim for −12 to −9 if you want it to hold up there.`, learn: 'density' } : null]],
+      ['Club and DJ', 'WAV, no normalisation', [tp > -0.3 ? { st: 'warn', why: 'Peaks at full scale: leave a little room (−0.3 to −1 dBTP) for DJ software.', learn: 'peaks' } : null,
+        isFinite(L) && L < -11 ? { st: 'warn', why: `At ${fmt(L)} LUFS it will sound quieter than club masters (−9 to −7). Make a louder club version.`, learn: 'delivery' } : null,
+        isFinite(m.corr) && m.corr < 0.2 ? { st: 'warn', why: 'Low mono compatibility: parts can cancel on mono club systems. Keep the low end centred.', learn: 'stereo' } : null]],
+    ];
+    return rows.map(([name, fmtName, cs]) => {
+      let list = cs.filter(Boolean);
+      if (clip) list = [{ st: 'danger', why: 'The file clips (samples at full scale). Re-export with a limiter ceiling below 0 dB.', learn: 'peaks' }, ...list];
+      const st = list.some(c => c.st === 'danger') ? 'danger' : list.length ? 'warn' : 'ok';
+      return { name, fmtName, st, list };
+    });
+  }
+  function renderReleaseReady() {
+    const m = S.metrics; if (!m) return;
+    const rows = releaseChecks(m);
+    const label = { ok: 'Pass', warn: 'Check', danger: 'Fix' };
+    $('releaseReady').innerHTML = rows.map(r => `<div class="rel-row ${r.st}">
+      <div class="rel-name"><span class="rel-ic">${STATUS_ICON[r.st]}</span><div><b>${esc(r.name)}</b><small>${esc(r.fmtName)}</small></div></div>
+      <div class="rel-why">${r.list.length ? r.list.map(c => `<p>${esc(c.why)} <a href="#learn/${c.learn}">Why?</a></p>`).join('') : '<p>Ready.</p>'}</div>
+      <div class="rel-verdict">${label[r.st]}</div></div>`).join('');
+    $('releaseSponsor').innerHTML = sponsorHtml(SITE.sponsors.release);
+    $('resultSponsor').innerHTML = sponsorHtml(SITE.sponsors.result);
+    track('Analysed', { ready: rows.every(r => r.st === 'ok') ? 'all' : rows.filter(r => r.st === 'ok').length + '/5' });
+  }
+
   function renderReadiness() {
     const m = S.metrics, R = DSP.readiness(m);
     S.readiness = R;
@@ -3636,7 +4024,7 @@ const DSP = (() => {
     renderFileInfo(); renderSummary(); renderFindings(); renderLoudnessTiles(); renderPlatforms();
     renderToneTiles(); renderStereoTiles(); renderDynamics(); renderRegionInfo(); renderQuietList();
     $('regionTable').innerHTML = ''; $('zoomPanel').classList.add('hidden');
-    computeRefDiffs(); renderRefContent(); renderHistory(); renderReadiness(); renderPeaksDensity(); renderLouder(); renderTimelineNotes(); renderMasterResult(); updateMasteredButton(); updateTransport(0);
+    computeRefDiffs(); renderRefContent(); renderHistory(); renderReleaseReady(); renderReadiness(); renderPeaksDensity(); renderLouder(); renderTimelineNotes(); renderMasterResult(); updateMasteredButton(); updateTransport(0);
     invalidateCaches();
   }
 
@@ -4813,26 +5201,34 @@ const DSP = (() => {
     const sum = Object.fromEntries(Object.entries(s.summary || {}).map(([k, v]) => [k, v === null ? NaN : v])), set = s.settings || {}, tl = s.timeline || {};   // null = not measured
     const target = isFinite(set.target) ? set.target : -14;
     const ceil = isFinite(set.ceiling) ? set.ceiling : -1;
+    const plrMode = set.targetMode === 1, plrTarget = isFinite(set.targetPLR) ? set.targetPLR : 10;
+    const ceilMode = isFinite(set.ceilingMode) ? set.ceilingMode : 0;
     const created = s.created ? new Date(s.created) : null;
     $('sessTitle').textContent = name.replace(/\.json$/i, '');
-    $('sessMeta').textContent = [s.plugin || 'Liminal', created && !isNaN(created) ? created.toLocaleString() : '', isFinite(s.durationSec) ? fmtTime(s.durationSec) + (s.source === 'learn' ? ' rendered by Learn' : ' recorded') : '', s.sampleRate ? (s.sampleRate / 1000) + ' kHz' : ''].filter(Boolean).join(' · ');
-    $('sessSub').textContent = `Target ${fmt(target)} LUFS · ceiling ${fmt(ceil)} dBTP` + (s.source === 'learn' ? ' · from Learn: what it heard, rendered at the threshold it set' : '');
-    document.querySelector('#session .eyebrow').textContent = s.source === 'learn' ? 'Liminal Learn report' : 'Liminal session';
+    $('sessMeta').textContent = [s.plugin || 'Liminal', created && !isNaN(created) ? created.toLocaleString() : '', isFinite(s.durationSec) ? fmtTime(s.durationSec) + (s.source === 'learn' ? ' rendered by Learn' : s.source === 'release' ? ' rendered for the release pack' : ' recorded') : '', s.sampleRate ? (s.sampleRate / 1000) + ' kHz' : ''].filter(Boolean).join(' · ');
+    $('sessSub').textContent = (plrMode ? `Target density PLR ${fmt(plrTarget)}` : `Target ${fmt(target)} LUFS`) + ` · ceiling ${fmt(ceil)} dB` + (ceilMode === 1 ? ' after Opus and Vorbis' : ceilMode === 2 ? ' after every codec' : ' true peak')
+      + (s.source === 'learn' ? ' · from Learn: what it heard, rendered at the threshold it set' : s.source === 'release' ? ' · release pack master' : '');
+    document.querySelector('#session .eyebrow').textContent = s.source === 'learn' ? 'Liminal Learn report' : s.source === 'release' ? 'Liminal release pack master' + ((s.summary || {}).releaseTarget ? ' · ' + s.summary.releaseTarget : '') : 'Liminal session';
 
-    const I = sum.integrated, d = I - target;
+    const I = sum.integrated, tp = sum.truePeakOut, plr = sum.plr;
+    // In density mode the loudness "target" is where this song's peak sits minus the PLR
+    const effTarget = plrMode && isFinite(tp) ? tp - plrTarget : target, d = I - effTarget;
     const iStatus = !isFinite(I) ? '' : Math.abs(d) <= 1 ? 'ok' : 'warn';
-    const tp = sum.truePeakOut, tpStatus = !isFinite(tp) ? '' : tp > ceil + 0.05 ? 'danger' : 'ok';
-    const cp = sum.codecPeak, cpStatus = !isFinite(cp) ? '' : cp > 0 ? 'danger' : cp > -0.9 ? 'warn' : 'ok';
-    const plr = sum.plr, plrStatus = !isFinite(plr) ? '' : plr < 8 ? 'warn' : 'ok';
+    const tpStatus = !isFinite(tp) ? '' : tp > ceil + 0.05 ? 'danger' : 'ok';
+    const cpi = sessionCodec(s), cp = cpi.value;
+    const cpStatus = !isFinite(cp) ? '' : cp > ceil + 0.05 ? (cp > 0 ? 'danger' : 'warn') : cp > -0.5 ? 'warn' : 'ok';
+    const plrStatus = !isFinite(plr) ? '' : plr < 8 ? 'warn' : 'ok';
+    const pu = (s.summary || {}).punch || null;
     const gra = sum.grAvg, graStatus = !isFinite(gra) ? '' : gra > 4 ? 'warn' : 'ok';
     const pct = sum.grPercent, pctStatus = !isFinite(pct) ? '' : pct > 50 ? 'warn' : 'ok';
     $('sessTiles').innerHTML = [
-      tile('Integrated', fmt(I), 'LUFS', iStatus, isFinite(I) ? (Math.abs(d) < 0.25 ? 'On target' : `${fmt(Math.abs(d))} LU ${d < 0 ? 'under' : 'over'} target`) : ''),
+      tile('Integrated', fmt(I), 'LUFS', plrMode ? '' : iStatus, isFinite(I) ? (plrMode ? 'Density target: PLR ' + fmt(plrTarget) : Math.abs(d) < 0.25 ? 'On target' : `${fmt(Math.abs(d))} LU ${d < 0 ? 'under' : 'over'} target`) : ''),
       tile('Max short-term', fmt(sum.maxShortTerm), 'LUFS', '', 'Loudest 3 s'),
       tile('True peak', fmt(tp), 'dBTP', tpStatus, tpStatus === 'danger' ? 'Over the ceiling' : 'Under the ceiling'),
-      tile('Codec peak (est.)', fmt(cp), 'dBTP', cpStatus, cpStatus === 'ok' ? 'Safe for AAC / MP3' : 'May clip after encoding'),
-      tile('PLR', fmt(plr), 'dB', plrStatus, !isFinite(plr) ? '' : plr < 8 ? 'Squashed' : plr <= 13 ? 'Competitive' : 'Very dynamic'),
-      tile('LRA', fmt(sum.lra), 'LU', '', 'Loudness range'),
+      tile(cpi.label, fmt(cp), 'dB', cpStatus, cpi.note),
+      tile('PLR', fmt(plr), 'dB', plrMode ? (isFinite(plr) && Math.abs(plr - plrTarget) <= 0.5 ? 'ok' : 'warn') : plrStatus, !isFinite(plr) ? '' : plrMode ? (Math.abs(plr - plrTarget) <= 0.5 ? 'On the density target' : `Target ${fmt(plrTarget)}`) : plr < 8 ? 'Squashed' : plr <= 13 ? 'Competitive' : 'Very dynamic'),
+      pu ? tile('Punch', fmt(pu.out), 'dB', pu.loss > 5 ? 'danger' : pu.loss > 3 ? 'warn' : 'ok', `Limiter takes ${fmt(Math.max(0, pu.loss))} dB off the hits`)
+         : tile('LRA', fmt(sum.lra), 'LU', '', 'Loudness range'),
       tile('Gain reduction', fmt(gra), 'dB avg', graStatus, isFinite(sum.grPeak) ? `Peak ${fmt(sum.grPeak)} dB` : ''),
       tile('Time limiting', isFinite(pct) ? Math.round(pct) : '—', '%', pctStatus, 'More than 0.5 dB'),
     ].join('');
@@ -4845,7 +5241,12 @@ const DSP = (() => {
     }
     if (isFinite(tp)) F.push(tp > ceil + 0.05 ? { status: 'danger', title: `True peak ${fmt(tp)} dBTP is over the ${fmt(ceil)} dBTP ceiling`, body: 'Something after Liminal is adding level, or the ceiling was changed during the recording.' }
                                              : { status: 'ok', title: `True peak held at ${fmt(tp)} dBTP`, body: 'Safe for streaming delivery.' });
-    if (isFinite(cp) && cp > -0.5) F.push({ status: cpStatus, title: `Codec peak estimate ${fmt(cp)} dBTP`, body: 'Lossy encoders cut the top octave, which makes loud peaks overshoot. Lower the Ceiling to -1.5 or -2.0 dBTP to stay clean after encoding.' });
+    if (isFinite(cp) && (cp > ceil + 0.05 || cp > -0.5)) F.push({ status: cpStatus, title: `${cpi.real ? 'Decoded peak' : 'Codec peak estimate'} ${fmt(cp)} dB`, body: ceilMode === 0
+        ? 'Lossy encoders cut the top octave, which makes loud peaks overshoot. Set Liminal\'s ceiling mode to Streaming (or All codecs) and Learn again: it measures this song through real Opus and Vorbis encoders and keeps the decoded peaks under the ceiling.'
+        : 'The decoded peaks are above the ceiling. Press Learn again so Liminal can re-measure this song through the real encoders.' });
+    else if (cpi.real && isFinite(cp)) F.push({ status: 'ok', title: `Decoded peaks held at ${fmt(cp)} dB`, body: `Measured through real Opus (${fmt(cpi.opus)} dB) and Vorbis (${fmt(cpi.vorbis)} dB) encoders${ceilMode === 2 ? ', plus a 1 dB margin for MP3 and AAC' : ''}. Safe after streaming encoding.` });
+    if (pu) F.push(pu.loss > 4 ? { status: 'warn', title: `The limiter takes ${fmt(pu.loss)} dB of punch`, body: 'The drums lose their snap. Try Optimise in Liminal (it ranks setups by punch at the same loudness), Punch Guard mode, a slower attack, or fix the loudest hits in the mix (Mix Doctor shows which).' }
+                 : { status: 'ok', title: `Punch ${fmt(pu.out)} dB (${fmt(Math.max(0, pu.loss))} dB taken by the limiter)`, body: 'The hits still stand out from the music around them.' });
     if (isFinite(plr)) F.push(plr < 8 ? { status: 'warn', title: `PLR ${fmt(plr)} dB: heavily limited`, body: 'At -14 LUFS this costs punch with no loudness benefit. Back off the limiting, or let Bass first take the kick peaks.' }
                                       : plr <= 13 ? { status: 'ok', title: `PLR ${fmt(plr)} dB: competitive`, body: 'Punchy and dense, in the range of commercial masters at -14 LUFS.' }
                                                   : { status: 'info', title: `PLR ${fmt(plr)} dB: lots of dynamics`, body: 'Fine for acoustic or cinematic music; pop and electronic masters usually sit at 8-12 dB.' });
@@ -4854,7 +5255,7 @@ const DSP = (() => {
     lastSessionFindings = F;
     $('sessFindings').innerHTML = F.map(f => `<div class="finding ${f.status}"><div class="ic">${STATUS_ICON[f.status]}</div><div><div class="ft">${esc(f.title)}</div><div class="fb">${esc(f.body)}</div></div></div>`).join('') || '<p class="note">No loudness data in this session yet.</p>';
 
-    const MODES = ['Brickwall', 'Soft Clip', 'Lookahead', 'Multiband'];
+    const MODES = ['Brickwall', 'Soft Clip', 'Lookahead', 'Multiband', 'Punch Guard'];
     const onOff = v => v ? 'On' : 'Off';
     const items = [
       ['Mode', MODES[set.mode] || set.mode], ['Threshold', fmt(set.threshold) + ' dB'], ['Ceiling', fmt(set.ceiling) + ' dBTP'],
@@ -4862,11 +5263,213 @@ const DSP = (() => {
       ['Lookahead', fmt(set.lookahead) + ' ms'], ['Auto makeup', onOff(set.makeup)], ['Output', fmtSigned(set.outputGain) + ' dB'],
       ['Bass first', set.bassFirst ? `On, ${fmt(set.bassRange)} dB below ${fmt(set.bassFreq, 0)} Hz` : 'Off'], ['Stereo link', fmt(set.linkAmount, 0) + '%'],
       ['M/S', onOff(set.msMode)], ['Oversampling', ['Off', '2x', '4x'][set.osMode] || '—'], ['4x on export', onOff(set.exportOS)],
-      ['Drive', fmt(set.drive) + ' dB'], ['Crossover', fmt(set.xoverFreq, 0) + ' Hz'], ['Dither', ['Off', '24-bit', '16-bit'][set.dither] || '—'], ['Target', fmt(target) + ' LUFS'],
+      ['Drive', fmt(set.drive) + ' dB'], ['Crossover', fmt(set.xoverFreq, 0) + ' Hz'], ['Dither', ['Off', '24-bit', '16-bit'][set.dither] || '—'],
+      ['Target', plrMode ? 'PLR ' + fmt(plrTarget) : fmt(target) + ' LUFS'],
+      ['Ceiling mode', ['True peak', 'Streaming (Opus, Vorbis)', 'All codecs'][ceilMode] || '—'],
     ];
+    if (isFinite(set.codecTrim)) items.push(['Codec trim', fmt(set.codecTrim, 2) + ' dB']);
+    if (set.mode === 4 && isFinite(set.punchClip)) items.push(['Clip', fmt(set.punchClip) + ' dB']);
     $('sessSettings').innerHTML = items.map(([k, v]) => `<div><span>${esc(k)}</span><b>${esc(String(v))}</b></div>`).join('');
     requestAnimationFrame(() => drawSessionChart(s));
+    renderCompare();
+    renderSuggestions(s);
   }
+
+  // ---- Suggested Liminal settings, and a preset to load them ----
+  const MODE_NAMES = ['Brickwall', 'Soft Clip', 'Lookahead', 'Multiband', 'Punch Guard'];
+  function suggestLiminal(s) {
+    const set = Object.assign({}, s.settings || {}), sum = s.summary || {}, out = [];
+    const n = v => (typeof v === 'number' && isFinite(v)) ? v : NaN;
+    const ceil = isFinite(set.ceiling) ? set.ceiling : -1, cm = isFinite(set.ceilingMode) ? set.ceilingMode : 0;
+    const cpi = sessionCodec(s), loss = sum.punch ? n(sum.punch.loss) : NaN, gra = n(sum.grAvg), pct = n(sum.grPercent), plr = n(sum.plr);
+    const change = (id, to, label, fromText, toText, why) => { if (set[id] === to) return; out.push({ id, to, label, from: fromText, toText, why }); set[id] = to; };
+    if (isFinite(cpi.value) && cpi.value > ceil + 0.05 && cm === 0)
+      change('ceilingMode', 1, 'Ceiling mode', 'True peak', 'Streaming', `Peaks reach ${fmt(cpi.value)} dB after encoding, over your ${fmt(ceil)} dB ceiling. Streaming mode keeps them under it, measured with real encoders when you Learn.`);
+    const punchy = (isFinite(loss) && loss > 2.5) || (isFinite(gra) && gra > 4);
+    if (punchy) {
+      const why = isFinite(loss) && loss > 2.5 ? `The limiter takes ${fmt(loss)} dB off the hits, so the drums lose their snap.` : `The limiter is turning the mix down ${fmt(gra)} dB on average${isFinite(pct) ? `, ${Math.round(pct)}% of the time` : ''}, which flattens the hits.`;
+      if (set.mode === 2 && n(set.attack) < 5) {
+        change('attack', 10, 'Attack', `${fmt(set.attack)} ms`, '10 ms', why + ' A slower attack lets the start of each hit through.');
+        if (!(n(set.lookahead) >= 10)) change('lookahead', 10, 'Lookahead', `${fmt(set.lookahead)} ms`, '10 ms', 'Gives the slower attack room to work.');
+      } else if (set.mode !== 4) {
+        change('mode', 4, 'Mode', MODE_NAMES[set.mode] || '—', 'Punch Guard', why + ' Punch Guard leaves the tips of the hits to a clipper instead of turning the whole mix down.');
+        change('punchClip', 2, 'Clip', '—', '2 dB', 'A clean starting point for Punch Guard.');
+      } else if (n(set.punchClip) < 3) {
+        change('punchClip', Math.min(3, (n(set.punchClip) || 2) + 1), 'Clip', `${fmt(set.punchClip)} dB`, `${fmt(Math.min(3, (n(set.punchClip) || 2) + 1))} dB`, why + ' More clip lets more of each hit through the limiter.');
+      }
+    }
+    if ([0, 1, 4].includes(set.mode) && (set.osMode || 0) === 0)
+      change('osMode', 1, 'Oversampling', 'Off', '2x', `${MODE_NAMES[set.mode]} clips the waveform; oversampling keeps that clean.`);
+    if (n(set.release) < 40 && isFinite(gra) && gra > 2.5)
+      change('release', 60, 'Release', `${fmt(set.release, 0)} ms`, '60 ms', 'A very short release on a busy master can distort the bass.');
+    if (isFinite(pct) && pct > 80 && set.adaptiveRelease === false)
+      change('adaptiveRelease', true, 'Adaptive release', 'Off', 'On', `The limiter works ${Math.round(pct)}% of the time; adaptive release stops it pumping on dense passages.`);
+    if (isFinite(plr) && plr < 7.5)
+      { change('targetMode', 1, 'Target', set.targetMode === 1 ? `PLR ${fmt(set.targetPLR)}` : `${fmt(set.target)} LUFS`, 'PLR 9', `PLR ${fmt(plr)} is very dense. Aiming for a density of 9 keeps it competitive with more punch.`); set.targetPLR = 9; }
+    return { changes: out, settings: set };
+  }
+  function presetXml(set) {
+    const MAP = { target: 'autoTarget', makeup: 'makeupMode' }, SKIP = new Set(['codecTrim']);
+    const rows = [];
+    for (const [k, v] of Object.entries(set)) {
+      if (SKIP.has(k) || v === null || v === undefined) continue;
+      const val = typeof v === 'boolean' ? (v ? 1 : 0) : +v;
+      if (!isFinite(val)) continue;
+      rows.push(`  <PARAM id="${MAP[k] || k}" value="${val}"/>`);
+    }
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<Parameters LiminalVersion="4">\n${rows.join('\n')}\n</Parameters>\n`;
+  }
+  let lastSuggestion = null;
+  function renderSuggestions(s) {
+    const box = $('sessSuggest'); if (!box) return;
+    if (!s.settings) { $('sessSuggestPanel').classList.add('hidden'); return; }
+    $('sessSuggestPanel').classList.remove('hidden');
+    const sg = lastSuggestion = suggestLiminal(s);
+    if (!sg.changes.length) {
+      box.innerHTML = '<p class="note">These settings look right for this track. If you want more density or punch, try Optimise in Liminal: it ranks setups at the same loudness.</p>';
+      return;
+    }
+    box.innerHTML = `<div class="sugg-list">${sg.changes.map(c => `<div class="sugg"><div class="sugg-set"><b>${esc(c.label)}</b><span>${esc(c.from)} <i>→</i> <em>${esc(c.toText)}</em></span></div><p>${esc(c.why)}</p></div>`).join('')}</div>
+      <div class="controls" style="margin-top:14px"><button class="btn primary sm" id="presetBtn">Download preset for Liminal</button>
+      <span class="note">In Liminal: open the preset menu, choose <b>Import preset…</b>, pick this file, then press <b>Learn</b> again.</span></div>`;
+    $('presetBtn').addEventListener('click', () => {
+      download(new Blob([presetXml(sg.settings)], { type: 'application/xml' }), `${(lastSessionName || 'Liminal').replace(/[\\/:*?"<>|]/g, '')} - MasterScope suggestion.mlpreset`);
+      track('Preset downloaded');
+    });
+  }
+
+  // Codec peak for a session: the real decoded peaks when Learn measured them,
+  // else the plugin's calibrated prediction, else the 16 kHz estimate.
+  function sessionCodec(s) {
+    const sum = s.summary || {}, set = s.settings || {}, cm = isFinite(set.ceilingMode) ? set.ceilingMode : 0;
+    const num = v => (typeof v === 'number' && isFinite(v)) ? v : NaN;
+    const r = sum.codecReal;
+    if (r && isFinite(num(r.opus)) && isFinite(num(r.vorbis))) {
+      const worst = Math.max(r.opus, r.vorbis) + (cm === 2 ? (num(r.mp3Margin) || 1) : 0);
+      return { value: worst, real: true, opus: r.opus, vorbis: r.vorbis, label: cm === 2 ? 'Codec peak (+MP3)' : 'Decoded peak', note: cm === 2 ? 'Opus, Vorbis + MP3 margin' : 'Real Opus and Vorbis' };
+    }
+    if (isFinite(num(sum.codecPeakPredicted))) return { value: sum.codecPeakPredicted + (cm === 2 ? 1 : 0), real: false, label: 'Codec peak', note: 'Calibrated estimate' };
+    const v = num(sum.codecPeak);
+    return { value: v, real: false, label: 'Codec peak (est.)', note: !isFinite(v) ? '' : v > -0.9 ? 'May clip after encoding' : 'Safe for AAC / MP3' };
+  }
+
+  // ---- Compare two reports ----
+  let compareSession = null, compareName = '';
+  $('sessCompare').addEventListener('click', () => $('sessCompareFile').click());
+  $('sessCompareFile').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0]; e.target.value = '';
+    if (!f) return;
+    let obj = null; try { obj = JSON.parse(await f.text()); } catch (err) {}
+    if (!obj || obj.format !== 'liminal-session') return toast('That .json file isn’t a Liminal session.');
+    compareSession = obj; compareName = f.name.replace(/\.json$/i, '');
+    renderCompare(); drawSessionChart(lastSession);
+    $('sessComparePanel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+  $('sessCompareClear').addEventListener('click', () => { compareSession = null; renderCompare(); drawSessionChart(lastSession); });
+  function renderCompare() {
+    const panel = $('sessComparePanel');
+    if (!compareSession || !lastSession) { panel.classList.add('hidden'); return; }
+    panel.classList.remove('hidden');
+    $('sessCompareName').textContent = compareName;
+    const A = lastSession, B = compareSession, sa = A.summary || {}, sb = B.summary || {}, xa = A.settings || {}, xb = B.settings || {};
+    const n = v => (typeof v === 'number' && isFinite(v)) ? v : NaN;
+    const MODES = ['Brickwall', 'Soft Clip', 'Lookahead', 'Multiband', 'Punch Guard'];
+    const rows = [
+      ['Integrated', n(sa.integrated), n(sb.integrated), 'LUFS', 0],
+      ['True peak', n(sa.truePeakOut), n(sb.truePeakOut), 'dBTP', -1],
+      ['Codec peak', sessionCodec(A).value, sessionCodec(B).value, 'dB', -1],
+      ['PLR', n(sa.plr), n(sb.plr), 'dB', 1],
+      ['Punch', n((sa.punch || {}).out), n((sb.punch || {}).out), 'dB', 1],
+      ['Avg gain reduction', n(sa.grAvg), n(sb.grAvg), 'dB', -1],
+      ['Peak gain reduction', n(sa.grPeak), n(sb.grPeak), 'dB', -1],
+      ['LRA', n(sa.lra), n(sb.lra), 'LU', 0],
+      ['Correlation', n(sa.correlation), n(sb.correlation), '', 1],
+    ];
+    const better = (dlt, dir) => !isFinite(dlt) || Math.abs(dlt) < 0.05 || dir === 0 ? '' : (dlt * dir > 0 ? 'ok' : 'warn');
+    const setRow = (k, a, b) => `<tr><td>${esc(k)}</td><td class="n">${esc(a)}</td><td class="n">${esc(b)}</td><td class="n">${a === b ? '' : 'changed'}</td></tr>`;
+    let html = '<table><thead><tr><th></th><th class="n">This report</th><th class="n">' + esc(compareName) + '</th><th class="n">This minus that</th></tr></thead><tbody>';
+    for (const [k, a, b, u, dir] of rows) {
+      if (!isFinite(a) && !isFinite(b)) continue;
+      const dl = a - b;
+      html += `<tr><td>${esc(k)}</td><td class="n">${fmt(a, k === 'Correlation' ? 2 : 1)} ${u}</td><td class="n">${fmt(b, k === 'Correlation' ? 2 : 1)} ${u}</td><td class="n ${better(dl, dir)}">${isFinite(dl) ? fmtSigned(dl, k === 'Correlation' ? 2 : 1) : '—'}</td></tr>`;
+    }
+    html += setRow('Mode', MODES[xa.mode] || '—', MODES[xb.mode] || '—');
+    html += setRow('Threshold', fmt(xa.threshold) + ' dB', fmt(xb.threshold) + ' dB');
+    html += setRow('Attack / release', `${fmt(xa.attack)} / ${fmt(xa.release, 0)} ms`, `${fmt(xb.attack)} / ${fmt(xb.release, 0)} ms`);
+    html += setRow('Ceiling', `${fmt(xa.ceiling)} dB, ${['true peak', 'streaming', 'all codecs'][xa.ceilingMode || 0]}`, `${fmt(xb.ceiling)} dB, ${['true peak', 'streaming', 'all codecs'][xb.ceilingMode || 0]}`);
+    html += '</tbody></table><p class="note">Green is the better direction for a streaming master (more density headroom, more punch, less limiting, lower peaks). The other report\'s loudness is drawn faintly in the chart below.</p>';
+    $('sessCompareTable').innerHTML = html;
+  }
+
+  // ---- Master card: a shareable image of the result ----
+  function drawCard({ kicker, title, stats, line, foot }) {
+    const W = 1200, H = 630, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const g = cv.getContext('2d');
+    g.fillStyle = '#07080f'; g.fillRect(0, 0, W, H);
+    // warm ridges along the bottom, like the landing page
+    const STOPS = [[27, 31, 94], [90, 42, 138], [176, 58, 110], [236, 106, 58], [251, 179, 60]];
+    const heat = t => { t = Math.max(0, Math.min(1, t)) * 4; const i = Math.min(3, Math.floor(t)), f = t - i; return STOPS[i].map((v, k) => Math.round(v + (STOPS[i + 1][k] - v) * f)); };
+    for (let k = 9; k >= 0; k--) {
+      const d = k / 9, y0 = H - 8 - d * 150, h = 70 - d * 25;
+      g.beginPath(); g.moveTo(0, y0);
+      for (let i = 0; i <= 100; i++) { const f = i / 100, v = 0.35 + 0.4 * (1 - f * 0.7) * (0.5 + 0.5 * Math.sin(f * 19 + k) * Math.sin(f * 5 - k * 0.4)); g.lineTo(f * W, y0 - v * h); }
+      g.lineTo(W, y0); g.closePath(); g.fillStyle = '#07080f'; g.fill();
+      const c = heat(0.95 - d * 0.8); g.strokeStyle = `rgba(${c},${1 - d * 0.6})`; g.lineWidth = 2 - d; g.stroke();
+    }
+    if (line && line.length > 2) {
+      g.beginPath(); line.forEach((v, i) => { const x = 60 + i / (line.length - 1) * (W - 120), y = 440 - (Math.max(-30, Math.min(-3, v)) + 30) / 27 * 70; i ? g.lineTo(x, y) : g.moveTo(x, y); });
+      g.strokeStyle = 'rgba(244,237,228,0.35)'; g.lineWidth = 2.5; g.stroke();
+    }
+    g.fillStyle = '#ec6a3a'; g.beginPath(); g.roundRect ? g.roundRect(60, 54, 52, 52, 12) : g.rect(60, 54, 52, 52); g.fill();
+    g.strokeStyle = '#fff'; g.lineWidth = 4; g.lineJoin = g.lineCap = 'round'; g.beginPath();
+    [[10,34],[18,34],[22,22],[28,44],[33,14],[39,50],[44,26],[48,34],[54,34]].forEach(([px, py], i) => { const x = 60 + px / 64 * 52, y = 54 + py / 64 * 52; i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+    g.fillStyle = '#f4ede4'; g.font = '600 25px Inter, sans-serif'; g.fillText(kicker, 128, 80);
+    g.fillStyle = '#b9b0c4'; g.font = '500 18px Inter, sans-serif'; g.fillText(kicker.includes('Liminal') ? 'by MasterScope' : 'Is it ready to release?', 128, 104);
+    g.fillStyle = '#f4ede4'; g.font = '800 56px Inter, sans-serif'; g.fillText(title.slice(0, 34), 60, 196);
+    const cw = (W - 120) / stats.length;
+    stats.forEach(([k, v, u], i) => {
+      const x = 60 + i * cw;
+      g.fillStyle = '#b9b0c4'; g.font = '500 20px Inter, sans-serif'; g.fillText(k, x, 266);
+      g.fillStyle = '#f4ede4'; g.font = '600 52px Inter, sans-serif'; g.fillText(v, x, 326);
+      const vw = g.measureText(v).width; g.fillStyle = '#b9b0c4'; g.font = '500 20px Inter, sans-serif'; g.fillText(u, x + vw + 8, 326);
+    });
+    if (foot) { g.fillStyle = '#c7bfb4'; g.font = '500 19px Inter, sans-serif'; g.fillText(foot, 60, 378); }
+    const sp = SITE.sponsors.card;
+    g.fillStyle = '#f4ede4'; g.font = '600 18px Inter, sans-serif'; g.textAlign = 'right';
+    g.fillText('masterscope.gwstudio.com.au' + (sp && sp.name ? `  ·  presented by ${sp.name}` : ''), W - 40, H - 26); g.textAlign = 'left';
+    return cv;
+  }
+  async function shareCard(cv, name) {
+    const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+    const file = new File([blob], name, { type: 'image/png' });
+    track('Card shared');
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: 'My master', text: 'Checked with MasterScope' }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    download(blob, name);
+  }
+  $('sessCard').addEventListener('click', () => {
+    const s = lastSession; if (!s) return;
+    const sum = s.summary || {}, set = s.settings || {};
+    const n = v => (typeof v === 'number' && isFinite(v)) ? v : NaN;
+    const cpi = sessionCodec(s);
+    const stats = [['Loudness', fmt(n(sum.integrated)), 'LUFS'], ['Density (PLR)', fmt(n(sum.plr)), 'dB'], ['True peak', fmt(n(sum.truePeakOut)), 'dBTP'],
+                   [cpi.real ? 'Decoded peak' : 'Codec peak', fmt(cpi.value), 'dB']];
+    if (sum.punch) stats.push(['Punch', fmt(n(sum.punch.out)), 'dB']);
+    const cv = drawCard({ kicker: 'Mastered with Liminal', title: lastSessionName || 'My master', stats,
+      line: ((s.timeline || {}).shortTerm || []).filter(v => typeof v === 'number' && v > -69),
+      foot: `${MODE_NAMES[set.mode] || 'Liminal'} · ceiling ${fmt(set.ceiling)} dB ${['true peak', 'streaming-safe', 'safe on every codec'][set.ceilingMode || 0]}` });
+    shareCard(cv, `${lastSessionName || 'liminal'} - master card.png`);
+  });
+  $('shareCardBtn').addEventListener('click', () => {
+    const m = S.metrics; if (!m) return;
+    const rows = releaseChecks(m), passed = rows.filter(r => r.st === 'ok').length;
+    const title = (S.fileName || 'My track').replace(/\.[a-z0-9]+$/i, '');
+    const cv = drawCard({ kicker: 'Checked with MasterScope', title,
+      stats: [['Loudness', fmt(m.lufs), 'LUFS'], ['Density (PLR)', fmt(m.plr), 'dB'], ['True peak', fmt(m.truePeak), 'dBTP'], ['Codec peak', fmtSigned(m.codecPeak), 'dB']],
+      foot: passed === rows.length ? 'Release ready on Spotify, Apple Music, YouTube, SoundCloud and the club' : `Release ready on ${passed} of ${rows.length} platforms` });
+    shareCard(cv, `${title} - MasterScope card.png`);
+  });
 
   function drawSessionChart(s) {
     const cv = $('sessChart'), W = cv.clientWidth, H = cv.clientHeight;
@@ -4875,13 +5478,15 @@ const DSP = (() => {
     cv.width = W * dpr; cv.height = H * dpr;
     const css = getComputedStyle(document.documentElement), col = n => css.getPropertyValue(n).trim();
     paintSessionChart(cv.getContext('2d'), s, W, H, dpr,
-      { faint: col('--text-faint'), grid: col('--grid'), ok: col('--ok'), danger: col('--danger'), accent: col('--accent'), font: col('--font') });
+      { faint: col('--text-faint'), grid: col('--grid'), ok: col('--ok'), danger: col('--danger'), accent: col('--accent'), font: col('--font'), compare: compareSession });
   }
   // Shared by the page and the PDF report (which uses fixed light colours)
   function paintSessionChart(g, s, W, H, scale, P) {
     const tl = s.timeline || {}, st = tl.shortTerm || [], gr = tl.gr || [];
     g.setTransform(scale, 0, 0, scale, 0, 0); g.clearRect(0, 0, W, H);
-    const target = isFinite((s.settings || {}).target) ? s.settings.target : -14;
+    const sst = s.settings || {}, ssum = s.summary || {};
+    const target = sst.targetMode === 1 && isFinite(ssum.truePeakOut) && isFinite(sst.targetPLR) ? ssum.truePeakOut - sst.targetPLR
+                 : isFinite(sst.target) ? sst.target : -14;
     const fs = P.fontSize || 11, L = fs * 3.6, R = fs * 3.6, T = 8, B = fs * 2, pw = W - L - R, ph = H - T - B;
     const lo = -30, hi = -3, y = v => T + (1 - (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * ph;
     const n = Math.max(st.length, gr.length, 2), x = i => L + i / (n - 1) * pw;
@@ -4899,6 +5504,11 @@ const DSP = (() => {
       g.fillStyle = P.danger + '33'; g.fill();
       g.beginPath(); gr.forEach((v, i) => (i ? g.lineTo : g.moveTo).call(g, x(i), gy(+v || 0)));
       g.strokeStyle = P.danger; g.lineWidth = 1.5; g.stroke();
+    }
+    if (P.compare && P.compare.timeline && Array.isArray(P.compare.timeline.shortTerm)) {
+      const cs = P.compare.timeline.shortTerm, cx = i => L + i / Math.max(1, cs.length - 1) * pw;
+      const cp = cs.map((v, i) => [cx(i), v]).filter(p => typeof p[1] === 'number' && isFinite(p[1]) && p[1] > -69);
+      if (cp.length > 1) { g.beginPath(); cp.forEach(([px, v], i) => (i ? g.lineTo : g.moveTo).call(g, px, y(v))); g.strokeStyle = P.faint; g.lineWidth = 1.5; g.setLineDash([3, 3]); g.stroke(); g.setLineDash([]); }
     }
     const pts = st.map((v, i) => [x(i), v]).filter(p => typeof p[1] === 'number' && isFinite(p[1]) && p[1] > -69);   // null = no reading yet
     if (pts.length > 1) {
@@ -5530,6 +6140,234 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
     try { win.paginate(); } catch (e) {}
     win.focus(); win.print();
   });
+
+  // ===================================================================
+  // Landing page: live ridges that become your song, demo song, density
+  // strip, count-ups and the MasterScope + Liminal loop
+  // ===================================================================
+  const LP = window.LP = (() => {
+    const cv = $('lpRidges');
+    if (!cv) return null;
+    const g = cv.getContext('2d');
+    const M = 24, P = 128, reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let frames = null, morphStart = 0, raf = 0, last = 0, onScreen = true, phase = 0;
+    const STOPS = [[27, 31, 94], [90, 42, 138], [176, 58, 110], [236, 106, 58], [251, 179, 60], [252, 245, 196]];
+    function heat(t, a) {
+      t = Math.max(0, Math.min(1, t)) * (STOPS.length - 1);
+      const i = Math.min(STOPS.length - 2, Math.floor(t)), f = t - i;
+      const c = STOPS[i].map((v, k) => Math.round(v + (STOPS[i + 1][k] - v) * f));
+      return `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+    }
+    // The idle landscape: smooth bumps that drift slowly
+    function idle(k, f, ph) {
+      const tilt = 1 - f * 0.75;
+      const b = 0.5 + 0.5 * Math.sin(f * 21 + k * 0.7 + ph) * Math.sin(f * 5.3 - k * 0.3 - ph * 0.6);
+      const n = 0.09 * Math.sin(f * 63 + k * 2.1 + ph * 1.7) + 0.06 * Math.sin(f * 117 - k * 1.3);
+      return Math.max(0, 0.38 + 0.45 * tilt * b + n);
+    }
+    function size() {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const w = cv.clientWidth, h = cv.clientHeight;
+      if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return [w, h];
+    }
+    function draw(now) {
+      const [W, H] = size();
+      g.fillStyle = '#07080f'; g.fillRect(0, 0, W, H);
+      const mix = frames ? Math.min(1, (now - morphStart) / 1400) : 0, ease = mix * mix * (3 - 2 * mix);
+      // after the morph the song plays through: one new slice every 0.18 s
+      const off = frames ? Math.floor(Math.max(0, now - morphStart - 1400) / 180) : 0;
+      for (let k = M - 1; k >= 0; k--) {
+        const depth = k / (M - 1);
+        const y0 = H * (0.985 - depth * 0.73), h = H * (0.30 - depth * 0.11);
+        const x0 = W * 0.0 + depth * W * 0.04, w = W - depth * W * 0.08;
+        const fr = frames ? frames[(frames.length - 1 - ((M - 1 - k) + off) % frames.length + frames.length) % frames.length] : null;
+        g.beginPath(); g.moveTo(x0, y0);
+        for (let i = 0; i < P; i++) {
+          const f = i / (P - 1);
+          let v = idle(k, f, phase);
+          if (fr) v = v * (1 - ease) + fr[i] * ease;
+          g.lineTo(x0 + f * w, y0 - v * h);
+        }
+        g.lineTo(x0 + w, y0); g.closePath();
+        g.fillStyle = '#07080f'; g.fill();
+        g.lineWidth = 1.9 - depth; g.strokeStyle = heat(0.95 - depth * 0.85, 1 - depth * 0.55); g.stroke();
+      }
+    }
+    function loop(now) {
+      raf = 0;
+      if (!onScreen || document.hidden || currentView !== 'landing') return;
+      if (now - last > 33) { phase += reduce ? 0 : 0.012; draw(now); last = now; }
+      if (!reduce || frames) raf = requestAnimationFrame(loop);
+    }
+    function kick() { if (!raf) raf = requestAnimationFrame(loop); }
+    new IntersectionObserver(es => { onScreen = es[0].isIntersecting; if (onScreen) kick(); }).observe(cv);
+    document.addEventListener('visibilitychange', kick);
+    window.addEventListener('resize', () => { last = 0; kick(); });
+
+    // Your song's spectrum: 64 moments through the track, 1/6-octave-ish bands, pink-tilted
+    function spectraOf(buffer) {
+      const N = 8192, ch = buffer.numberOfChannels, len = buffer.length, fs = buffer.sampleRate;
+      const L = buffer.getChannelData(0), R = ch > 1 ? buffer.getChannelData(1) : L;
+      const win = new Float64Array(N); for (let i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / (N - 1));
+      const re = new Float64Array(N), im = new Float64Array(N), out = [], F = 64;
+      const edges = []; for (let i = 0; i <= P; i++) edges.push(Math.max(1, Math.round(30 * Math.pow(600, i / P) / fs * N)));
+      let max = -200;
+      for (let fi = 0; fi < F; fi++) {
+        const s0 = Math.floor((len - N) * fi / (F - 1));
+        for (let i = 0; i < N; i++) { re[i] = 0.5 * (L[s0 + i] + R[s0 + i]) * win[i]; im[i] = 0; }
+        DSP.fft(re, im);
+        const row = new Float64Array(P);
+        for (let b = 0; b < P; b++) {
+          let p = 0, c = 0;
+          for (let k = edges[b]; k <= Math.max(edges[b], edges[b + 1] - 1) && k < N / 2; k++) { p += re[k] * re[k] + im[k] * im[k]; c++; }
+          const fc = 30 * Math.pow(600, (b + 0.5) / P);
+          row[b] = 10 * Math.log10(p / Math.max(1, c) + 1e-20) + 10 * Math.log10(fc / 1000);
+          max = Math.max(max, row[b]);
+        }
+        const sm = new Float64Array(P);   // light smoothing across bands
+        for (let b = 0; b < P; b++) sm[b] = (row[Math.max(0, b - 1)] + 2 * row[b] + row[Math.min(P - 1, b + 1)]) / 4;
+        out.push(sm);
+      }
+      return out.map(row => Array.from(row, v => Math.max(0, Math.min(1.05, (v - (max - 54)) / 54))));
+    }
+    async function morphTo(buffer) {
+      try { frames = spectraOf(buffer); } catch (e) { frames = null; return; }
+      morphStart = performance.now();
+      $('lpRidgeNote').textContent = 'This is your song';
+      kick();
+      await new Promise(r => setTimeout(r, 1100));
+    }
+    function startProgress(name) {
+      $('lpCtas').classList.add('hidden');
+      $('lpProgress').classList.remove('hidden');
+      $('lpProgressFile').textContent = name;
+      $('lpProgressBar').style.width = '2%';
+      $('lpProgressStep').textContent = 'Reading your track…';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function endProgress() {
+      $('lpCtas').classList.remove('hidden');
+      $('lpProgress').classList.add('hidden');
+    }
+
+    // Typical density by style, and where your last track landed
+    const BANDS = [['Club and EDM', 5, 8, '#b03a6e', '#fff'], ['Pop, hip-hop, dance, rock', 8, 12, '#ec6a3a', '#1a0d06'],
+                   ['Acoustic, jazz', 12, 14, '#fbb33c', '#1a1208'], ['Unmastered mixes', 14, 19, '#2e2a40', '#e9e3f0']];
+    const lo = 5, hi = 19, pct = v => (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo) * 100;
+    $('lpStrip').insertAdjacentHTML('afterbegin', BANDS.map(([n, a, b, bg, fg]) =>
+      `<div class="lp-band" style="left:${pct(a)}%;width:calc(${pct(b) - pct(a)}% - 4px);background:${bg};color:${fg}"><b>${n}</b><span>PLR ${a}–${b}</span></div>`).join('') +
+      [6, 8, 10, 12, 14, 16, 18].map(v => `<span class="lp-tick" style="left:${pct(v)}%">${v}</span>`).join(''));
+    function updateMarker() {
+      let e = null; try { const l = loadHist(); e = l[l.length - 1]; } catch (err) {}
+      const mk = $('lpMarker');
+      if (!e || !isFinite(e.plr)) { mk.classList.add('hidden'); return; }
+      const band = BANDS.find(b => e.plr >= b[1] && e.plr < b[2]) || (e.plr < lo ? BANDS[0] : BANDS[BANDS.length - 1]);
+      $('lpMarkerLabel').textContent = `${(e.name || 'Your track').replace(/\.[a-z0-9]+$/i, '').slice(0, 28)}: PLR ${fmt(e.plr)}`;
+      mk.style.left = pct(e.plr) + '%';
+      mk.classList.toggle('flip', pct(e.plr) > 70);
+      mk.classList.remove('hidden');
+      $('lpStripNote').textContent = `Your last track sits with ${band[0].toLowerCase()}. Typical ranges for released masters; density is a choice, so judge it by ear.`;
+    }
+
+    // Numbers count up, and the loop lights 1 → 2 → 3 → 4, when scrolled into view
+    const counted = new WeakSet();
+    new IntersectionObserver(es => es.forEach(en => {
+      if (!en.isIntersecting) return;
+      en.target.querySelectorAll('[data-count-to]').forEach(el => {
+        if (counted.has(el)) return; counted.add(el);
+        const a = +el.dataset.countFrom, b = +el.dataset.countTo, t0 = performance.now(), D = reduce ? 0 : 1400;
+        const step = now => { const x = D ? Math.min(1, (now - t0) / D) : 1, e2 = 1 - Math.pow(1 - x, 3); el.textContent = fmt(a + (b - a) * e2); if (x < 1) requestAnimationFrame(step); };
+        requestAnimationFrame(step);
+      });
+    }), { threshold: 0.4 }).observe($('lpResults'));
+    let loopTimer = 0;
+    const items = [...document.querySelectorAll('.lp-loop li')];
+    new IntersectionObserver(es => {
+      clearInterval(loopTimer);
+      if (!es[0].isIntersecting || reduce) { items.forEach(li => li.classList.remove('lit')); return; }
+      let i = 0;
+      const lightNext = () => { items.forEach((li, j) => li.classList.toggle('lit', j === i % items.length)); i++; };
+      lightNext(); loopTimer = setInterval(lightNext, 1300);
+    }, { threshold: 0.35 }).observe($('lpLoop'));
+
+    // A demo song, synthesised in the browser: an unmastered 124 bpm mix
+    async function renderDemo() {
+      const fs = 44100, dur = 30, Off = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      const ctx = new Off(2, fs * dur, fs), out = ctx.createGain(); out.gain.value = 0.5; out.connect(ctx.destination);
+      const beat = 60 / 124, noise = ctx.createBuffer(1, fs, fs), nd = noise.getChannelData(0);
+      let sd = 7; for (let i = 0; i < fs; i++) { sd = (sd * 16807) % 2147483647; nd[i] = sd / 1073741823.5 - 1; }
+      const pan = (node, p) => { const pn = ctx.createStereoPanner(); pn.pan.value = p; node.connect(pn); return pn; };
+      const roots = [55, 43.65, 65.41, 49], chords = [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
+      const nBeats = Math.floor(dur / beat);
+      for (let b = 0; b < nBeats; b++) {
+        const t = b * beat, bar = Math.floor(b / 4), ci = bar % 4, intro = bar < 2;
+        if (!intro) {   // kick
+          const o = ctx.createOscillator(), e = ctx.createGain();
+          o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(46, t + 0.09);
+          e.gain.setValueAtTime(1.0, t); e.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+          o.connect(e); e.connect(out); o.start(t); o.stop(t + 0.4);
+        }
+        if (!intro && b % 2 === 1) {   // snare
+          const s = ctx.createBufferSource(); s.buffer = noise;
+          const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2200; bp.Q.value = 0.7;
+          const e = ctx.createGain(); e.gain.setValueAtTime(0.75, t); e.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+          s.connect(bp); bp.connect(e); e.connect(out); s.start(t, Math.random() * 0.5); s.stop(t + 0.25);
+          const o = ctx.createOscillator(), e2 = ctx.createGain(); o.frequency.value = 190;
+          e2.gain.setValueAtTime(0.35, t); e2.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+          o.connect(e2); e2.connect(out); o.start(t); o.stop(t + 0.1);
+        }
+        for (let h = 0; h < 2; h++) {   // hats
+          const th = t + h * beat / 2, s = ctx.createBufferSource(); s.buffer = noise;
+          const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7500;
+          const e = ctx.createGain(); e.gain.setValueAtTime(h ? 0.32 : 0.18, th); e.gain.exponentialRampToValueAtTime(0.001, th + 0.05);
+          s.connect(hp); hp.connect(e); pan(e, 0.25).connect(out); s.start(th, 0.3); s.stop(th + 0.06);
+        }
+        for (let q = 0; q < 2 && !intro; q++) {   // bass, eighth notes ducking under the kick
+          const tb = t + q * beat / 2, o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = roots[ci];
+          const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 380;
+          const e = ctx.createGain(); e.gain.setValueAtTime(0.0001, tb); e.gain.linearRampToValueAtTime(q ? 0.42 : 0.22, tb + 0.03); e.gain.exponentialRampToValueAtTime(0.01, tb + beat / 2);
+          o.connect(lp); lp.connect(e); e.connect(out); o.start(tb); o.stop(tb + beat / 2 + 0.02);
+        }
+        if (b % 4 === 0) {   // pad chord per bar, wide
+          chords[ci].forEach((f, j) => [-1, 1].forEach(side => {
+            const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f * (1 + side * 0.004);
+            const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1800;
+            const e = ctx.createGain(); e.gain.setValueAtTime(0.0001, t); e.gain.linearRampToValueAtTime(0.045, t + 0.4); e.gain.linearRampToValueAtTime(0.0001, t + beat * 4);
+            o.connect(lp); lp.connect(e); pan(e, side * 0.6).connect(out); o.start(t); o.stop(t + beat * 4 + 0.05);
+          }));
+        }
+      }
+      const buf = await ctx.startRendering();
+      let pk = 0; for (let c = 0; c < 2; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) pk = Math.max(pk, Math.abs(d[i])); }
+      const gn = Math.pow(10, -6 / 20) / Math.max(1e-6, pk);   // leave it unmastered: peaks at −6 dBFS
+      for (let c = 0; c < 2; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) d[i] *= gn; }
+      return buf;
+    }
+    $('demoBtn').addEventListener('click', async () => {
+      const name = 'Demo song (unmastered mix)';
+      stopEverything();
+      startProgress(name);
+      setProgress(0.04, 'Making the demo song…');
+      await tick();
+      let buf;
+      try { await ensureContext(44100); buf = await renderDemo(); } catch (e) { endProgress(); return toast('Your browser couldn’t make the demo song.', 4000); }
+      await morphTo(buf);
+      await analyse(buf, name, { format: 'Demo (made in your browser)', sampleRate: 44100, bitDepth: 24, size: 0 });
+    });
+
+    return {
+      startProgress, endProgress, morphTo,
+      onShow() { endProgress(); updateMarker(); last = 0; kick(); },
+    };
+  })();
+  if (!/^#(learn|liminal|advertise|privacy)/.test(location.hash)) showView('landing');
+  // Contact and visit-count lines on the Advertise and Privacy pages; sponsors on Learn chapters
+  if (SITE.contactEmail) ['advContact', 'privContact'].forEach(id => { $(id).innerHTML = `Email <a href="mailto:${SITE.contactEmail}">${SITE.contactEmail}</a>.`; });
+  if (SITE.analytics) $('privAnalytics').textContent = 'We count visits with Plausible, which uses no cookies and stores no personal data. We see totals only (pages visited, countries, which features are used), never who you are.';
+  Object.entries(SITE.sponsors.learn || {}).forEach(([ch, sp]) => { const el = document.getElementById('ch-' + ch); if (el) el.insertAdjacentHTML('beforeend', sponsorHtml(sp)); });
+
 
   route();   // open #learn or #liminal directly from a link
 
