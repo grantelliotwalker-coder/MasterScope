@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://masterscope.gwstudio.com.au/sitemap.xml

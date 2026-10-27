@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How a limiter works – MasterScope Learn</title>
+<meta name="description" content="A mastering limiter does two jobs: it stops peaks going over a ceiling, and it lets you raise the overall level until the track is as dense as you want.…">
+<meta name="copyright" content="© 2026 MasterScope. All rights reserved.">
+<meta name="theme-color" content="#07080f">
+<link rel="canonical" href="https://masterscope.gwstudio.com.au/learn/limiter/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MasterScope">
+<meta property="og:title" content="How a limiter works – MasterScope Learn">
+<meta property="og:description" content="A mastering limiter does two jobs: it stops peaks going over a ceiling, and it lets you raise the overall level until the track is as dense as you want.…">
+<meta property="og:url" content="https://masterscope.gwstudio.com.au/learn/limiter/">
+<meta property="og:image" content="https://masterscope.gwstudio.com.au/img/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%236f86ff'/%3E%3Ccircle cx='32' cy='32' r='24' fill='%233d5afe'/%3E%3Ccircle cx='32' cy='32' r='24' fill='none' stroke='%23fff' stroke-width='3'/%3E%3Cpath d='M32 2v10M32 52v10M2 32h10M52 32h10' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M13 34 L19 34 L23 23 L28 43 L33 17 L38 47 L42 27 L45 34 L51 34' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body class="wide-page" data-chapter="limiter">
+<header class="topbar">
+  <a class="brand" href="/" style="text-decoration:none;color:inherit">
+    <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="14" fill="var(--accent-strong)"/>
+      <path d="M10 34 L18 34 L22 22 L28 44 L33 14 L39 50 L44 26 L48 34 L54 34" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div>Master<span>Scope</span></div>
+  </a>
+  <nav class="site-nav" aria-label="Site">
+    <a href="/" data-route="analyse">Analyse</a>
+    <a href="/learn/" data-route="learn" class="active" aria-current="page">Learn</a>
+    <a href="/liminal/" data-route="liminal">Liminal</a>
+  </nav>
+  <div class="spacer"></div>
+  <button class="btn icon ghost" id="themeToggle" aria-label="Switch colour theme" title="Switch colour theme">
+    <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+  </button>
+</header>
+<main>
+  <section class="page">
+    <div class="doc">
+      <aside class="doc-toc" aria-label="Chapters">
+        <div class="toc-title"><a href="/learn/" style="color:inherit;text-decoration:none">Learn</a></div>
+        <ol id="learnToc"><li><a href="/learn/streaming/">How streaming plays your music</a></li><li><a href="/learn/loudness/">Measuring loudness</a></li><li><a href="/learn/peaks/">Peaks: sample, true and codec</a></li><li><a href="/learn/density/">Density and PLR</a></li><li><a href="/learn/tone/">Tonal balance</a></li><li><a href="/learn/lowend/">The low end</a></li><li><a href="/learn/stereo/">Stereo and mono</a></li><li><a href="/learn/dynamics/">Dynamics in the mix</a></li><li><a href="/learn/limiter/" class="active" aria-current="page">How a limiter works</a></li><li><a href="/learn/workflow/">A mastering workflow</a></li><li><a href="/learn/delivery/">Exporting and delivery</a></li><li><a href="/learn/checklist/">Release checklist</a></li><li><a href="/learn/glossary/">Glossary</a></li></ol>
+      </aside>
+      <article class="doc-body">
+        <section class="chapter" id="ch-limiter">
+          <div class="ch-num">09</div>
+          <h1 class="ch-title">How a limiter works</h1>
+          <p>A mastering limiter does two jobs: it stops peaks going over a ceiling, and it lets you raise the overall level until the track is as dense as you want. Every limiter has the same core controls.</p>
+          <dl class="terms">
+            <dt>Threshold and makeup</dt><dd>Lowering the threshold makes the limiter work harder and, with makeup gain, raises the level. Liminal's Learn sets the threshold for you to land on a loudness target.</dd>
+            <dt>Ceiling</dt><dd>The highest level the output can reach, in dBTP. −1 is the usual choice; −2 or lower for louder masters, and lower still if the codec peak reads high.</dd>
+            <dt>Attack and lookahead</dt><dd>Lookahead lets the limiter see a peak coming and turn down smoothly before it arrives, instead of clipping it. Attack is how gradually it does so. Very short attack (under 1 ms) grabs the front of every drum hit and flattens the punch; around 5 to 10 ms keeps it.</dd>
+            <dt>Release</dt><dd>How quickly the gain recovers after a peak. Short release is denser but can distort or pump; long release is smoother but can duck the track after each hit. Adaptive release stretches it automatically on dense passages.</dd>
+            <dt>Stereo link</dt><dd>How much the two channels share gain reduction. 100% keeps the stereo image steady; lower lets each side be limited on its own.</dd>
+            <dt>Oversampling</dt><dd>Runs the limiter at a higher internal rate so it catches inter-sample peaks and reduces distortion, at the cost of CPU.</dd>
+          </dl>
+          <figure class="shot"><img src="/img/liminal-bassfirst.webp" alt="Liminal in Lookahead mode with Bass first enabled" loading="lazy" width="1440" height="900"><figcaption>Liminal in Lookahead mode. The display shows the waveform after limiting, what was removed (red) and the gain reduction over time.</figcaption></figure>
+          <h3>Liminal's modes</h3>
+          <dl class="terms">
+            <dt>Lookahead</dt><dd>The default for mastering: smooth, transparent gain reduction with adjustable attack, release and lookahead.</dd>
+            <dt>Brickwall</dt><dd>Zero added latency and an absolute ceiling. Useful while tracking or for a final safety stage.</dd>
+            <dt>Soft Clip</dt><dd>Rounds the peaks off instead of turning the track down. It keeps the gain reduction low and the dynamics lively, but the clipped edges raise the codec peak, so it suits masters with headroom under the ceiling.</dd>
+            <dt>Multiband</dt><dd>Limits the lows and highs separately, so a big kick doesn't pull the vocal down with it.</dd>
+            <dt>Punch Guard</dt><dd>Liminal's Punch Guard mode: the lookahead limiter does the work but leaves the very tips of the peaks to an oversampled clipper. A clipper shaves a millisecond off a drum hit where a limiter turns the whole mix down around it for 50 ms or more, so at the same loudness the drums keep more snap. On test mixes, 2 to 3 dB of clip gave 1 to 1.5 dB more punch than Lookahead alone.</dd>
+            <dt>Bass first</dt><dd>Takes up to a set amount off the low band before the main limiter, so the kick and bass don't trigger limiting across the whole mix. Use only as much as you need: on most mixes 2 to 3 dB is plenty.</dd>
+          </dl>
+          <div class="fig-row">
+            <figure class="shot"><img src="/img/liminal-softclip.webp" alt="Liminal in Soft Clip mode" loading="lazy" width="1440" height="900"><figcaption>Soft Clip mode.</figcaption></figure>
+            <figure class="shot"><img src="/img/liminal-multiband.webp" alt="Liminal in Multiband mode" loading="lazy" width="1440" height="900"><figcaption>Multiband mode.</figcaption></figure>
+          </div>
+          <h3>Punch, and finding the best setup</h3>
+          <p>Liminal's Loudness panel shows <b>Punch</b>: how far the hits stand out from the music around them (the loudest 10 ms of each second against its average), with how much the limiter takes off compared with your mix. Losing under 2 dB is clean; over 4 dB and the drums lose their snap.</p>
+          <p>Rather than guess attack and release, press <b>Optimise</b>. It tries about 30 setups on the loudest 30 seconds Learn heard, learns every one to the same target and ceiling so they are equally loud, and ranks them by punch. Apply the one you like and Liminal re-learns it on the whole song.</p>
+          <figure class="shot"><img src="/img/liminal-optimise.webp" alt="Liminal's Optimise tab ranking limiter setups by punch" loading="lazy" width="1440" height="900"><figcaption>Optimise: every setup at the same loudness and density, ranked by punch, with decoded peaks checked through real encoders.</figcaption></figure>
+          <div class="callout tip"><b>Listen at matched loudness.</b> Liminal's Match button plays your unlimited mix at the same loudness as the output, so you hear only what the limiter changes, not just "louder". Delta plays only what is being removed: if you can hear drums or vocals in it, the limiter is doing too much.</div>
+        
+          <div class="doc-cta">
+            <div><b>Put it into practice</b><span>Open a mix in MasterScope, or get Liminal for your DAW.</span></div>
+            <div class="cta-btns"><a class="btn primary" href="/">Analyse a track</a><a class="btn" href="/liminal/">Get Liminal</a></div>
+          </div></section>
+        <nav class="doc-pager" aria-label="Chapters"><a class="prev" href="/learn/dynamics/"><small>Previous</small>Dynamics in the mix</a><a class="next" href="/learn/workflow/"><small>Next</small>A mastering workflow</a></nav>
+      </article>
+    </div>
+  </section>
+</main>
+<footer><span>© 2026 MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/advertise/">Advertise</a><a href="/privacy/">Privacy</a></span></footer>
+<script src="/assets/config.js"></script>
+<script src="/assets/site.js" defer></script>
+</body>
+</html>
