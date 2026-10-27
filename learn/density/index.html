@@ -18,11 +18,16 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%236f86ff'/%3E%3Ccircle cx='32' cy='32' r='24' fill='%233d5afe'/%3E%3Ccircle cx='32' cy='32' r='24' fill='none' stroke='%23fff' stroke-width='3'/%3E%3Cpath d='M32 2v10M32 52v10M2 32h10M52 32h10' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M13 34 L19 34 L23 23 L28 43 L33 17 L38 47 L42 27 L45 34 L51 34' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","headline":"Density and PLR","description":"The peak-to-loudness ratio (PLR) is true peak minus integrated loudness. It measures how far the peaks stand above the body of the track, so it is the…","url":"https://masterscope.gwstudio.com.au/learn/density/","inLanguage":"en","image":"https://masterscope.gwstudio.com.au/img/ms-readiness.webp","author":{"@type":"Organization","@id":"https://masterscope.gwstudio.com.au/#org","name":"MasterScope","url":"https://masterscope.gwstudio.com.au/","logo":"https://masterscope.gwstudio.com.au/icon-512.png","parentOrganization":{"@type":"Organization","name":"GW Studio"}},"publisher":{"@type":"Organization","@id":"https://masterscope.gwstudio.com.au/#org","name":"MasterScope","url":"https://masterscope.gwstudio.com.au/","logo":"https://masterscope.gwstudio.com.au/icon-512.png","parentOrganization":{"@type":"Organization","name":"GW Studio"}},"isPartOf":{"@type":"Course","name":"MasterScope Learn","description":"A plain-English guide to mixing and mastering for streaming.","provider":{"@type":"Organization","@id":"https://masterscope.gwstudio.com.au/#org","name":"MasterScope","url":"https://masterscope.gwstudio.com.au/","logo":"https://masterscope.gwstudio.com.au/icon-512.png","parentOrganization":{"@type":"Organization","name":"GW Studio"}},"url":"https://masterscope.gwstudio.com.au/learn/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Learn","item":"https://masterscope.gwstudio.com.au/learn/"},{"@type":"ListItem","position":2,"name":"Density and PLR","item":"https://masterscope.gwstudio.com.au/learn/density/"}]}]}</script>
 </head>
 <body class="wide-page" data-chapter="density">
 <header class="topbar">
@@ -67,9 +72,9 @@
           <p>Because PLR is peak minus loudness, choosing a PLR and a ceiling fixes the loudness: <b>target loudness = ceiling − PLR</b>. A PLR of 10 with a ceiling of −2 dBTP lands at −12 LUFS. A PLR of 13 with a ceiling of −1 lands at −14.</p>
           <figure class="shot"><img src="/img/ms-readiness.webp" alt="MasterScope's −14 readiness panel with the PLR bar" loading="lazy" width="1600" height="639"><figcaption>MasterScope's −14 readiness panel places your PLR on a bar from squashed to too dynamic, with the steps to get where you want.</figcaption></figure>
           <div class="callout tip"><b>Learn by density.</b> In Liminal, click the target and choose a density instead of a loudness (PLR 8 to 14). Learn then finds the threshold that gives your song that PLR at your ceiling, whatever loudness that turns out to be. Load a reference on the Optimise tab and press <i>Use its density</i> to match a track you like.</div>
-          <h3>Does denser sound louder?</h3>
+          <h2 class="sub">Does denser sound louder?</h2>
           <p>A little, and only up to a point. LUFS already measures loudness the way we hear it, so at −14 two tracks are about equally loud. A denser master sounds fuller and more constant, which reads as "bigger" at low volume. Below a PLR of about 8, the drum hits lose impact and the track starts to sound smaller, even though the meter says it is just as loud. Judge density by ear at matched loudness, and compare against a reference in your genre.</p>
-          <h3>Louder masters by choice</h3>
+          <h2 class="sub">Louder masters by choice</h2>
           <p>You don't have to master to exactly −14. A master at −12 with a PLR of 10 is turned down 2 dB on Spotify and sounds the same there as a −14 master with the same density, but it plays louder on SoundCloud and in DJ sets. So pick your PLR by ear, set the ceiling (−1 dBTP, or lower for louder masters and anything clipped), and let the loudness follow. Don't turn the master down after the limiter just to read −14: streaming services will do that for you, and the file will be quieter everywhere else.</p>
         
           <div class="doc-cta">
@@ -81,7 +86,7 @@
     </div>
   </section>
 </main>
-<footer><span>© 2026 MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/about/">About</a><a href="/advertise/">Advertise</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="mailto:masterscope@gwstudio.com.au">Contact</a></span></footer>
+<footer><span>© 2026 MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/about/">About</a><a href="/changelog/">What’s new</a><a href="/advertise/">Advertise</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="mailto:masterscope@gwstudio.com.au">Contact</a></span></footer>
 <script src="/assets/config.js"></script>
 <script src="/assets/site.js" defer></script>
 </body>

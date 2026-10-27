@@ -18,11 +18,16 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%236f86ff'/%3E%3Ccircle cx='32' cy='32' r='24' fill='%233d5afe'/%3E%3Ccircle cx='32' cy='32' r='24' fill='none' stroke='%23fff' stroke-width='3'/%3E%3Cpath d='M32 2v10M32 52v10M2 32h10M52 32h10' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M13 34 L19 34 L23 23 L28 43 L33 17 L38 47 L42 27 L45 34 L51 34' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","headline":"Dynamics in the mix","description":"A master can only be as dense as the mix allows cleanly. If a few parts poke out far above the rest, the master limiter has to pull the whole track down…","url":"https://masterscope.gwstudio.com.au/learn/dynamics/","inLanguage":"en","image":"https://masterscope.gwstudio.com.au/img/ms-louder_mix.webp","author":{"@type":"Organization","@id":"https://masterscope.gwstudio.com.au/#org","name":"MasterScope","url":"https://masterscope.gwstudio.com.au/","logo":"https://masterscope.gwstudio.com.au/icon-512.png","parentOrganization":{"@type":"Organization","name":"GW Studio"}},"publisher":{"@type":"Organization","@id":"https://masterscope.gwstudio.com.au/#org","name":"MasterScope","url":"https://masterscope.gwstudio.com.au/","logo":"https://masterscope.gwstudio.com.au/icon-512.png","parentOrganization":{"@type":"Organization","name":"GW Studio"}},"isPartOf":{"@type":"Course","name":"MasterScope Learn","description":"A plain-English guide to mixing and mastering for streaming.","provider":{"@type":"Organization","@id":"https://masterscope.gwstudio.com.au/#org","name":"MasterScope","url":"https://masterscope.gwstudio.com.au/","logo":"https://masterscope.gwstudio.com.au/icon-512.png","parentOrganization":{"@type":"Organization","name":"GW Studio"}},"url":"https://masterscope.gwstudio.com.au/learn/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Learn","item":"https://masterscope.gwstudio.com.au/learn/"},{"@type":"ListItem","position":2,"name":"Dynamics in the mix","item":"https://masterscope.gwstudio.com.au/learn/dynamics/"}]}]}</script>
 </head>
 <body class="wide-page" data-chapter="dynamics">
 <header class="topbar">
@@ -55,14 +60,14 @@
           <div class="ch-num">08</div>
           <h1 class="ch-title">Dynamics in the mix</h1>
           <p>A master can only be as dense as the mix allows cleanly. If a few parts poke out far above the rest, the master limiter has to pull the whole track down every time they hit, and that is what you hear as pumping and lost punch. Controlling those parts in the mix lets the limiter do less for the same loudness.</p>
-          <h3>The tools</h3>
+          <h2 class="sub">The tools</h2>
           <dl class="terms">
             <dt>Compressor</dt><dd>Turns a part down when it goes over a threshold, by a ratio. Attack sets how quickly it reacts (slower lets the transient through), release how quickly it lets go. Use it to even out vocals, bass and buses.</dd>
             <dt>Clipper</dt><dd>Shaves off the very tops of waveforms instantly. On a drum bus, a dB or two of clipping takes the sharpest transients off with little audible change. It adds bright harmonics, so watch the codec peak on the master.</dd>
             <dt>De-esser</dt><dd>A compressor that only reacts to harsh "s" and "t" sounds, or any bright, spiky part: hats, a bright synth.</dd>
             <dt>Saturation</dt><dd>Gentle distortion that adds harmonics and density to sustained parts without the pumping of heavy compression.</dd>
           </dl>
-          <h3>Find what the limiter is fighting</h3>
+          <h2 class="sub">Find what the limiter is fighting</h2>
           <p>MasterScope's <b>Louder at −14</b> panel splits your track into six ranges and shows two things for each: its share of the height of the loudest peaks, and its share of the loudness. A range with a long amber bar and a short blue one spends peak room without adding much loudness. It then tests the fix on your actual audio: taking 4 dB off the loudest moments in one range at a time and measuring how much less limiting the track then needs.</p>
           <figure class="shot"><img src="/img/ms-louder_mix.webp" alt="MasterScope's Louder at −14 panel for a mix before mastering" loading="lazy" width="1600" height="1432"><figcaption>A mix before mastering. Presence and highs make 45% of the peak height but only 18% of the loudness; controlling the highs cuts the limiting by 30%, while controlling the bass would make it worse.</figcaption></figure>
           <p>It also tells you whether those peaks are drum hits or sustained parts, and suggests the matching tool: a drum-bus clipper for hits, a de-esser or compression for a bright vocal or synth. For the clearest answer, analyse your mix with the master limiter switched off.</p>
@@ -77,7 +82,7 @@
     </div>
   </section>
 </main>
-<footer><span>© 2026 MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/about/">About</a><a href="/advertise/">Advertise</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="mailto:masterscope@gwstudio.com.au">Contact</a></span></footer>
+<footer><span>© 2026 MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/about/">About</a><a href="/changelog/">What’s new</a><a href="/advertise/">Advertise</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="mailto:masterscope@gwstudio.com.au">Contact</a></span></footer>
 <script src="/assets/config.js"></script>
 <script src="/assets/site.js" defer></script>
 </body>

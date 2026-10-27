@@ -18,11 +18,16 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%236f86ff'/%3E%3Ccircle cx='32' cy='32' r='24' fill='%233d5afe'/%3E%3Ccircle cx='32' cy='32' r='24' fill='none' stroke='%23fff' stroke-width='3'/%3E%3Cpath d='M32 2v10M32 52v10M2 32h10M52 32h10' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M13 34 L19 34 L23 23 L28 43 L33 17 L38 47 L42 27 L45 34 L51 34' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Article","headline":"How a limiter works","description":"A mastering limiter does two jobs: it stops peaks going over a ceiling, and it lets you raise the overall level until the track is as dense as you want.…","url":"https://masterscope.gwstudio.com.au/learn/limiter/","inLanguage":"en","image":"https://masterscope.gwstudio.com.au/img/liminal-bassfirst.webp","author":{"@type":"Organization","@id":"https://masterscope.gwstudio.com.au/#org","name":"MasterScope","url":"https://masterscope.gwstudio.com.au/","logo":"https://masterscope.gwstudio.com.au/icon-512.png","parentOrganization":{"@type":"Organization","name":"GW Studio"}},"publisher":{"@type":"Organization","@id":"https://masterscope.gwstudio.com.au/#org","name":"MasterScope","url":"https://masterscope.gwstudio.com.au/","logo":"https://masterscope.gwstudio.com.au/icon-512.png","parentOrganization":{"@type":"Organization","name":"GW Studio"}},"isPartOf":{"@type":"Course","name":"MasterScope Learn","description":"A plain-English guide to mixing and mastering for streaming.","provider":{"@type":"Organization","@id":"https://masterscope.gwstudio.com.au/#org","name":"MasterScope","url":"https://masterscope.gwstudio.com.au/","logo":"https://masterscope.gwstudio.com.au/icon-512.png","parentOrganization":{"@type":"Organization","name":"GW Studio"}},"url":"https://masterscope.gwstudio.com.au/learn/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Learn","item":"https://masterscope.gwstudio.com.au/learn/"},{"@type":"ListItem","position":2,"name":"How a limiter works","item":"https://masterscope.gwstudio.com.au/learn/limiter/"}]}]}</script>
 </head>
 <body class="wide-page" data-chapter="limiter">
 <header class="topbar">
@@ -64,7 +69,7 @@
             <dt>Oversampling</dt><dd>Runs the limiter at a higher internal rate so it catches inter-sample peaks and reduces distortion, at the cost of CPU.</dd>
           </dl>
           <figure class="shot"><img src="/img/liminal-bassfirst.webp" alt="Liminal in Lookahead mode with Bass first enabled" loading="lazy" width="1440" height="900"><figcaption>Liminal in Lookahead mode. The display shows the waveform after limiting, what was removed (red) and the gain reduction over time.</figcaption></figure>
-          <h3>Liminal's modes</h3>
+          <h2 class="sub">Liminal's modes</h2>
           <dl class="terms">
             <dt>Lookahead</dt><dd>The default for mastering: smooth, transparent gain reduction with adjustable attack, release and lookahead.</dd>
             <dt>Brickwall</dt><dd>Zero added latency and an absolute ceiling. Useful while tracking or for a final safety stage.</dd>
@@ -77,7 +82,7 @@
             <figure class="shot"><img src="/img/liminal-softclip.webp" alt="Liminal in Soft Clip mode" loading="lazy" width="1440" height="900"><figcaption>Soft Clip mode.</figcaption></figure>
             <figure class="shot"><img src="/img/liminal-multiband.webp" alt="Liminal in Multiband mode" loading="lazy" width="1440" height="900"><figcaption>Multiband mode.</figcaption></figure>
           </div>
-          <h3>Punch, and finding the best setup</h3>
+          <h2 class="sub">Punch, and finding the best setup</h2>
           <p>Liminal's Loudness panel shows <b>Punch</b>: how far the hits stand out from the music around them (the loudest 10 ms of each second against its average), with how much the limiter takes off compared with your mix. Losing under 2 dB is clean; over 4 dB and the drums lose their snap.</p>
           <p>Rather than guess attack and release, press <b>Optimise</b>. It tries about 30 setups on the loudest 30 seconds Learn heard, learns every one to the same target and ceiling so they are equally loud, and ranks them by punch. Apply the one you like and Liminal re-learns it on the whole song.</p>
           <figure class="shot"><img src="/img/liminal-optimise.webp" alt="Liminal's Optimise tab ranking limiter setups by punch" loading="lazy" width="1440" height="900"><figcaption>Optimise: every setup at the same loudness and density, ranked by punch, with decoded peaks checked through real encoders.</figcaption></figure>
@@ -92,7 +97,7 @@
     </div>
   </section>
 </main>
-<footer><span>© 2026 MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/about/">About</a><a href="/advertise/">Advertise</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="mailto:masterscope@gwstudio.com.au">Contact</a></span></footer>
+<footer><span>© 2026 MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/about/">About</a><a href="/changelog/">What’s new</a><a href="/advertise/">Advertise</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="mailto:masterscope@gwstudio.com.au">Contact</a></span></footer>
 <script src="/assets/config.js"></script>
 <script src="/assets/site.js" defer></script>
 </body>
