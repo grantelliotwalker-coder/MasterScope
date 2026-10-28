@@ -228,6 +228,7 @@
     <!-- Overview -->
     <div class="tab-pane active" data-pane="overview">
       <div class="stack">
+        <section class="panel verdict-card" id="verdictCard" aria-live="polite"></section>
         <section class="panel" data-help="release">
           <div class="panel-head"><h2>Release ready?</h2><span class="sub">Platform by platform</span></div>
           <div class="release-list" id="releaseReady"></div>
@@ -249,11 +250,8 @@
         </section>
         <section class="panel" data-help="overviewWave">
           <div class="panel-head"><h2>Waveform</h2><span class="sub">Click to play from any point</span></div>
-          <canvas id="wfOverview" aria-label="Waveform of the whole track"></canvas>
-        </section>
-        <section class="panel" data-help="fileinfo">
-          <div class="panel-head"><h2>File</h2></div>
-          <div class="kv" id="fileInfo"></div>
+          <canvas id="wfOverview" aria-label="Waveform of the whole track, coloured by loudness"></canvas>
+          <div class="wf-legend"><span class="wf-ramp" aria-hidden="true"></span><span>Quieter than average</span><span>Louder than average</span><span class="wf-key"><i class="wf-tick"></i>Loudest peaks</span><span class="wf-key"><i class="wf-dip"></i>Energy dips</span></div>
         </section>
       </div>
     </div>
