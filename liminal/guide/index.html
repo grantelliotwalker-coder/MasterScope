@@ -108,7 +108,7 @@
         <section class="chapter guide">
           <h2 id="window">3. The window</h2>
           <ul>
-            <li><b>Top bar:</b> presets (arrows step through them), Save, Delete, Undo, Redo, A/B, Record session (●), dark or light theme, full screen and About (ⓘ).</li>
+            <li><b>Top bar:</b> presets (arrows step through them), Save, Delete, Undo, Redo, A/B, Record session (the red dot), dark or light theme, full screen and About (ⓘ), which has links to this guide and What's new.</li>
             <li><b>Display</b> (top left): eight views, chosen with the tabs. See <a href="#views">Views</a>.</li>
             <li><b>Controls</b> (bottom left): the limiting mode and the knobs for that mode, plus M/S, Sidechain, Bass first and Adaptive release.</li>
             <li><b>Faders</b> (middle): Threshold, the GR meter and Ceiling, then the ceiling mode, Auto makeup, Output and Stereo link.</li>
@@ -120,7 +120,7 @@
         </section>
         <section class="chapter guide">
           <h2 id="learn">4. Learn and targets</h2>
-          <p>Learn is how Liminal sets itself. Press <b>Learn</b>, play the song, press <b>Stop</b>. While you play, it listens; when you stop, it renders what it heard through hidden copies of itself at different thresholds, picks the one that hits your target at your ceiling, and checks the result through real streaming encoders. Then it restarts the loudness readings so they reflect the new setting. <b>Undo</b> puts the old threshold back.</p>
+          <p>Learn is how Liminal sets itself (the first time you open Liminal, the display shows these steps). Press <b>Learn</b>, play the song, press <b>Stop</b>. While you play, it listens; when you stop, it renders what it heard through hidden copies of itself at different thresholds, picks the one that hits your target at your ceiling, and checks the result through real streaming encoders. Then it restarts the loudness readings so they reflect the new setting. <b>Undo</b> puts the old threshold back.</p>
           <h3>Two kinds of target</h3>
           <div class="table-wrap"><table class="data">
             <thead><tr><th>Target</th><th>What Learn aims for</th><th>Use it when</th></tr></thead>
@@ -129,6 +129,7 @@
               <tr><td>Density (PLR)</td><td>A peak-to-loudness ratio: how dense the master is. 9 to 11 is punchy and competitive; 12 and up is open; under 8 sounds squashed.</td><td>Streaming. The services turn every song to the same loudness, so density is what listeners actually hear.</td></tr>
             </tbody>
           </table></div>
+          <p>While Learn calculates, a bar under the button shows its progress. Afterwards the Loudness panel shows what Learn measured (<i>Learned: −14.0 LUFS</i>) until enough of the song has played again for its own readings to settle; the line under the big number says how long it has been measuring.</p>
           <p>Use the − and + buttons for small steps, or click the value for the full list. Learn's own report (the <b>Report</b> button) is the same session file Record makes, rendered from what Learn heard, so one listen gives you the setting and the report. More on why density matters in <a href="/learn/density/">Learn: density</a>.</p>
           <figure class="shot"><img src="/img/liminal-capturing.webp" alt="Liminal while Learn is listening to the song" loading="lazy" width="1440" height="900"><figcaption>While Learn is listening. Play the song through, then press Stop.</figcaption></figure>
 
@@ -180,7 +181,7 @@
               <tr><td>Drive (Soft Clip)</td><td>How hard the signal is pushed into the clipper.</td><td>To taste</td></tr>
               <tr><td>Crossover (Multiband)</td><td>Where the lows split from the highs.</td><td class="num">about 150 Hz</td></tr>
               <tr><td>Bass first</td><td>When a peak comes mostly from the low end, only the low band is turned down, so hats, vocals and snare don't duck with every kick. Lookahead and Brickwall.</td><td>On for kick- and 808-led music</td></tr>
-              <tr><td>Bass range / Bass freq</td><td>The most the low band may be turned down on its own, and where the low band ends.</td><td class="num">6 dB · 100 to 150 Hz</td></tr>
+              <tr><td>Bass range / Bass freq</td><td>The most the low band may be turned down on its own, and where the low band ends. They appear once Bass first is on.</td><td class="num">6 dB · 100 to 150 Hz</td></tr>
               <tr><td>M/S</td><td>Limits the centre and the sides separately, so wide parts don't pull the centre down.</td><td>Off</td></tr>
               <tr><td>Sidechain</td><td>Lets another track routed to Liminal's sidechain input decide when to limit. Brickwall and Lookahead.</td><td>Off</td></tr>
               <tr><td>Auto makeup</td><td>Turns the output up so the loudest peaks sit at the ceiling. Turn off to set the level with Output.</td><td>On</td></tr>
