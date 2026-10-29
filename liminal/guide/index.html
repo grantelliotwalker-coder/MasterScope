@@ -60,11 +60,11 @@
           <li><a href="#window">The window</a></li>
           <li><a href="#learn">Learn and targets</a></li>
           <li><a href="#ceiling">Ceiling and codecs</a></li>
-          <li><a href="#modes">Modes</a></li>
+          <li><a href="#modes">Styles</a></li>
           <li><a href="#controls">Every control</a></li>
           <li><a href="#listen">Listen</a></li>
           <li><a href="#readouts">Meters and readouts</a></li>
-          <li><a href="#views">Views</a></li>
+          <li><a href="#views">Views and Tools</a></li>
           <li><a href="#optimise">Optimise, reference, release pack</a></li>
           <li><a href="#presets">Presets, A/B and reports</a></li>
           <li><a href="#help">Troubleshooting</a></li>
@@ -74,7 +74,7 @@
         <section class="chapter guide" id="g-intro">
           <div class="eyebrow">Liminal 1.0 · user guide</div>
           <h1 class="ch-title">How to use Liminal</h1>
-          <p class="lede">Everything in Liminal, from installing it to the last button. If you only read one part, read the <a href="#quick-start">quick start</a>: it gets a song release ready in about the time it takes to play it. Hover over any control in the plug-in for a short explanation too.</p>
+          <p class="lede">Everything in Liminal, from installing it to the last button. Liminal is built to be used by hand: pick a style, pull the threshold down until it sounds right, and the ceiling keeps the peaks safe. When you want a second opinion, the <b>Tools</b> button has Learn, Optimise, Mix Doctor and the rest. Hover over any control in the plug-in for a short explanation too.</p>
 
         </section>
         <section class="chapter guide">
@@ -96,31 +96,35 @@
           <h2 id="quick-start">2. Quick start</h2>
           <ol class="guide-steps">
             <li><b>Put Liminal last on your master bus</b>, after any EQ, compression or saturation. Nothing that changes the level should come after it.</li>
-            <li><b>Pick a starting point.</b> The default is fine. For most music, the preset <i>Streaming: punchy (PLR 10)</i> is a great start.</li>
-            <li><b>Choose a target</b> in the Learn panel (bottom right). Click the value: pick a loudness such as −14 LUFS, or a density such as PLR 10. Not sure? Use PLR 10. See <a href="#learn">Learn and targets</a>.</li>
-            <li><b>Press Learn and play the song</b>, the whole thing or at least its loudest section. Then press <b>Stop</b>. Liminal works out the threshold that lands on your target at your ceiling, checks it through the real Opus and Vorbis encoders, and sets it.</li>
-            <li><b>Listen.</b> Click <b>Match</b> in the Listen panel to hear your unlimited mix at the same loudness, then <b>Out</b> again. If the limited version sounds smaller or the drums lose their snap, try <a href="#optimise">Optimise</a> or a higher PLR.</li>
-            <li><b>Bounce your master</b> as usual. Optional: press <b>Report</b>, save the .json file and drop it on <a href="/">MasterScope</a> to check it against every platform and get suggestions.</li>
+            <li><b>Pick a style.</b> <i>Lookahead</i> (the default) suits most music. Or start from a preset such as <i>Streaming: punchy (PLR 10)</i>.</li>
+            <li><b>Play the loudest part of the song and pull the Threshold down</b> until it's as loud as you want and still sounds right. Auto makeup turns the output up as you go, and the Ceiling (−1.0 dBTP) keeps the peaks safe.</li>
+            <li><b>Watch the Loudness card.</b> It shows the integrated loudness, the true peak and the PLR (density). For streaming, a PLR of 9 to 11 is punchy and competitive.</li>
+            <li><b>Listen honestly.</b> Turn on <b>Level match</b> to hear your unlimited mix at the same loudness, and <b>Hear what's removed</b> to hear only what the limiter takes away. If the drums lose their snap, back the threshold off or try Punch Guard.</li>
+            <li><b>Want a second opinion?</b> Open <b>Tools</b>, choose a target and press <b>Learn</b>, play the song, then press Stop: Liminal suggests the threshold that lands on it. See <a href="#learn">Learn and targets</a>.</li>
+            <li><b>Bounce your master</b> as usual. Optional: press <b>Report</b> (beside Learn) or use the Session log, and drop the .json file on <a href="/">MasterScope</a> to check it against every platform.</li>
           </ol>
-          <figure class="shot"><img src="/img/liminal-main.webp" alt="Liminal's main window: display tabs, the limiter display, mode buttons and knobs, the threshold, gain reduction and ceiling meters, and the loudness, listen and learn panels" loading="lazy" width="1440" height="900"><figcaption>Liminal's window. Left: the display and the limiter controls. Middle: Threshold, gain reduction (GR) and Ceiling. Right: Loudness, Listen and Learn.</figcaption></figure>
+          <figure class="shot"><img src="/img/liminal-main.webp" alt="Liminal's main window: the limiter display with tabs, the style and knobs below it, the threshold, gain reduction and ceiling meters, and the loudness card" loading="lazy" width="1440" height="900"><figcaption>Liminal's window. Left: the display, with the style and its knobs below. Right: Threshold, gain reduction (GR) and Ceiling, then the Loudness card. Bottom: Advanced.</figcaption></figure>
 
         </section>
         <section class="chapter guide">
           <h2 id="window">3. The window</h2>
           <ul>
-            <li><b>Top bar:</b> presets (arrows step through them), Save, Delete, Undo, Redo, A/B, Record session (the red dot), dark or light theme, full screen and About (ⓘ), which has links to this guide and What's new.</li>
-            <li><b>Display</b> (top left): eight views, chosen with the tabs. See <a href="#views">Views</a>.</li>
-            <li><b>Controls</b> (bottom left): the limiting mode and the knobs for that mode, plus M/S, Sidechain, Bass first and Adaptive release.</li>
-            <li><b>Faders</b> (middle): Threshold, the GR meter and Ceiling, then the ceiling mode, Auto makeup, Output and Stereo link.</li>
-            <li><b>Right:</b> the Loudness panel, Listen buttons and the Learn panel.</li>
-            <li><b>Bottom bar:</b> latency, the stereo correlation meter, Dither and Reset meters.</li>
+            <li><b>Top bar:</b> presets (arrows step through them), Save, Delete, Undo, Redo, A/B, <b>Tools</b>, dark or light theme, full screen and About (ⓘ), which has links to this guide and What's new.</li>
+            <li><b>Display</b> (top left): Limiter, Loudness and History tabs, plus a tab for whichever tool you opened. Above it on the right: <b>Hear what's removed</b> and <b>Level match</b>. See <a href="#views">Views and Tools</a>.</li>
+            <li><b>Controls</b> (under the display): the <b>Style</b> menu with a one-line description, the knobs for that style, and Adaptive release and Bass first.</li>
+            <li><b>Meters</b> (right): Threshold, the GR meter and Ceiling, then Auto makeup and Output.</li>
+            <li><b>Loudness card</b> (bottom right): integrated loudness, distance to your target, short-term, true peak and PLR. <b>More</b> opens every reading.</li>
+            <li><b>Bottom bar:</b> <b>Advanced</b> with a summary of its settings, the stereo correlation meter, latency and Reset meters.</li>
+            <li><b>Advanced</b> opens a strip with the settings you set once and leave: Oversampling, Linear phase and 4x on export, the ceiling mode, M/S and Sidechain, Stereo link and Dither.</li>
+            <li><b>Tools</b> opens a panel with Learn at the top, then Optimise, Mix Doctor, Spectrum, Spectrogram, Measure a song, Reference track, Codec check and Session log. Nothing in Tools changes your sound until you say so.</li>
           </ul>
+          <figure class="shot"><img src="/img/liminal-tools.webp" alt="Liminal with the Tools panel open: Learn with its target, then Optimise, Mix Doctor, Spectrum, Spectrogram, Measure a song, Reference track, Codec check and Session log" loading="lazy" width="1440" height="900"><figcaption>The Tools panel: Learn at the top, then every helper.</figcaption></figure>
           <p>Drag the bottom-right corner to make the window any size (the display gets the extra room), or press full screen. New instances open at the size you last used.</p>
 
         </section>
         <section class="chapter guide">
           <h2 id="learn">4. Learn and targets</h2>
-          <p>Learn is how Liminal sets itself (the first time you open Liminal, the display shows these steps). Press <b>Learn</b>, play the song, press <b>Stop</b>. While you play, it listens; when you stop, it renders what it heard through hidden copies of itself at different thresholds, picks the one that hits your target at your ceiling, and checks the result through real streaming encoders. Then it restarts the loudness readings so they reflect the new setting. <b>Undo</b> puts the old threshold back.</p>
+          <p>Learn suggests a threshold for a target. It's at the top of the <b>Tools</b> panel: choose the target, press <b>Learn</b>, play the song, press <b>Stop</b>. While you play, it listens; when you stop, it renders what it heard through hidden copies of itself at different thresholds, picks the one that hits your target at your ceiling, and checks the result through real streaming encoders. Then it restarts the loudness readings so they reflect the new setting. <b>Undo</b> puts the old threshold back.</p>
           <h3>Two kinds of target</h3>
           <div class="table-wrap"><table class="data">
             <thead><tr><th>Target</th><th>What Learn aims for</th><th>Use it when</th></tr></thead>
@@ -130,26 +134,27 @@
             </tbody>
           </table></div>
           <p>While Learn calculates, a bar under the button shows its progress. Afterwards the Loudness panel shows what Learn measured (<i>Learned: −14.0 LUFS</i>) until enough of the song has played again for its own readings to settle; the line under the big number says how long it has been measuring.</p>
-          <p>Use the − and + buttons for small steps, or click the value for the full list. Learn's own report (the <b>Report</b> button) is the same session file Record makes, rendered from what Learn heard, so one listen gives you the setting and the report. More on why density matters in <a href="/learn/density/">Learn: density</a>.</p>
-          <figure class="shot"><img src="/img/liminal-capturing.webp" alt="Liminal while Learn is listening to the song" loading="lazy" width="1440" height="900"><figcaption>While Learn is listening. Play the song through, then press Stop.</figcaption></figure>
+          <p>Use the − and + buttons for small steps, or click the value for the full list. Learn's own report (the <b>Report</b> button) is the same file the Session log makes, rendered from what Learn heard, so one listen gives you the setting and the report. More on why density matters in <a href="/learn/density/">Learn: density</a>.</p>
+          <figure class="shot"><img src="/img/liminal-capturing.webp" alt="Liminal while Learn is listening to the song" loading="lazy" width="1440" height="900"><figcaption>While Learn is listening (Tools panel, top). Play the song through, then press Stop.</figcaption></figure>
 
         </section>
         <section class="chapter guide">
           <h2 id="ceiling">5. Ceiling and codecs</h2>
-          <p>The <b>Ceiling</b> is the highest true peak the output can reach. −1.0 dBTP is the usual target for streaming; use −2.0 for very loud masters. Under the faders, the ceiling mode decides what the ceiling protects against:</p>
+          <p>The <b>Ceiling</b> is the highest true peak the output can reach. −1.0 dBTP is the usual target for streaming; use −2.0 for very loud masters. In <b>Advanced</b>, the ceiling mode decides what the ceiling protects against:</p>
           <ul>
             <li><b>True peak:</b> the classic ceiling. The file's own peaks, including those between samples, stay under it.</li>
             <li><b>Streaming</b> (the default): also keeps the peaks a listener gets after Opus (YouTube) and Ogg Vorbis (Spotify) encoding under the ceiling. Encoders remove the very top of the spectrum and that pushes peaks up; Learn measures how much for <i>your</i> song with the real encoders and allows for it. No extra latency.</li>
             <li><b>All codecs:</b> adds a 1 dB margin for MP3 and AAC (SoundCloud, DJ downloads, Apple Music), whose encoders overshoot a little more.</li>
           </ul>
-          <p>That's why, after Learn in Streaming mode, the true peak can sit well under the ceiling while the <b>Codec peak</b> sits right at it. More in <a href="/learn/peaks/">Learn: peaks</a>.</p>
-          <figure class="shot"><img src="/img/liminal-learned.webp" alt="Liminal after Learn, with the codec peak at the ceiling and the true peak lower" loading="lazy" width="1440" height="900"><figcaption>After Learn in Streaming mode: the codec peak sits at the −1 dB ceiling while the true peak is lower.</figcaption></figure>
+          <p>That's why, after Learn in Streaming mode, the true peak can sit well under the ceiling while the <b>Codec peak</b> (under <b>More</b> on the Loudness card) sits right at it. More in <a href="/learn/peaks/">Learn: peaks</a>.</p>
+          <figure class="shot"><img src="/img/liminal-learned.webp" alt="Liminal after Learn, with the codec peak at the ceiling and the true peak lower" loading="lazy" width="1440" height="900"><figcaption>After Learn: on target, with the true peak held under the −1 dB ceiling.</figcaption></figure>
 
         </section>
         <section class="chapter guide">
-          <h2 id="modes">6. Modes</h2>
+          <h2 id="modes">6. Styles</h2>
+          <p>Choose a style from the <b>Style</b> menu under the display. Each shows only the knobs it uses.</p>
           <div class="table-wrap"><table class="data">
-            <thead><tr><th>Mode</th><th>How it works</th><th>Best for</th></tr></thead>
+            <thead><tr><th>Style</th><th>How it works</th><th>Best for</th></tr></thead>
             <tbody>
               <tr><td><b>Lookahead</b></td><td>Sees peaks coming and turns down smoothly before they arrive.</td><td>Most mastering. The cleanest mode, and where Bass first works best.</td></tr>
               <tr><td><b>Punch Guard</b></td><td>A lookahead limiter into a clipper: the tips of the hits go to the clipper, so the mix isn't turned down around every drum hit.</td><td>Dense, drum-led music where you want loudness and snap. Use 2x or 4x oversampling.</td></tr>
@@ -159,14 +164,14 @@
             </tbody>
           </table></div>
           <div class="fig-row">
-            <figure class="shot"><img src="/img/liminal-punchguard.webp" alt="Liminal in Punch Guard mode" loading="lazy" width="1440" height="900"><figcaption>Punch Guard with its Clip control and oversampling.</figcaption></figure>
+            <figure class="shot"><img src="/img/liminal-punchguard.webp" alt="Liminal in Punch Guard mode" loading="lazy" width="1440" height="900"><figcaption>Punch Guard with its Clip control, and Advanced open below.</figcaption></figure>
             <figure class="shot"><img src="/img/liminal-bassfirst.webp" alt="Liminal in Lookahead mode with Bass first on" loading="lazy" width="1440" height="900"><figcaption>Lookahead with Bass first: the low band takes the limiting, shown in orange.</figcaption></figure>
           </div>
 
         </section>
         <section class="chapter guide">
           <h2 id="controls">7. Every control</h2>
-          <p>Only the controls that apply to the current mode are shown. Double-click any knob to reset it.</p>
+          <p>Only the controls that apply to the current style are shown. Oversampling, Linear phase, 4x on export, the ceiling mode, M/S, Sidechain, Stereo link and Dither are in <b>Advanced</b>. Double-click any knob to reset it.</p>
           <div class="table-wrap"><table class="data">
             <thead><tr><th>Control</th><th>What it does</th><th>Typical setting</th></tr></thead>
             <tbody>
@@ -198,13 +203,12 @@
         <section class="chapter guide">
           <h2 id="listen">8. Listen</h2>
           <ul>
-            <li><b>Out:</b> Liminal's normal output.</li>
-            <li><b>Match:</b> your unprocessed mix at the same loudness as the output. Flip between Out and Match to judge what limiting does to the sound without louder fooling your ears.</li>
-            <li><b>Delta:</b> only what the limiter takes away. Ideally faint transient ticks; clicks, crunch or bass in here are what listeners lose.</li>
-            <li><b>Opus:</b> the output through a real Opus encoder and decoder at 128 kbps (what YouTube streams), in real time. About 30 ms late, for listening only.</li>
-            <li><b>Ref:</b> your reference track at your output's loudness, following the playhead. Load one on the Optimise tab.</li>
+            <li><b>Level match</b> (above the display): your unprocessed mix at the same loudness as the output. Flip it on and off to judge what limiting does to the sound without louder fooling your ears.</li>
+            <li><b>Hear what's removed</b> (above the display): only what the limiter takes away. Ideally faint transient ticks; clicks, crunch or bass in here are what listeners lose.</li>
+            <li><b>Codec check</b> (Tools): the output through a real Opus encoder and decoder at 128 kbps (what YouTube streams), in real time. About 30 ms late, for listening only.</li>
+            <li><b>Reference track</b> (Tools): your reference track at your output's loudness, following the playhead. Load one in Optimise.</li>
           </ul>
-          <p>Listen settings are for monitoring only: they aren't saved in presets and never change your bounce. Set it back to <b>Out</b> before you export.</p>
+          <p>Only one can be on at a time, and pressing it again goes back to the normal output. They're for monitoring only: they aren't saved in presets and never change your bounce. Turn them off before you export.</p>
 
         </section>
         <section class="chapter guide">
@@ -212,7 +216,7 @@
           <div class="table-wrap"><table class="data">
             <thead><tr><th>Readout</th><th>What it tells you</th></tr></thead>
             <tbody>
-              <tr><td>Integrated (LUFS)</td><td>Loudness of everything played since the last reset: the number streaming services use. Click the panel to reset.</td></tr>
+              <tr><td>Integrated (LUFS)</td><td>The big number on the Loudness card: loudness of everything played since the last reset, the number streaming services use. Click the card (or <b>More</b>) for the rest of this table; <b>Reset meters</b> starts the readings again.</td></tr>
               <tr><td>Distance to target</td><td>How far the integrated loudness is from your Learn target.</td></tr>
               <tr><td>Short-term / Momentary</td><td>Loudness over the last 3 s and 0.4 s, with the loudest so far.</td></tr>
               <tr><td>True peak out</td><td>The highest output peak since reset, including peaks between samples.</td></tr>
@@ -229,32 +233,41 @@
 
         </section>
         <section class="chapter guide">
-          <h2 id="views">10. Views</h2>
+          <h2 id="views">10. Views and Tools</h2>
+          <p>Three tabs are always there:</p>
           <ul>
             <li><b>Limiter:</b> the last 10 seconds going in, what's left after limiting and the gain reduction, with the threshold dashed.</li>
             <li><b>Loudness:</b> short-term loudness over time against your target.</li>
             <li><b>History:</b> gain reduction over a longer stretch. A line that never returns to zero means constant limiting.</li>
+          </ul>
+          <p>The rest open from <b>Tools</b> and appear as a fourth tab:</p>
+          <ul>
             <li><b>Spectrum:</b> the output's frequency balance, scaled so pink noise is flat, with Average, Peak hold, Input and Reference overlays. Hover for frequency, note and level; double-click to clear.</li>
             <li><b>Spectrogram:</b> frequency over time in 2D or 3D, with a Delta view of only what limiting removes. Freeze holds the picture.</li>
             <li><b>Mix Doctor:</b> after Learn, shows which part of the mix makes the peaks the limiter fights, how much a little peak control there would save, and what to change in the mix.</li>
+            <li><b>Measure a song:</b> measures what plays into Liminal before Liminal touches it, such as a reference track on another channel routed in: loudness, true peak, PLR, its loudest moment and loudness range, with buttons to use its loudness or density as Learn's target. For songs on Spotify or YouTube, use <a href="/meter/">MasterScope Meter</a>.</li>
             <li><b>Optimise:</b> see the next section.</li>
           </ul>
           <div class="fig-row">
             <figure class="shot"><img src="/img/liminal-spectrum.webp" alt="Liminal's spectrum view with average and peak hold" loading="lazy" width="1440" height="900"><figcaption>Spectrum, with the average and peak hold.</figcaption></figure>
             <figure class="shot"><img src="/img/liminal-doctor.webp" alt="Liminal's Mix Doctor view" loading="lazy" width="1440" height="900"><figcaption>Mix Doctor: what in the mix sets the peaks, and the fix.</figcaption></figure>
           </div>
+          <div class="fig-row">
+            <figure class="shot"><img src="/img/liminal-spectrogram.webp" alt="Liminal's spectrogram" loading="lazy" width="1440" height="900"><figcaption>Spectrogram, with gain reduction on the same time line.</figcaption></figure>
+            <figure class="shot"><img src="/img/liminal-measure.webp" alt="Liminal's Measure a song tool after measuring a track" loading="lazy" width="1440" height="900"><figcaption>Measure a song, with buttons to use its loudness or density as your target.</figcaption></figure>
+          </div>
 
         </section>
         <section class="chapter guide">
           <h2 id="optimise">11. Optimise, reference and release pack</h2>
-          <p>All three live on the <b>Optimise</b> tab and use the audio Learn heard, so press Learn and play the song first.</p>
+          <p>All three are in <b>Optimise</b> (Tools) and use the audio Learn heard, so run Learn first.</p>
           <h3>Optimise</h3>
           <p>Tries about 30 setups (different attack and release, Multiband, Punch Guard, Bass first, Brickwall) on the loudest 30 seconds. Every one is learned to your target and ceiling mode, so they're all equally loud and dense, and they're ranked by punch. The top ones are checked with the real encoders. Press <b>Apply</b> to use one: Liminal sets the controls and re-learns it on the whole song. Undo goes back.</p>
           <h3>Reference track</h3>
-          <p><b>Load reference</b> takes a WAV, AIFF, FLAC or Ogg of a released track you like. Liminal measures its loudness, peaks, density, punch and tone. <b>Ref</b> in Listen plays it at your loudness, the spectrum can overlay its tonal balance, and <b>Use its density</b> sets Learn to its PLR so your master is as dense as the reference.</p>
+          <p><b>Load reference</b> takes a WAV, AIFF, FLAC or Ogg of a released track you like. Liminal measures its loudness, peaks, density, punch and tone. <b>Reference track</b> in Tools plays it at your loudness, the spectrum can overlay its tonal balance, and <b>Use its density</b> sets Learn to its PLR so your master is as dense as the reference.</p>
           <h3>Release pack</h3>
           <p><b>Make pack</b> learns and writes four masters from one listen: Streaming −14 (safe on every codec), Club −9, Apple Music −16 and YouTube −14 (Opus-safe). Each is a 24-bit WAV with its MasterScope report. Choose a name and the files go next to it.</p>
-          <figure class="shot"><img src="/img/liminal-optimise.webp" alt="Liminal's Optimise tab with ranked setups, the reference track and the release pack" loading="lazy" width="1440" height="900"><figcaption>Optimise: ranked setups at the same loudness, plus the reference track and release pack.</figcaption></figure>
+          <figure class="shot"><img src="/img/liminal-optimise.webp" alt="Liminal's Optimise tool with ranked setups, the reference track and the release pack" loading="lazy" width="1440" height="900"><figcaption>Optimise: ranked setups at the same loudness, with Apply beside each, plus the reference track and release pack.</figcaption></figure>
 
         </section>
         <section class="chapter guide">
@@ -264,7 +277,7 @@
             <li><b>Import preset</b> (at the bottom of the preset menu) loads a preset file, such as the one MasterScope suggests from your report. It's copied into your presets and can be undone.</li>
             <li><b>A/B:</b> two sets of settings to compare. Click the other letter to switch; changes stay in the slot you were on.</li>
             <li><b>Undo / Redo</b> cover every change, including Learn and Apply.</li>
-            <li><b>Record session</b> (●): press, play the song, press again. Save as .json for MasterScope or .csv for a spreadsheet. Learn's <b>Report</b> button gives you the same file without a second play-through.</li>
+            <li><b>Session log</b> (Tools): press, play the song, press again. Save as .json for MasterScope or .csv for a spreadsheet. Learn's <b>Report</b> button gives you the same file without a second play-through.</li>
           </ul>
           <div class="callout key"><b>The round trip with MasterScope</b>
             <ol>
@@ -281,15 +294,15 @@
             <dt>Liminal doesn't show up in my DAW.</dt>
             <dd>Check that <code>Liminal.vst3</code> is in <code>C:\Program Files\Common Files\VST3</code>, that your DAW is 64-bit and has VST3 enabled, then rescan plug-ins.</dd>
             <dt>Optimise, Mix Doctor or the release pack say to Learn first.</dt>
-            <dd>Optimise, Mix Doctor, the release pack and Report all use the audio Learn heard. Press Learn, play at least a few seconds (ideally the whole song), and press Stop.</dd>
+            <dd>Optimise, Mix Doctor, the release pack and Report all use the audio Learn heard. Open Tools, press Learn, play at least a few seconds (ideally the whole song), and press Stop.</dd>
             <dt>The loudness doesn't match my target.</dt>
-            <dd>The readings only cover what has played since the last reset. Press Reset meters and play the whole song, or press Learn again if you changed something before the limiter.</dd>
+            <dd>The readings only cover what has played since the last reset. Press Reset meters and play the whole song, or run Learn again if you changed something before the limiter.</dd>
             <dt>It sounds squashed.</dt>
             <dd>Try a higher PLR target (11 or 12), Punch Guard with 2x oversampling, or Optimise. Then check Mix Doctor: often one part of the mix makes most of the peaks.</dd>
             <dt>The kick makes everything duck.</dt>
-            <dd>Turn on Bass first (Lookahead mode), or try Multiband.</dd>
+            <dd>Turn on Bass first (Lookahead style), or try Multiband.</dd>
             <dt>High CPU or latency.</dt>
-            <dd>Lower Oversampling or turn off Linear phase while working, and turn on 4x on export so the bounce is still clean. Brickwall has no limiting latency at all, for tracking.</dd>
+            <dd>In Advanced, lower Oversampling or turn off Linear phase while working, and turn on 4x on export so the bounce is still clean. Brickwall has no limiting latency at all, for tracking.</dd>
           </dl>
           <p>Still stuck, or found a bug? Email <a href="mailto:masterscope@gwstudio.com.au">masterscope@gwstudio.com.au</a>.</p>
         

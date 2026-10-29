@@ -72,18 +72,19 @@
           <p class="guide-link"><a href="/liminal/guide/">Read the user guide →</a><span aria-hidden="true">&nbsp;&nbsp;·&nbsp;&nbsp;</span><a href="/changelog/">What’s new in 1.0</a></p>
           <p class="small muted">Works in any DAW that loads VST3 (and AU on Mac): Ableton Live, FL Studio, Cubase, Reaper, Studio One, Bitwig, Logic and more.</p>
         </div>
-        <figure class="lp-hero-shot"><img src="/img/liminal-learned.webp" alt="Liminal after Learn, in Lookahead mode" width="1440" height="900"></figure>
+        <figure class="lp-hero-shot"><img src="/img/liminal-learned.webp" alt="Liminal after Learn, on target in the Lookahead style" width="1440" height="900"></figure>
       </div>
 
       <h2 class="sr-only">What Liminal does</h2>
       <div class="lp-features">
-        <div class="lp-f"><h3>Learn, in one listen</h3><p>Pick a loudness or a density (PLR), press Learn and play the song. Liminal renders what it heard through hidden copies of itself and sets the threshold that lands on the target. Undo puts it back.</p></div>
+        <div class="lp-f"><h3>Simple by hand</h3><p>Choose a style, pull the threshold down until it sounds right, and the ceiling keeps the peaks safe. The settings you set once and leave live under Advanced; the helpers live under Tools.</p></div>
+        <div class="lp-f"><h3>Learn, in one listen</h3><p>A second opinion: pick a loudness or a density (PLR), press Learn and play the song. Liminal renders what it heard through hidden copies of itself and suggests the threshold that lands on the target. Undo puts it back.</p></div>
         <div class="lp-f"><h3>Safe after encoding</h3><p>The Streaming ceiling keeps the peaks a listener gets after Opus and Vorbis under your ceiling, measured on your song with the real encoders. All codecs adds a margin for MP3 and AAC.</p></div>
         <div class="lp-f"><h3>Optimise</h3><p>Tries about 30 setups at your target, all equally loud, and ranks them by punch. Apply the best and Liminal re-learns it on the whole song.</p></div>
         <div class="lp-f"><h3>Punch Guard</h3><p>A limiter into a clipper: the tips of the drum hits go to the clipper, so the mix isn't turned down around every hit. More snap at the same loudness.</p></div>
         <div class="lp-f"><h3>Mix Doctor</h3><p>Shows which part of the mix makes the peaks the limiter fights, how much a little peak control there would save, and what to do about it.</p></div>
         <div class="lp-f"><h3>See everything</h3><p>A rebuilt 8192-point spectrum (flat for pink noise, average, peak hold, input and reference overlays, note readout) and a 2D and 3D spectrogram with a Delta view of what limiting removes.</p></div>
-        <div class="lp-f"><h3>Hear what matters</h3><p>Match plays your mix at the output's loudness. Delta plays only what's removed. Opus plays the output through a real Opus encoder. Ref plays a reference track at your loudness.</p></div>
+        <div class="lp-f"><h3>Hear what matters</h3><p>Level match plays your mix at the output's loudness. Hear what's removed plays only what the limiter takes. Codec check plays the output through a real Opus encoder. Reference track plays a song you like at your loudness.</p></div>
         <div class="lp-f"><h3>Release pack</h3><p>Streaming, Club, Apple Music and YouTube masters written straight to disk from one listen, each a 24-bit WAV with its MasterScope report.</p></div>
         <div class="lp-f"><h3>Any window size</h3><p>Stretch the window to any shape (extra room goes to the graphs) or press full screen. New instances open at the size you last used.</p></div>
       </div>
@@ -99,9 +100,11 @@
         <div class="lp-gallery">
           <figure class="shot"><img src="/img/liminal-bassfirst.webp" alt="Liminal in Lookahead mode with Bass first" loading="lazy" width="1440" height="900"><figcaption>Lookahead with Bass first.</figcaption></figure>
           <figure class="shot"><img src="/img/liminal-punchguard.webp" alt="Liminal in Punch Guard mode" loading="lazy" width="1440" height="900"><figcaption>Punch Guard mode.</figcaption></figure>
-          <figure class="shot"><img src="/img/liminal-spectrogram.webp" alt="Liminal's 3D spectrogram" loading="lazy" width="1440" height="900"><figcaption>The 3D spectrogram.</figcaption></figure>
-          <figure class="shot"><img src="/img/liminal-spectrum.webp" alt="Liminal's spectrum with the average curve" loading="lazy" width="1440" height="900"><figcaption>The rebuilt spectrum.</figcaption></figure>
-          <figure class="shot"><img src="/img/liminal-optimise.webp" alt="Liminal's Optimise tab" loading="lazy" width="1440" height="900"><figcaption>Optimise, ranked by punch.</figcaption></figure>
+          <figure class="shot"><img src="/img/liminal-spectrogram.webp" alt="Liminal's spectrogram" loading="lazy" width="1440" height="900"><figcaption>The spectrogram.</figcaption></figure>
+          <figure class="shot"><img src="/img/liminal-spectrum.webp" alt="Liminal's spectrum with the average curve" loading="lazy" width="1440" height="900"><figcaption>The spectrum.</figcaption></figure>
+          <figure class="shot"><img src="/img/liminal-optimise.webp" alt="Liminal's Optimise tool" loading="lazy" width="1440" height="900"><figcaption>Optimise, ranked by punch.</figcaption></figure>
+          <figure class="shot"><img src="/img/liminal-tools.webp" alt="Liminal with the Tools panel open" loading="lazy" width="1440" height="900"><figcaption>Tools: Learn and every helper.</figcaption></figure>
+          <figure class="shot"><img src="/img/liminal-measure.webp" alt="Liminal's Measure a song tool" loading="lazy" width="1440" height="900"><figcaption>Measure a song.</figcaption></figure>
           <figure class="shot"><img src="/img/liminal-light.webp" alt="Liminal in the light theme" loading="lazy" width="1440" height="900"><figcaption>Light theme.</figcaption></figure>
         </div>
       </div>
@@ -129,15 +132,16 @@
         <h2>What's in 1.0</h2>
         <ul class="list">
           <li><b>Codec-safe ceiling, measured with real encoders.</b> True peak, Streaming (Opus and Vorbis) or All codecs. Learn encodes your song, measures the decoded peaks and calibrates the limiter, so a loud master doesn't overshoot after upload.</li>
-          <li><b>Listen through Opus</b> in real time, with the real decoded peak on the meter.</li>
+          <li><b>A cleaner window:</b> styles, a Tools panel for the helpers and an Advanced strip for set-and-forget settings.</li>
+          <li><b>Codec check:</b> listen through Opus in real time, with the real decoded peak on the meter.</li>
           <li><b>Learn by density.</b> Aim for a PLR instead of a loudness, or match a reference track's density in one click.</li>
           <li><b>Punch meter and Optimise.</b> See how much the limiter takes off the hits, then let Optimise find the setup that keeps the most.</li>
           <li><b>Punch Guard mode,</b> a lookahead limiter into an oversampled clipper.</li>
           <li><b>A detailed spectrum and a 2D and 3D spectrogram</b> (input, output or delta, with the 16 kHz codec line and gain reduction on the same time line).</li>
-          <li><b>Mix Doctor, reference track and release pack</b> inside the plug-in.</li>
+          <li><b>Mix Doctor, Measure a song, reference track and release pack</b> inside the plug-in.</li>
           <li><b>Stretch the window or go full screen.</b> New instances remember the size.</li>
           <li><b>Factory presets</b> built around streaming-safe ceilings and density targets, and an About box with the licences.</li>
-          <li><b>A report with every Learn,</b> and Record for any play-through. Drop either on MasterScope, which suggests what to change and gives you a preset to load back in.</li>
+          <li><b>A report with every Learn,</b> and the Session log for any play-through. Drop either on MasterScope, which suggests what to change and gives you a preset to load back in.</li>
         </ul>
       </div>
 
