@@ -92,6 +92,8 @@
           </button>
           <button class="lp-btn" id="demoBtn" type="button">Try a demo song</button>
         </div>
+        <p class="lp-live"><button class="lp-link" id="liveMeasureBtn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3l2-6 4 12 3-9 2 3h4"/></svg>Or measure a song playing on this computer</button></p>
+        <div class="lp-refbanner hidden" id="lpRefBanner" role="status"></div>
         <div class="lp-progress hidden" id="lpProgress" role="status" aria-live="polite">
           <div class="lp-pfile" id="lpProgressFile"></div>
           <div class="lp-pbar"><div id="lpProgressBar"></div></div>
@@ -441,6 +443,7 @@
     <!-- Compare -->
     <div class="tab-pane" data-pane="compare">
       <div class="stack">
+        <section class="panel hidden" id="meterRefPanel"></section>
         <section class="panel" data-help="reference">
           <div class="panel-head"><h2>Reference track</h2>
             <div class="actions">
@@ -505,7 +508,12 @@
 <input type="file" id="refInput" accept="audio/*,.wav,.aif,.aiff,.flac,.mp3,.m4a" class="hidden">
 <input type="file" id="histInput" accept="application/json" class="hidden">
 
-<footer><span>© 2026 MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/about/">About</a><a href="/changelog/">What’s new</a><a href="/advertise/">Advertise</a><a href="/press/">Press</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="mailto:masterscope@gwstudio.com.au">Contact</a></span></footer>
+<footer><span>© 2026 MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/meter/">Meter</a><a href="/about/">About</a><a href="/changelog/">What’s new</a><a href="/advertise/">Advertise</a><a href="/press/">Press</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="mailto:masterscope@gwstudio.com.au">Contact</a></span></footer>
+
+  <!-- Measure what's playing (Chrome and Edge on Windows share the computer's sound) -->
+  <div class="live-modal hidden" id="liveModal" role="dialog" aria-modal="true" aria-labelledby="liveTitle">
+    <div class="live-card" id="liveCard"></div>
+  </div>
 
 <script src="/assets/config.js"></script>
 <script src="/assets/app.js"></script>
