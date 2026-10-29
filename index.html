@@ -64,7 +64,7 @@
     <button class="tab" role="tab" data-tab="tone" aria-selected="false">Tone</button>
     <button class="tab" role="tab" data-tab="stereo" aria-selected="false">Stereo</button>
     <button class="tab" role="tab" data-tab="dynamics" aria-selected="false">Dynamics</button>
-    <button class="tab" role="tab" data-tab="tools" aria-selected="false">Tools</button>
+    <button class="tab" role="tab" data-needs-audio data-tab="tools" aria-selected="false">Tools</button>
     <button class="tab" role="tab" data-tab="compare" aria-selected="false">Compare</button>
   </div>
   <div class="tabbar-actions">
@@ -225,6 +225,7 @@
 
   <!-- ================= App ================= -->
   <section id="app" class="hidden">
+    <div class="meter-song-banner hidden" id="meterSongBanner" role="status"></div>
 
     <!-- Overview -->
     <div class="tab-pane active" data-pane="overview">
@@ -249,7 +250,7 @@
           <div id="resultSponsor"></div>
           <details class="passed" id="passedWrap"><summary id="passedSummary">Checks that passed</summary><div class="findings" id="passedList"></div></details>
         </section>
-        <section class="panel" data-help="overviewWave">
+        <section class="panel" data-needs-audio data-help="overviewWave">
           <div class="panel-head"><h2>Waveform</h2><span class="sub">Click to play from any point</span></div>
           <canvas id="wfOverview" aria-label="Waveform of the whole track, coloured by loudness"></canvas>
           <div class="wf-legend"><span class="wf-ramp" aria-hidden="true"></span><span>Quieter than average</span><span>Louder than average</span><span class="wf-key"><i class="wf-tick"></i>Loudest peaks</span><span class="wf-key"><i class="wf-dip"></i>Energy dips</span></div>
@@ -272,7 +273,7 @@
           <div class="panel-head"><h2>Peaks &amp; density</h2></div>
           <div id="peaksDensity"></div>
         </section>
-        <section class="panel" data-help="louder" id="louderPanel">
+        <section class="panel" data-needs-audio data-help="louder" id="louderPanel">
           <div class="panel-head"><h2>Louder at −14</h2><span class="sub">What to control in the mix, measured on this track</span></div>
           <div id="louder"></div>
         </section>
@@ -322,7 +323,7 @@
             <span><b>500–2k</b>Mids</span><span><b>2k–5k</b>Presence</span><span><b>5k–10k</b>Brilliance</span><span><b>10k+</b>Air</span>
           </div>
         </section>
-        <section class="panel" data-help="spectrogram">
+        <section class="panel" data-needs-audio data-help="spectrogram">
           <div class="panel-head"><h2>Spectrogram</h2><span class="sub">Click to play from that point</span></div>
           <canvas id="spectrogramCanvas"></canvas>
           <div class="heat-legend"><span>Quiet</span><div class="grad" id="heatGrad"></div><span>Loud</span></div>
@@ -337,18 +338,18 @@
         <section class="panel" data-help="vectorscope">
           <div class="panel-head"><h2>Vectorscope &amp; phase correlation</h2></div>
           <div class="scope-row">
-            <canvas id="vectorscopeCanvas"></canvas>
+            <canvas id="vectorscopeCanvas" data-needs-audio></canvas>
             <div>
               <div class="t-label">Phase correlation</div>
               <div class="corr-big" id="corrValue">—</div>
               <div class="corr-track"><div class="corr-marker" id="corrMarker"></div></div>
               <div class="corr-scale"><span>−1 cancels in mono</span><span>0</span><span>+1 mono</span></div>
-              <div class="scope-mode" id="scopeMode">Showing the whole track. Press play to see the live signal.</div>
+              <div class="scope-mode" id="scopeMode" data-needs-audio>Showing the whole track. Press play to see the live signal.</div>
               <div class="tiles" id="stereoTiles" style="margin-top:16px"></div>
             </div>
           </div>
         </section>
-        <section class="panel" data-help="stereofield">
+        <section class="panel" data-needs-audio data-help="stereofield">
           <div class="panel-head"><h2>Stereo width by frequency</h2></div>
           <canvas id="stereoFieldCanvas" class="interactive" style="cursor:default"></canvas>
           <div class="readout" id="stereoFieldReadout">Hover to read the width at any frequency.</div>
@@ -367,7 +368,7 @@
           <div class="panel-head"><h2>Dynamics</h2></div>
           <div class="tiles" id="dynTiles"></div>
         </section>
-        <section class="panel" data-help="transients">
+        <section class="panel" data-needs-audio data-help="transients">
           <div class="panel-head"><h2>Hits &amp; transients</h2></div>
           <div class="tiles" id="transTiles"></div>
         </section>
