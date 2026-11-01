@@ -79,7 +79,8 @@
         </section>
         <section class="chapter guide">
           <h2 id="install">1. Install</h2>
-          <div class="callout good"><b>Download Liminal 1.0.0</b> free from the <a href="/liminal/">Liminal page</a>. Windows may show <i>Windows protected your PC</i> because Liminal isn't code-signed yet: click <b>More info</b>, then <b>Run anyway</b>.</div>          <h3>Windows</h3>
+          <div class="callout good"><b>Download Liminal 1.0.0</b> free from the <a href="/liminal/">Liminal page</a>. Windows may show <i>Windows protected your PC</i> because Liminal isn't code-signed yet: click <b>More info</b>, then <b>Run anyway</b>. On a Mac, if macOS says it can't check the installer, open <b>System Settings → Privacy &amp; Security</b> and click <b>Open Anyway</b>.</div>
+          <h3>Windows</h3>
           <ol>
             <li>Run the installer. It copies <code>Liminal.vst3</code> to <code>C:\Program Files\Common Files\VST3</code>, the standard folder every VST3 host looks in. If you have a zip instead, copy <code>Liminal.vst3</code> into that folder yourself.</li>
             <li>Open your DAW and let it rescan plug-ins (most do this on start-up; in some you need to press Rescan in the plug-in settings).</li>
@@ -94,7 +95,7 @@
           </ol>
           <p>Liminal runs natively on Apple silicon and Intel Macs with macOS 10.13 or later, in any VST3 or AU host: Logic Pro, Ableton Live, FL Studio, Cubase, Reaper, Studio One, Bitwig and others. Measuring "this computer's sound" is Windows-only; on a Mac, measure through the track's input.</p>
           <h3>Uninstall</h3>
-          <p>Delete <code>Liminal.vst3</code> from the VST3 folder. Your own presets are kept in <code>Documents\MasterScope\Liminal\Presets</code>, so reinstalling brings them back. Delete that folder too if you want them gone.</p>
+          <p>Delete <code>Liminal.vst3</code> from the VST3 folder (on a Mac, also <code>Liminal.component</code> from <code>/Library/Audio/Plug-Ins/Components</code>). Your own presets are kept in <code>Documents\MasterScope\Liminal\Presets</code> (on a Mac, <code>~/Documents/MasterScope/Liminal/Presets</code>), so reinstalling brings them back. Delete that folder too if you want them gone.</p>
 
         </section>
         <section class="chapter guide">
@@ -297,7 +298,7 @@
           <h2 id="help">13. Troubleshooting</h2>
           <dl class="faq-list">
             <dt>Liminal doesn't show up in my DAW.</dt>
-            <dd>Check that <code>Liminal.vst3</code> is in <code>C:\Program Files\Common Files\VST3</code>, that your DAW is 64-bit and has VST3 enabled, then rescan plug-ins.</dd>
+            <dd>On Windows, check that <code>Liminal.vst3</code> is in <code>C:\Program Files\Common Files\VST3</code>, that your DAW is 64-bit and has VST3 enabled, then rescan plug-ins. On a Mac, check <code>/Library/Audio/Plug-Ins/VST3</code> (VST3) or <code>/Library/Audio/Plug-Ins/Components</code> (Audio Unit). Logic and GarageBand only check new Audio Units when they start, so quit and reopen them; in Logic, Settings → Plug-in Manager shows whether Liminal passed its check.</dd>
             <dt>Optimise, Mix Doctor or the release pack say to Learn first.</dt>
             <dd>Optimise, Mix Doctor, the release pack and Report all use the audio Learn heard. Open Tools, press Learn, play at least a few seconds (ideally the whole song), and press Stop.</dd>
             <dt>The loudness doesn't match my target.</dt>
