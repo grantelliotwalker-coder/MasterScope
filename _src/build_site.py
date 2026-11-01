@@ -34,6 +34,8 @@ if os.path.exists(_rel_path):
     if all(os.path.exists(os.path.join(OUT, 'downloads', f['setup'])) for f in _files.values()):
         RELEASE = dict(_r, files=_files)
 LIVE = RELEASE is not None
+# installers are served from the GitHub Release (published by .github/workflows/release.yml) so downloads are counted
+DL_BASE = f"https://github.com/grantelliotwalker-coder/MasterScope/releases/download/v{RELEASE['version']}/" if LIVE else '/downloads/'
 
 
 def _release_blocks(t):
@@ -43,7 +45,7 @@ def _release_blocks(t):
     if LIVE:
         for prefix, key in (('SUITE', 'suite'), ('LIMINAL', 'liminal'), ('METER', 'meter')):
             f = RELEASE['files'][key]
-            for k, v in {'VERSION': RELEASE['version'], 'URL': '/downloads/' + f['setup'], 'SHA': f['sha256'],
+            for k, v in {'VERSION': RELEASE['version'], 'URL': DL_BASE + f['setup'], 'SHA': f['sha256'],
                          'SIZE': f"{f['bytes'] / 1048576:.1f} MB", 'DATE': RELEASE['date']}.items():
                 t = t.replace('{{' + prefix + '_' + k + '}}', v)
     return t
@@ -53,7 +55,7 @@ def src(f):
     t = open(os.path.join(HERE, f), encoding='utf-8').read()
     if f.endswith('.html'):
         t = t.replace('{{EMAIL}}', EMAIL).replace('>Contact details are coming soon.<', f'>{CONTACT}<')
-        t = _release_blocks(t)
+        t = _release_blocks(t).replace('{{DL_BASE}}', DL_BASE)
     return t
 
 
@@ -312,7 +314,7 @@ write('liminal/index.html', static_page('/liminal/', 'Liminal – a free masteri
      'screenshot': DOMAIN + '/img/liminal-main.webp',
      'description': 'A free mastering limiter: press Learn, play your song once, and it sets itself for your loudness or density, checks the peaks through real Opus and Vorbis encoders, and hands MasterScope the report.',
      'offers': {'@type': 'Offer', 'price': '0', 'priceCurrency': 'AUD'}, 'publisher': ORG, 'license': DOMAIN + '/terms/#liminal',
-     **({'downloadUrl': DOMAIN + '/downloads/' + RELEASE['setup'], 'fileSize': f"{RELEASE['bytes'] / 1048576:.1f} MB", 'datePublished': RELEASE['iso_date']} if LIVE else {})},
+     **({'downloadUrl': DL_BASE + RELEASE['setup'], 'fileSize': f"{RELEASE['bytes'] / 1048576:.1f} MB", 'datePublished': RELEASE['iso_date']} if LIVE else {})},
     crumbs(('Liminal', '/liminal/')))))
 pages.append(('/liminal/', '0.9'))
 write('liminal/guide/index.html', static_page('/liminal/guide/', 'Liminal user guide – install, Learn and every control',
@@ -330,7 +332,7 @@ write('meter/index.html', static_page('/meter/', 'MasterScope Meter – measure 
      'operatingSystem': 'Windows 10, Windows 11', 'softwareVersion': '1.0.1', 'image': DOMAIN + '/img/meter-main.webp',
      'description': 'Measures the loudness, true peak, PLR and loudness range of anything your computer plays, and shows what Spotify, YouTube, Apple Music, Tidal, Amazon and Deezer do to it.',
      'offers': {'@type': 'Offer', 'price': '0', 'priceCurrency': 'AUD'}, 'publisher': ORG,
-     **({'downloadUrl': DOMAIN + '/downloads/' + RELEASE['setup'], 'fileSize': f"{RELEASE['bytes'] / 1048576:.1f} MB", 'datePublished': RELEASE['iso_date']} if LIVE else {})},
+     **({'downloadUrl': DL_BASE + RELEASE['setup'], 'fileSize': f"{RELEASE['bytes'] / 1048576:.1f} MB", 'datePublished': RELEASE['iso_date']} if LIVE else {})},
     crumbs(('Meter', '/meter/')))))
 pages.append(('/meter/', '0.8'))
 write('about/index.html', static_page('/about/', 'About MasterScope – ' + TAGLINE.rstrip('.'), 'Why MasterScope and Liminal are free, who makes them, and how they are paid for.', '', src('about.html'), '', jsonld({'@type': 'AboutPage', 'url': DOMAIN + '/about/', 'about': ORG})))
