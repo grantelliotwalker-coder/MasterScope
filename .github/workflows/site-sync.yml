@@ -2,6 +2,8 @@ name: Site in sync with _src
 on:
   push:
     branches: [main]
+permissions:
+  contents: read
 jobs:
   check:
     runs-on: ubuntu-latest

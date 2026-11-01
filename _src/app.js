@@ -2675,7 +2675,7 @@
     win.document.open(); win.document.write(html); win.document.close();
     const wait = ms => new Promise(r => setTimeout(r, ms));
     await Promise.race([Promise.all([...win.document.images].map(i => i.decode ? i.decode().catch(() => {}) : null).concat(win.document.fonts ? [win.document.fonts.ready] : [])), wait(3000)]);
-    try { win.paginate(); } catch (e) {}
+    wireReportPrint(win); try { paginateReport(win); } catch (e) {}
     win.focus(); win.print();
   });
 
@@ -2757,9 +2757,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>${REPORT_CSS}</style></head><body>
-<div class="toolbar"><div><b>${esc(name)} – Liminal session report</b><span>In the print dialog, choose <b>Save as PDF</b> as the destination. For best results turn off “Headers and footers”.</span></div><button onclick="window.print()">Save as PDF</button></div>
+<div class="toolbar"><div><b>${esc(name)} – Liminal session report</b><span>In the print dialog, choose <b>Save as PDF</b> as the destination. For best results turn off “Headers and footers”.</span></div><button type="button">Save as PDF</button></div>
 ${pageHtml}
-<script>${PAGINATE_JS}<\/script>
 </body></html>`;
   }
 
@@ -3109,32 +3108,34 @@ ${pageHtml}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>${REPORT_CSS}</style></head><body>
-<div class="toolbar"><div><b>${esc(baseName())} – MasterScope report</b><span>In the print dialog, choose <b>Save as PDF</b> as the destination. For best results turn off “Headers and footers”.</span></div><button onclick="window.print()">Save as PDF</button></div>
+<div class="toolbar"><div><b>${esc(baseName())} – MasterScope report</b><span>In the print dialog, choose <b>Save as PDF</b> as the destination. For best results turn off “Headers and footers”.</span></div><button type="button">Save as PDF</button></div>
 ${pageHtml}
-<script>${PAGINATE_JS}<\/script>
 </body></html>`;
   }
 
   // Runs inside the report window: moves blocks that would run into the footer onto a continuation page
-  const PAGINATE_JS = `
-window.paginate = function () {
-  var pages = document.querySelectorAll('.page');
-  for (var i = 0; i < pages.length; i++) {
-    var p = pages[i], body = p.querySelector('.body'), limit = p.querySelector('.rf').getBoundingClientRect().top - 8;
-    var moved = [];
-    while (body.children.length > 1 && body.lastElementChild.getBoundingClientRect().bottom > limit) moved.unshift(body.removeChild(body.lastElementChild));
-    while (body.children.length > 1 && /^H[23]$/.test(body.lastElementChild.tagName)) moved.unshift(body.removeChild(body.lastElementChild));
-    if (moved.length) {
-      var np = p.cloneNode(true), nb = np.querySelector('.body');
-      nb.innerHTML = '';
-      moved.forEach(function (el) { nb.appendChild(el); });
-      p.parentNode.insertBefore(np, p.nextSibling);
-      pages = document.querySelectorAll('.page');
+  // Splits report pages that overflow. Runs from this page on the report window's
+  // document, so the report needs no script of its own (keeps the page's security policy strict).
+  function paginateReport(win) {
+    const doc = win.document;
+    let pages = doc.querySelectorAll('.page');
+    for (let i = 0; i < pages.length; i++) {
+      const p = pages[i], body = p.querySelector('.body'), limit = p.querySelector('.rf').getBoundingClientRect().top - 8;
+      const moved = [];
+      while (body.children.length > 1 && body.lastElementChild.getBoundingClientRect().bottom > limit) moved.unshift(body.removeChild(body.lastElementChild));
+      while (body.children.length > 1 && /^H[23]$/.test(body.lastElementChild.tagName)) moved.unshift(body.removeChild(body.lastElementChild));
+      if (moved.length) {
+        const np = p.cloneNode(true), nb = np.querySelector('.body');
+        nb.innerHTML = '';
+        moved.forEach(el => nb.appendChild(el));
+        p.parentNode.insertBefore(np, p.nextSibling);
+        pages = doc.querySelectorAll('.page');
+      }
     }
+    const pn = doc.querySelectorAll('.pn');
+    for (let j = 0; j < pn.length; j++) pn[j].textContent = 'Page ' + (j + 1) + ' of ' + pn.length;
   }
-  var pn = document.querySelectorAll('.pn');
-  for (var j = 0; j < pn.length; j++) pn[j].textContent = 'Page ' + (j + 1) + ' of ' + pn.length;
-};`;
+  function wireReportPrint(win) { const b = win.document.querySelector('.toolbar button'); if (b) b.addEventListener('click', () => win.print()); }
 
   const REPORT_CSS = `
 @page { size: A4; margin: 0; }
@@ -3289,7 +3290,7 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
       Promise.all([...win.document.images].map(i => i.decode ? i.decode().catch(() => {}) : null).concat(win.document.fonts ? [win.document.fonts.ready] : [])),
       wait(3000),
     ]);
-    try { win.paginate(); } catch (e) {}
+    wireReportPrint(win); try { paginateReport(win); } catch (e) {}
     win.focus(); win.print();
   });
 
