@@ -1,0 +1,57 @@
+name: Publish installers as a GitHub Release
+
+# The site's download buttons point at this release, so GitHub counts every
+# download. Runs when the installers or _src/release.json change, or by hand
+# (Actions -> this workflow -> Run workflow). It creates release v<version>
+# and uploads every installer in downloads/ for that version, after checking
+# each Windows installer against the SHA-256 in _src/release.json.
+# Files already on the release are left alone, so download counts are kept.
+on:
+  push:
+    branches: [main]
+    paths: ['_src/release.json', 'downloads/**', '.github/workflows/release.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create or update the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VER=$(python3 -c "import json;print(json.load(open('_src/release.json'))['version'])")
+          TAG="v$VER"
+          # check the Windows installers against release.json before publishing
+          python3 - <<'EOF'
+          import json, hashlib, sys
+          r = json.load(open('_src/release.json'))
+          for f in r['files'].values():
+              h = hashlib.sha256(open('downloads/' + f['setup'], 'rb').read()).hexdigest()
+              if h != f['sha256']:
+                  sys.exit(f"SHA-256 mismatch for {f['setup']}")
+              print('ok', f['setup'])
+          EOF
+          shopt -s nullglob
+          FILES=(downloads/*-"$VER"-*)
+          [ ${#FILES[@]} -gt 0 ] || { echo "No installers for $VER in downloads/"; exit 1; }
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "MasterScope tools $VER" \
+              --notes "Free installers for Liminal, MasterScope Meter and the MasterScope Full Suite. What's new: https://masterscope.gwstudio.com.au/changelog/ · Download page: https://masterscope.gwstudio.com.au/liminal/"
+          fi
+          HAVE=$(gh release view "$TAG" --json assets -q '.assets[].name')
+          for f in "${FILES[@]}"; do
+            n=$(basename "$f")
+            if grep -qxF "$n" <<<"$HAVE"; then echo "already there: $n"; else gh release upload "$TAG" "$f"; echo "uploaded: $n"; fi
+          done
+          gh release view "$TAG" --json assets -q '.assets[] | "\(.name)  \(.size) bytes  \(.download_count) downloads"'
