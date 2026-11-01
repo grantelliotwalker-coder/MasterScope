@@ -1,5 +1,10 @@
 # MasterScope site: how to edit
 
+**More than one Claude session works on this repo.** Before you change anything:
+1. `git pull` first, and again right before you push. If the push is rejected, pull, rebuild with `python3 _src/build_site.py`, and keep the other session's work.
+2. Read **Decisions** at the bottom of this file. Don't reverse one unless Grant asks you to in your conversation; if he does, update the decision here in the same commit, so other sessions follow it too.
+3. When Grant settles something new about content, design, releases or the plan, add it to **Decisions** (one line, with the date).
+
 The pages in this repo are **built output**. Don't edit them directly: the next build overwrites them.
 
 1. Edit the sources in `_src/` (page bodies like `_src/liminal.html`, `_src/press.html`, the analyser in `_src/body.html`, `_src/app.js`, `_src/dsp.js`, styles in `_src/style.css`; titles, descriptions and JSON-LD in `_src/build_site.py`).
@@ -12,3 +17,19 @@ A check on every push rebuilds from `_src/` and fails if the built pages don't m
 
 ## Changelog style (`_src/changelog.html`)
 One entry per version (1.0.1, 1.1 …), newest first, with its date. List only what a producer would notice: new features and visible changes, one short line each. Small fixes go in a single "Fixes and improvements." line. No bug details, no testing or validation details, no website housekeeping (share images, contrast, contact address).
+
+## Releasing new installers
+Windows: `_src/launch_liminal.sh` (copies from the Liminal repo's `dist` branch and fills the download details from `release.json`). Mac: copy `Liminal-<version>-macOS.pkg` from the Liminal repo's `dist-mac` branch into `downloads/` (check its sha256 against `release.json` there), then update the Mac file name, version and SHA-256 in `_src/liminal.html` and `_src/liminal-guide.html`. Remove the previous version's installers from `downloads/`.
+
+## Decisions
+Settled by Grant. Follow these; change one only when Grant asks, and record the change here.
+
+- **Grant is named as the maker** (1 Nov 2026). About says "MasterScope is made by Grant Walker at GW Studio". The home page note under "Why is it free?" is his, signed "Grant Walker, producer, and the maker of MasterScope and Liminal", with his round photo linking to https://music.gwstudio.com.au/. Never present Grant (or anyone connected to GW Studio) as an independent user, and never write testimonials or reviews in anyone's voice; real third-party quotes only, with permission.
+- **Favicon** (1 Nov 2026): full-bleed square, lighter outer blue `#6f86ff` with the darker scope inside, no transparency, so Google shows it without a white disc. Keep it opaque.
+- **Liminal on Mac** (1 Nov 2026): universal VST3 and AU, macOS 10.13+. Unsigned for now (no Apple Developer account yet): keep the "Open Anyway" steps on the Liminal page and guide. "Listen to this computer" and MasterScope Meter stay Windows-only.
+- **Formats**: VST3 (Windows and Mac) and AU (Mac). No VST2 (Steinberg no longer licenses it). AAX not planned yet.
+- **Versions** (1 Nov 2026): 1.0 was the first public release; 1.0.1 is current (new installers, Meter asks for a song name). Installers on the site always come from the CI branches (`dist`, `dist-mac`), never hand-built.
+- **Code signing**: not yet. Apple is US$99/year (yearly only); Windows signing to be decided. Don't promise signed builds on the site.
+- **Languages** (1 Nov 2026): English only for now. Revisit in 2 to 3 months using Search Console's Countries report; Spanish first if the data supports it.
+- **Search**: Google Search Console and Bing Webmaster Tools are set up with the sitemap. IndexNow submits changed pages after every push (`.github/workflows/indexnow.yml`); keep the key file `3689232d704a14b7fe577b516af0b4d2.txt` at the root.
+- **Next up** (1 Nov 2026): KVR listing for Liminal (Mac, Windows, VST3, AU), a note to free-plugin blogs, then community posts. A real-Mac check in Logic or GarageBand is on hold until a Mac user is available.
