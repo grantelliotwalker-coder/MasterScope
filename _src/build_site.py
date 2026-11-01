@@ -166,6 +166,7 @@ def static_page(path, title, desc, active, main, body_attrs='', ld=''):
 {FOOTER}
 <script src="/assets/config.js"></script>
 <script src="/assets/site.js" defer></script>
+<script src="/assets/bg3d.js" defer></script>
 </body>
 </html>
 '''
@@ -193,6 +194,7 @@ os.makedirs(OUT, exist_ok=True)
 minify(src('style.css'), 'css', 'assets/site.css')
 minify(src('dsp.js') + '\n' + src('app.js'), 'js', 'assets/app.js')
 minify(src('site.js'), 'js', 'assets/site.js')
+minify(src('bg3d.js'), 'js', 'assets/bg3d.js')
 write('assets/config.js', src('config.js'))
 shutil.copytree(os.path.join(HERE, 'og'), os.path.join(OUT, 'og'), dirs_exist_ok=True)
 for f in os.listdir(os.path.join(HERE, 'static')):
@@ -212,6 +214,7 @@ index = f'''{head("MasterScope – Is your track ready to release?", "Drop your 
 {body}
 <script src="/assets/config.js"></script>
 <script src="/assets/app.js"></script>
+<script src="/assets/bg3d.js" defer></script>
 </body>
 </html>
 '''

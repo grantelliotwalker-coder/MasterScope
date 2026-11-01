@@ -1099,3 +1099,11 @@ body.meter-song.meter-lite [data-needs-detail] { display: none !important; }
 @media (max-width: 640px) { :root[data-theme="light"] .lp-why > div::before { background: linear-gradient(0deg, #ffffff 35%, rgba(255,255,255,.75) 100%), url("/img/studio-desk-bg.webp") center 40% / cover no-repeat; } }
 @media (max-width: 640px) { .lp-why > div::before { background: linear-gradient(0deg, #12131d 35%, rgba(18,19,29,.7) 100%), url("/img/studio-desk-bg.webp") center 40% / cover no-repeat; } }
 .changelog .release h3 { margin: 20px 0 0; font-size: 16px; } .changelog .release h3 a { color: inherit; text-decoration: none; } .changelog .release h3 a:hover { text-decoration: underline; }
+/* Faint 3D wave terrain behind every page (bg3d.js) */
+html { background: var(--bg); }
+body { background: transparent; }
+#bg3d { position: fixed; inset: 0; background: transparent !important; border: 0 !important; border-radius: 0 !important; width: 100%; height: 100%; z-index: -1; pointer-events: none; display: block; }
+html:has(body.landing-page) { background: #07080f; }
+:root[data-theme="light"]:has(body.landing-page) { background: #f6f2ec; }
+#landing { background: transparent; }
+@media print { #bg3d { display: none; } }
