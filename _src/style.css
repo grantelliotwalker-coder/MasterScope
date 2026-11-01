@@ -1172,3 +1172,18 @@ html.drawer-open { overflow: hidden; }
 .glance-grid dd { margin: 0; color: var(--text); font-size: 14px; line-height: 1.45; }
 /* Tagline in the footer */
 footer .foot-tag { font-weight: 600; color: var(--text-dim); margin-right: 6px; }
+/* Reference strip at the top of the report, and the clipped-measurement note */
+.ref-strip { margin: 14px auto 0; max-width: var(--maxw, 1240px); box-sizing: border-box; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; font-size: 14px; color: var(--text-dim); }
+.ref-strip b { color: var(--text); }
+.ref-strip .rs-text { flex: 1 1 300px; min-width: 0; overflow-wrap: anywhere; }
+.ref-strip .rs-label { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); }
+.ref-strip .rs-kind { color: var(--text-faint); }
+.ref-strip .rs-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.clip-warn { flex-basis: 100%; margin-top: 6px; padding: 8px 12px; border-radius: 10px; border-left: 3px solid #f0a020; background: color-mix(in srgb, #f0a020 10%, transparent); color: var(--text-dim); font-size: 13.5px; line-height: 1.5; }
+.clip-warn b { color: var(--text); }
+@media (max-width: 640px) { .ref-strip { margin: 10px 12px 0; } .ref-strip .rs-actions { width: 100%; } .ref-strip .rs-actions .btn { flex: 1; justify-content: center; } }
+@media print { .ref-strip { display: none; } }
+.topbar .site-nav a { white-space: nowrap; }
+.topbar .file-chip { flex: 0 1 auto; }
+@media (min-width: 641px) { .topbar .site-nav { flex-shrink: 0; } .topbar .file-chip { flex: 0 1 auto; min-width: 0; overflow: hidden; } .topbar .file-chip .name { max-width: none; min-width: 0; } }
+@media (max-width: 1240px) { .topbar .file-chip .meta { display: none; } }

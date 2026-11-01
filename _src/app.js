@@ -2182,6 +2182,7 @@
   }
   function renderRefContent() {
     const has = !!S.ref;
+    renderRefStrip();
     $('refEmpty').classList.toggle('hidden', has);
     if (!has) $('refEmpty').textContent = 'Load a released track in a similar style, or a MasterScope Meter export of a song you measured. Its tonal curve will also appear on the Tone tab.';
     $('refContent').classList.toggle('hidden', !has);
@@ -2906,6 +2907,7 @@ ${pageHtml}
         <div class="vi">${STATUS_ICON[R.status]}</div>
         <div><div class="vh">${esc(R.headline)}</div><div class="vs">${esc(readinessSub(R, m))}</div></div>
       </div>
+      ${S.meterSong && meterClipped(S.meterSong) ? `<p class="small" style="border-left:1mm solid #f0a020;padding:2mm 3mm;background:#fff7e6;margin:3mm 0"><b>Peaks may be cut off.</b> ${esc(CLIP_NOTE)}</p>` : ''}
       ${budgetHtml(m.plr, refPlr)}
       <h3>Steps to a competitive −14 master</h3>
       <ol class="rsteps">${readinessSteps(R, m).map(s => `<li>${s}</li>`).join('')}</ol>
@@ -3556,7 +3558,7 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
     if (!r) return null;
     const num = (v, lo, hi) => (typeof v === 'number' && isFinite(v) && v >= lo && v <= hi) ? v : NaN;
     const out = { name: String(r.name || 'Reference song').slice(0, 120), lufs: num(r.lufs, -70, 5), tp: num(r.tp, -60, 12), plr: num(r.plr, 0, 40),
-                  lra: num(r.lra, 0, 60), maxShort: num(r.maxShort, -70, 5), source: r.source === 'browser' ? 'browser' : 'meter' };
+                  lra: num(r.lra, 0, 60), maxShort: num(r.maxShort, -70, 5), source: r.source === 'browser' ? 'browser' : 'meter', clipped: r.clipped === true };
     if (!isFinite(out.plr) && isFinite(out.tp) && isFinite(out.lufs)) out.plr = out.tp - out.lufs;
     return isFinite(out.lufs) ? out : null;
   }
@@ -3612,10 +3614,10 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
     if (!isFinite(sum.plr) && isFinite(sum.truePeak) && isFinite(sum.lufs)) sum.plr = sum.truePeak - sum.lufs;
     if (!isFinite(sum.lufs)) return toast('That Meter export has no loudness reading.');
     if (previewWhich === 'ref' || previewWhich === 'mine') stopPreview();
-    S.ref = { buffer: null, name: name.slice(0, 120), sum, budget: null, meter: true, meterTone: tone };
+    S.ref = { buffer: null, name: name.slice(0, 120), sum, budget: null, meter: true, meterTone: tone, clipped: meterClipped(o) };
     S.ref.bars = refBarsFor(S.ref);
     // the numbers also drive the landing banner and the density notes until a track is in
-    setMeterRef({ name: S.ref.name, lufs: sum.lufs, tp: sum.truePeak, plr: sum.plr, lra: sum.lra, maxShort: n(r.maxShortTermLufs), source: 'meter' });
+    setMeterRef({ name: S.ref.name, lufs: sum.lufs, tp: sum.truePeak, plr: sum.plr, lra: sum.lra, maxShort: n(r.maxShortTermLufs), source: 'meter', clipped: S.ref.clipped });
     if (S.metrics) {
       computeRefDiffs(); renderRefContent(); renderToneTiles(); renderReadiness(); renderPeaksDensity();
       if (currentView !== 'app') showView('app');
@@ -3626,6 +3628,10 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
   // ---- A Meter export as its own report: everything MasterScope can work out
   // from the measurements, the same tabs as for a file. The parts that need the
   // audio itself (waveform, spectrogram, vectorscope, transients, Tools, playback) are hidden.
+  // A Meter measurement whose sample peak reached 0 dBFS: the player (or the computer)
+  // was at full scale, so the loudest peaks were probably cut off and true peak and PLR read low
+  function meterClipped(o) { const r = (o && o.result) || {}; return typeof r.samplePeakDbfs === 'number' && r.samplePeakDbfs >= -0.01; }
+  const CLIP_NOTE = 'This measurement hit 0 dBFS, the most the player can put out, so its loudest peaks were probably cut off and its true peak and density (PLR) read lower than the real song. Its loudness is still right. For the peaks and density, measure it again with Volume normalisation on in the Spotify app (Settings → Playback): Spotify turns loud songs down, so nothing gets cut, though the loudness then reads about −14.';
   function setMeterSongMode(o) {
     S.meterSong = o || null;
     document.body.classList.toggle('meter-song', !!o);
@@ -3637,6 +3643,7 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
     const srcName = { spotify: 'Spotify', chrome: 'Chrome', msedge: 'Edge', firefox: 'Firefox', vlc: 'VLC' }[src.toLowerCase()] || src;
     ban.innerHTML = `<div><b>Measured by MasterScope Meter</b>${srcName ? ` from ${esc(srcName)}` : ''}${/app/.test(cap.source || '') ? ', straight from the app' : cap.source ? ', after this computer\'s sound effects' : ''}. `
       + (o.wave ? `Only numbers were kept: everything here was measured as it played. Playback and Tools need the audio file.` : `This export is from an earlier Meter, so the waveform, spectrogram, vectorscope, transients and peak sources aren't in it: measure the song again with the latest Meter to see them. Playback and Tools need the audio file.`) + `${/^(spotify|chrome|msedge|firefox|brave|opera)$/i.test(src) ? ' Its true peak is the peak as it streamed, after encoding.' : ''}</div>`
+      + (meterClipped(o) ? `<div class="clip-warn" role="note"><b>Peaks may be cut off.</b> ${esc(CLIP_NOTE)}</div>` : '')
       + `<div class="msb-actions"><button class="btn sm primary" id="msbCompare" type="button">Compare my track with it</button></div>`;
     $('msbCompare').addEventListener('click', () => {
       const o2 = S.meterSong, name = S.fileName;
@@ -3772,7 +3779,7 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
   }
   function setMeterRef(r, announce) {
     S.meterRef = cleanRef(r);
-    try { if (S.meterRef) localStorage.setItem(REF_KEY, JSON.stringify(S.meterRef)); else localStorage.removeItem(REF_KEY); } catch (e) {}
+    try { if (S.meterRef) sessionStorage.setItem(REF_KEY, JSON.stringify(S.meterRef)); else sessionStorage.removeItem(REF_KEY); } catch (e) {}
     renderRefBanner(); renderMeterRef();
     if (S.metrics) { renderPeaksDensity(); renderReadiness(); renderReleaseReady(); }
     if (announce && S.meterRef) toast(S.metrics ? `Comparing with ${S.meterRef.name}: see the Compare tab.` : `Reference loaded: ${S.meterRef.name}. Drop your track to compare.`, 4500);
@@ -3786,6 +3793,29 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
       : `Yours is ${fmt(-dp)} dB denser (PLR ${fmt(m.plr)} against ${fmt(r.plr)}), so it may sound flatter next to it at the same loudness.`;
   }
   function refPlr() { return S.ref ? S.ref.sum.plr : (S.meterRef ? S.meterRef.plr : NaN); }
+  // One line at the top of every report tab: what this track is being compared with, and Remove
+  function renderRefStrip() {
+    const el = $('refStrip'); if (!el) return;
+    const r = S.ref || null, mr = S.meterRef;
+    const name = r ? r.name : mr ? mr.name : '';
+    const show = !!name && !!S.metrics && !S.meterSong;
+    el.classList.toggle('hidden', !show);
+    if (!show) { el.innerHTML = ''; return; }
+    const kind = r ? (r.meter ? 'a MasterScope Meter measurement' : 'a reference track') : (mr.source === 'browser' ? 'your measurement in this browser' : 'a MasterScope Meter measurement');
+    const clipped = r ? r.clipped : mr && mr.clipped;
+    el.innerHTML = `<div class="rs-text"><span class="rs-label">Comparing with</span> <b>${esc(name)}</b> <span class="rs-kind">· ${kind}</span></div>
+      <div class="rs-actions"><button class="btn sm ghost" id="refStripView" type="button">See the comparison</button><button class="btn sm" id="refStripRemove" type="button">Remove</button></div>
+      ${clipped ? `<div class="clip-warn" role="note"><b>Its peaks may be cut off.</b> ${esc(CLIP_NOTE)}</div>` : ''}`;
+    $('refStripView').addEventListener('click', () => { setTab('compare'); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('refStripRemove').addEventListener('click', removeAllRefs);
+  }
+  function removeAllRefs() {
+    if (previewWhich === 'ref' || previewWhich === 'mine') stopPreview();
+    S.ref = null; setMeterRef(null);
+    if (S.metrics) { computeRefDiffs(); renderRefContent(); renderToneTiles(); renderReadiness(); renderPeaksDensity(); }
+    renderMeterRef(); renderRefStrip();
+    toast('Reference removed.');
+  }
   function renderRefBanner() {
     const el = $('lpRefBanner'); if (!el) return;
     const r = S.meterRef;
@@ -3795,6 +3825,7 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
     $('lpRefClear').addEventListener('click', () => setMeterRef(null));
   }
   function renderMeterRef() {
+    renderRefStrip();
     const el = $('meterRefPanel'); if (!el) return;
     const r = S.ref && S.ref.meter ? null : S.meterRef;
     el.classList.toggle('hidden', !r);
@@ -3822,7 +3853,8 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
   {
     const fromUrl = refFromUrl();
     if (fromUrl) { history.replaceState(null, '', location.pathname + location.hash); setMeterRef(fromUrl, true); }
-    else { try { S.meterRef = cleanRef(JSON.parse(localStorage.getItem(REF_KEY) || 'null')); } catch (e) { S.meterRef = null; } renderRefBanner(); }
+    else { try { S.meterRef = cleanRef(JSON.parse(sessionStorage.getItem(REF_KEY) || 'null')); } catch (e) { S.meterRef = null; } renderRefBanner(); }
+    try { localStorage.removeItem(REF_KEY); } catch (e) {}   // references used to be kept across visits
   }
 
   // ===================================================================
