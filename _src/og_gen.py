@@ -33,6 +33,7 @@ cards.append(('liminal-guide', 'Liminal · user guide', 'How to use Liminal', 'I
 cards.append(('meter', 'MasterScope Meter · free app', 'How loud is the music you\'re up against?', 'Measure any song on Spotify or YouTube: loudness, peaks, density, and what streaming does to it.'))
 cards.append(('about', 'About', 'Made so anyone can learn to master.', 'Free tools and a free guide for finishing music that holds its own.'))
 cards.append(('changelog', "What's new", "What's new in MasterScope and Liminal", 'Every update to the analyser, the Learn guide and the Liminal plug-in.'))
+cards.append(('coming-soon', 'Coming soon', 'More free tools are on the way.', 'New plug-ins in development from the makers of MasterScope, Liminal and Meter.'))
 cards.append(('press', 'Press kit', 'Liminal and MasterScope: press kit', 'Descriptions, facts, screenshots and logos, free to use in coverage and listings.'))
 cards.append(('advertise', 'Advertise', 'Reach people finishing and releasing music.', 'Labelled, useful sponsorships. No tracking pixels, no ad networks.'))
 

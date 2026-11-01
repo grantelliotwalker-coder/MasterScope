@@ -145,6 +145,7 @@ def topbar(active):
     {a("learn", "/learn/", "Learn")}
     {a("liminal", "/liminal/", "Liminal")}
     {a("meter", "/meter/", "Meter")}
+    {a("soon", "/coming-soon/", "<span class=\"nav-long\">Coming soon</span><span class=\"nav-short\">Soon</span>")}
   </nav>
   <div class="spacer"></div>
   <button class="btn icon ghost" id="themeToggle" aria-label="Switch colour theme" title="Switch colour theme">
@@ -153,7 +154,7 @@ def topbar(active):
 </header>'''
 
 
-FOOTER = f'''<footer><span>© {YEAR} MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/meter/">Meter</a><a href="/about/">About</a><a href="/changelog/">What’s new</a><a href="/advertise/">Advertise</a><a href="/press/">Press</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a>{f'<a href="mailto:{EMAIL}">Contact</a>' if EMAIL else ''}</span></footer>'''
+FOOTER = f'''<footer><span>© {YEAR} MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/meter/">Meter</a><a href="/about/">About</a><a href="/changelog/">What’s new</a><a href="/coming-soon/">Coming soon</a><a href="/advertise/">Advertise</a><a href="/press/">Press</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a>{f'<a href="mailto:{EMAIL}">Contact</a>' if EMAIL else ''}</span></footer>'''
 
 
 def static_page(path, title, desc, active, main, body_attrs='', ld=''):
@@ -333,6 +334,8 @@ write('about/index.html', static_page('/about/', 'About MasterScope', 'Why Maste
 pages.append(('/about/', '0.4'))
 write('changelog/index.html', static_page('/changelog/', "What’s new – MasterScope and Liminal", 'Every update to the MasterScope analyser, the Learn guide and the free Liminal limiter, newest first.', '', src('changelog.html')))
 pages.append(('/changelog/', '0.4'))
+write('coming-soon/index.html', static_page('/coming-soon/', 'Coming soon – new free plug-ins from MasterScope', 'New free plug-ins in development from the makers of MasterScope, Liminal and Meter. See what is coming and check back for news.', 'soon', src('coming-soon.html')))
+pages.append(('/coming-soon/', '0.5'))
 write('press/index.html', static_page('/press/', 'Press kit – Liminal and MasterScope', 'Descriptions, facts, screenshots and logos for writing about the free Liminal limiter and MasterScope.', '', src('press.html')))
 pages.append(('/press/', '0.3'))
 write('terms/index.html', static_page('/terms/', 'Terms of use and Liminal licence – MasterScope', 'The terms for using MasterScope and the free licence for the Liminal plug-in.', '', src('terms.html')))
