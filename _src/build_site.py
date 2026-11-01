@@ -73,12 +73,13 @@ def minify(text, loader, rel):
 
 
 # ---------------------------------------------------------------- shared parts
+TAGLINE = 'Free tools for release-ready masters.'
 FAVICON = '''<link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">'''
-ORG = {'@type': 'Organization', '@id': DOMAIN + '/#org', 'name': 'MasterScope', 'url': DOMAIN + '/', 'logo': DOMAIN + '/icon-512.png',
+ORG = {'@type': 'Organization', '@id': DOMAIN + '/#org', 'name': 'MasterScope', 'url': DOMAIN + '/', 'logo': DOMAIN + '/icon-512.png', 'slogan': TAGLINE,
        'parentOrganization': {'@type': 'Organization', 'name': 'GW Studio'}}
 
 
@@ -156,7 +157,7 @@ def topbar(active):
 </header>'''
 
 
-FOOTER = f'''<footer><span>© {YEAR} MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/meter/">Meter</a><a href="/about/">About</a><a href="/changelog/">What’s new</a><a href="/coming-soon/">Coming soon</a><a href="/advertise/">Advertise</a><a href="/press/">Press</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a>{f'<a href="mailto:{EMAIL}">Contact</a>' if EMAIL else ''}</span></footer>'''
+FOOTER = f'''<footer><span><b class="foot-tag">{TAGLINE}</b> © {YEAR} MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/meter/">Meter</a><a href="/about/">About</a><a href="/changelog/">What’s new</a><a href="/coming-soon/">Coming soon</a><a href="/advertise/">Advertise</a><a href="/press/">Press</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a>{f'<a href="mailto:{EMAIL}">Contact</a>' if EMAIL else ''}</span></footer>'''
 
 
 def static_page(path, title, desc, active, main, body_attrs='', ld=''):
@@ -332,7 +333,7 @@ write('meter/index.html', static_page('/meter/', 'MasterScope Meter – measure 
      **({'downloadUrl': DOMAIN + '/downloads/' + RELEASE['setup'], 'fileSize': f"{RELEASE['bytes'] / 1048576:.1f} MB", 'datePublished': RELEASE['iso_date']} if LIVE else {})},
     crumbs(('Meter', '/meter/')))))
 pages.append(('/meter/', '0.8'))
-write('about/index.html', static_page('/about/', 'About MasterScope', 'Why MasterScope and Liminal are free, who makes them, and how they are paid for.', '', src('about.html'), '', jsonld({'@type': 'AboutPage', 'url': DOMAIN + '/about/', 'about': ORG})))
+write('about/index.html', static_page('/about/', 'About MasterScope – ' + TAGLINE.rstrip('.'), 'Why MasterScope and Liminal are free, who makes them, and how they are paid for.', '', src('about.html'), '', jsonld({'@type': 'AboutPage', 'url': DOMAIN + '/about/', 'about': ORG})))
 pages.append(('/about/', '0.4'))
 write('changelog/index.html', static_page('/changelog/', "What’s new – MasterScope and Liminal", 'Every update to the MasterScope analyser, the Learn guide and the free Liminal limiter, newest first.', '', src('changelog.html')))
 pages.append(('/changelog/', '0.4'))
@@ -351,7 +352,27 @@ pages.append(('/privacy/', '0.3'))
 write('404.html', static_page('/404.html', 'Page not found – MasterScope', 'That page doesn\'t exist.', '',
                               '''  <section class="page"><div class="doc-page"><div class="eyebrow">404</div><h1>That page doesn't exist.</h1>
   <p class="lede">It may have moved. Try the <a href="/">analyser</a>, the <a href="/learn/">Learn guide</a> or <a href="/liminal/">Liminal</a>.</p></div></section>'''))
+# lastmod: each page's date moves only when its built HTML changes (fingerprints kept in _src/lastmod.json),
+# so the build stays reproducible and search engines re-check only what really changed
+import hashlib, json as _json
+from datetime import datetime
+from zoneinfo import ZoneInfo
+LM_FILE = os.path.join(HERE, 'lastmod.json')
+try: LM = _json.load(open(LM_FILE, encoding='utf-8'))
+except Exception: LM = {}
+today = datetime.now(ZoneInfo('Australia/Sydney')).date().isoformat()
+def _fingerprint(path):
+    files = ['index.html', 'assets/app.js'] if path == '/' else [path.strip('/') + '/index.html']
+    h = hashlib.sha256()
+    for f in files: h.update(open(os.path.join(OUT, f), 'rb').read())
+    return h.hexdigest()[:16]
+lm_new = {}
+for p, _ in pages:
+    fp = _fingerprint(p); old_e = LM.get(p)
+    lm_new[p] = old_e if old_e and old_e.get('hash') == fp else {'hash': fp, 'date': today}
+if lm_new != LM:
+    open(LM_FILE, 'w', encoding='utf-8').write(_json.dumps(lm_new, indent=1, sort_keys=True) + '\n')
 write('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-      ''.join(f'  <url><loc>{DOMAIN}{p}</loc><priority>{pr}</priority></url>\n' for p, pr in pages) + '</urlset>\n')
+      ''.join(f'  <url><loc>{DOMAIN}{p}</loc><lastmod>{lm_new[p]["date"]}</lastmod><priority>{pr}</priority></url>\n' for p, pr in pages) + '</urlset>\n')
 write('robots.txt', f'User-agent: *\nAllow: /\nSitemap: {DOMAIN}/sitemap.xml\n')
 print('built', len(pages), 'pages into', os.path.abspath(OUT), '· downloads:', ('LIVE ' + ', '.join(f['setup'] for f in RELEASE['files'].values())) if LIVE else 'coming soon')

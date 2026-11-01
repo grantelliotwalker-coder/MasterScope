@@ -28,7 +28,7 @@ for i, (cid, title) in enumerate(toc):
     if cid == 'how-loud-to-master': sub = 'LUFS for Spotify, Apple Music, YouTube, SoundCloud and the club, and why −14 isn\'t a target.'
     cards.append((f'learn-{cid}', f'Learn · {i + 1:02d}', txt(title), sub))
 cards.append(('learn', 'Learn', 'Learn mixing and mastering for streaming', 'A plain-English guide to loudness, peaks, density, tone, limiting and delivery.'))
-cards.append(('liminal', 'Liminal · free VST3', 'The mastering limiter that lands on your target.', 'Press Learn, play your song once. Checked through real streaming encoders.'))
+cards.append(('liminal', 'Liminal · free VST3 and AU', 'The mastering limiter that lands on your target.', 'Press Learn, play your song once. Checked through real streaming encoders.'))
 cards.append(('liminal-guide', 'Liminal · user guide', 'How to use Liminal', 'Install, Learn and targets, codec-safe ceilings, every control, Optimise and the release pack.'))
 cards.append(('meter', 'MasterScope Meter · free app', 'How loud is the music you\'re up against?', 'Measure any song on Spotify or YouTube: loudness, peaks, density, and what streaming does to it.'))
 cards.append(('about', 'About', 'Made so anyone can learn to master.', 'Free tools and a free guide for finishing music that holds its own.'))
@@ -51,7 +51,7 @@ p{margin:22px 0 0;font-size:27px;line-height:1.35;color:#c7bfb4;max-width:900px}
 .dom{position:absolute;left:60px;bottom:30px;font-size:20px;color:#c7bfb4;font-weight:500;z-index:2;background:rgba(7,8,15,.88);padding:7px 12px;border-radius:9px}
 </style></head><body><canvas id="c" width="2400" height="460"></canvas>
 <div class="in"><div class="top"><div class="brand"><svg width="44" height="44" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#6f86ff"/><circle cx="32" cy="32" r="24" fill="#3d5afe"/><circle cx="32" cy="32" r="24" fill="none" stroke="#fff" stroke-width="3"/><path d="M32 2v10M32 52v10M2 32h10M52 32h10" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M13 34 L19 34 L23 23 L28 43 L33 17 L38 47 L42 27 L45 34 L51 34" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><div>Master<span>Scope</span></div></div><div class="eyebrow">__EYEBROW__</div></div>
-<h1 style="--fs:__FS__px">__TITLE__</h1><p>__SUB__</p></div><div class="dom">masterscope.gwstudio.com.au</div>
+<h1 style="--fs:__FS__px">__TITLE__</h1><p>__SUB__</p></div><div class="dom">masterscope.gwstudio.com.au · Free tools for release-ready masters</div>
 <script>
 (()=>{const cv=document.getElementById('c'),g=cv.getContext('2d');g.scale(2,2);const W=1200,H=230,M=14,P=120,seed=__SEED__;
 const S=[[27,31,94],[90,42,138],[176,58,110],[236,106,58],[251,179,60],[252,245,196]];

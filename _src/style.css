@@ -1164,3 +1164,11 @@ html.drawer-open { overflow: hidden; }
   body:has(#tabbar:not(.hidden)) .topbar .file-chip .name { max-width: none; font-size: 14px; }
   body:has(#tabbar:not(.hidden)) .topbar .spacer { display: none; }
 }
+/* Liminal: At a glance */
+.glance { margin-top: 32px; margin-bottom: 8px; }
+.glance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin: 14px 0 0; }
+.glance-grid > div { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+.glance-grid dt { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); margin: 0 0 4px; }
+.glance-grid dd { margin: 0; color: var(--text); font-size: 14px; line-height: 1.45; }
+/* Tagline in the footer */
+footer .foot-tag { font-weight: 600; color: var(--text-dim); margin-right: 6px; }
