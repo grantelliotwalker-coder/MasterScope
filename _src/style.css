@@ -544,7 +544,7 @@
     .site-nav a { padding: 6px 7px; font-size: 13px; }
     .topbar .file-chip { display: none; }
   }
-  @media (max-width: 400px) { .brand > div { display: none; } }
+  @media (max-width: 480px) { .brand > div { display: none; } }
 
   /* ---------- Learn ---------- */
   .page { padding: 28px 0 60px; }
@@ -1121,3 +1121,5 @@ html:has(body.landing-page) { background: #07080f; }
 @media (prefers-reduced-motion: reduce) { .soon-card .redact { animation: none; } }
 .site-nav .nav-short { display: none; }
 @media (max-width: 640px) { .site-nav .nav-long { display: none; } .site-nav .nav-short { display: inline; } }
+@media (max-width: 380px) { .topbar { padding: 0 10px; gap: 6px; } .topbar .site-nav a { padding-left: 5px; padding-right: 5px; font-size: 13px; } }
+@media (max-width: 340px) { .topbar .site-nav a { padding-left: 3px; padding-right: 3px; font-size: 12px; } }
