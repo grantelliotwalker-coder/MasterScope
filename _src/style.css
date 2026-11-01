@@ -1140,3 +1140,27 @@ html:has(body.landing-page) { background: #07080f; }
 @media (max-width: 420px) { .topbar { gap: 6px; padding: 0 10px; } .topbar .site-nav a { padding-left: 5px; padding-right: 5px; } }
 @media (max-width: 380px) { .topbar .site-nav a { padding-left: 4px; padding-right: 4px; font-size: 13px; } }
 @media (max-width: 340px) { .topbar { padding: 0 8px; gap: 4px; } .topbar .site-nav a { padding-left: 2px; padding-right: 2px; font-size: 12px; } }
+/* Phones with a track open: hamburger + side menu, file name in the top bar */
+#navToggle { display: none; }
+.nav-drawer { position: fixed; inset: 0; z-index: 60; pointer-events: none; visibility: hidden; transition: visibility 0s .25s; }
+.nav-drawer.open { pointer-events: auto; visibility: visible; transition: none; }
+.nav-drawer-backdrop { position: absolute; inset: 0; background: rgba(4,5,10,.55); opacity: 0; transition: opacity .25s; }
+.nav-drawer.open .nav-drawer-backdrop { opacity: 1; }
+.nav-drawer-panel { position: absolute; top: 0; right: 0; bottom: 0; width: min(80vw, 300px); background: var(--surface); border-left: 1px solid var(--border);
+  padding: 10px 16px calc(20px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; transform: translateX(100%); transition: transform .25s ease; box-shadow: -12px 0 40px rgba(0,0,0,.35); }
+.nav-drawer.open .nav-drawer-panel { transform: none; }
+.nav-drawer-head { display: flex; align-items: center; justify-content: space-between; height: 40px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); }
+.nav-drawer-open { justify-content: center; gap: 8px; width: 100%; padding: 12px; }
+.drawer-nav { display: flex; flex-direction: column; gap: 2px; }
+.drawer-nav a { font-size: 17px; padding: 12px 12px; border-radius: 10px; }
+html.drawer-open { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .nav-drawer, .nav-drawer-backdrop, .nav-drawer-panel { transition: none; } }
+@media print { .nav-drawer { display: none; } }
+@media (max-width: 640px) {
+  body:has(#tabbar:not(.hidden)) .topbar .site-nav { display: none; }
+  body:has(#tabbar:not(.hidden)) #navToggle { display: inline-flex; }
+  body:has(#tabbar:not(.hidden)) .topbar .file-chip:not(.hidden) { display: flex; flex: 1; min-width: 0; margin-left: 2px; padding-left: 12px; }
+  body:has(#tabbar:not(.hidden)) .topbar .file-chip .meta { display: none; }
+  body:has(#tabbar:not(.hidden)) .topbar .file-chip .name { max-width: none; font-size: 14px; }
+  body:has(#tabbar:not(.hidden)) .topbar .spacer { display: none; }
+}

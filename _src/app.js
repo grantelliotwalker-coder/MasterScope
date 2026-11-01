@@ -280,6 +280,22 @@
   $('dropzone').addEventListener('click', () => fileInput.click());
   if ($('lpFinalDrop')) $('lpFinalDrop').addEventListener('click', () => fileInput.click());
   $('openAnotherBtn').addEventListener('click', () => fileInput.click());
+  // Side menu for phones with a track open
+  (() => {
+    const dr = $('navDrawer'), tg = $('navToggle');
+    if (!dr || !tg) return;
+    const set = open => {
+      dr.classList.toggle('open', open); dr.setAttribute('aria-hidden', String(!open));
+      tg.setAttribute('aria-expanded', String(open));
+      document.documentElement.classList.toggle('drawer-open', open);
+      if (open) dr.querySelector('.nav-drawer-head button').focus(); else tg.focus({ preventScroll: true });
+    };
+    tg.addEventListener('click', () => set(!dr.classList.contains('open')));
+    dr.querySelectorAll('[data-close], .drawer-nav a').forEach(el => el.addEventListener('click', () => set(false)));
+    $('drawerOpenBtn').addEventListener('click', () => { set(false); fileInput.click(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && dr.classList.contains('open')) set(false); });
+    matchMedia('(min-width: 641px)').addEventListener('change', e => { if (e.matches && dr.classList.contains('open')) set(false); });
+  })();
   if ($('openAnotherTabBtn')) $('openAnotherTabBtn').addEventListener('click', () => fileInput.click());
   // tapping the landing wave (or its note) opens the file picker too, handy on phones
   ['lpRidges', 'lpRidgeNote'].forEach(id => { if ($(id)) $(id).addEventListener('click', () => fileInput.click()); });
