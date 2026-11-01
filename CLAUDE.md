@@ -33,3 +33,6 @@ Settled by Grant. Follow these; change one only when Grant asks, and record the 
 - **Languages** (1 Nov 2026): English only for now. Revisit in 2 to 3 months using Search Console's Countries report; Spanish first if the data supports it.
 - **Search**: Google Search Console and Bing Webmaster Tools are set up with the sitemap. IndexNow submits changed pages after every push (`.github/workflows/indexnow.yml`); keep the key file `3689232d704a14b7fe577b516af0b4d2.txt` at the root.
 - **Next up** (1 Nov 2026): KVR listing for Liminal (Mac, Windows, VST3, AU), a note to free-plugin blogs, then community posts. A real-Mac check in Logic or GarageBand is on hold until a Mac user is available.
+- **Photos of Grant** (1 Nov 2026): keep the site about the tools, not about Grant. Only the small round headshot (cropped from his Hero photo, `img/grant-avatar.webp`) next to his note, and his studio-desk photo as a faint, blurred backdrop behind "Why is it free?" (`img/studio-desk-bg.webp`, both themes). No other personal photos.
+- **3D background** (1 Nov 2026): a faint drifting 3D wave terrain behind every page (`_src/bg3d.js`, one fixed canvas). Keep it subtle; it stops for reduced motion and is hidden in print.
+- **Changelog** (1 Nov 2026): history starts at 1.0, one entry for the first release of all three tools; later versions follow the changelog style above.
