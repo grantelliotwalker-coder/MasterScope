@@ -3928,6 +3928,8 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
     $('liveClose2').addEventListener('click', closeLive);
   }
   $('liveMeasureBtn').addEventListener('click', () => liveHelp('Measure the loudness, peaks and density of any song you play on Spotify, YouTube or anywhere on this computer.'));
+  // iPhone, iPad and Android browsers can't share the device's sound, so don't offer it there
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) { const l = $('liveMeasureBtn').closest('.lp-live'); if (l) l.classList.add('hidden'); }
   $('liveModal').addEventListener('click', e => { if (e.target === $('liveModal') && !Live.proc) closeLive(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('liveModal').classList.contains('hidden') && !Live.proc) closeLive(); });
 
