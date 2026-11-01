@@ -5,110 +5,110 @@
  },
  "/about/": {
   "date": "2026-11-02",
-  "hash": "7a65144bbd768838"
+  "hash": "3533d9d2e7eefbc0"
  },
  "/advertise/": {
   "date": "2026-11-02",
-  "hash": "a284dd4447cdc5b2"
+  "hash": "138fea3ec8dc086f"
  },
  "/changelog/": {
   "date": "2026-11-02",
-  "hash": "808f3c4e6bf9432b"
+  "hash": "e8ac91a18ae18786"
  },
  "/coming-soon/": {
   "date": "2026-11-02",
-  "hash": "5f21a082632f5dd4"
+  "hash": "fd50e7e82579cf1c"
  },
  "/learn/": {
   "date": "2026-11-02",
-  "hash": "a00a1015e2797bab"
+  "hash": "28a4f27d591a910b"
  },
  "/learn/checklist/": {
   "date": "2026-11-02",
-  "hash": "304cfd38b44fd6ce"
+  "hash": "681b4a210d8d1df3"
  },
  "/learn/delivery/": {
   "date": "2026-11-02",
-  "hash": "1617c82faf72cdd1"
+  "hash": "3f1f69e50cb90508"
  },
  "/learn/density/": {
   "date": "2026-11-02",
-  "hash": "90c96409abcd7a76"
+  "hash": "b0e6a54dd1d643c5"
  },
  "/learn/dynamics/": {
   "date": "2026-11-02",
-  "hash": "a5eb90d0fc2098d8"
+  "hash": "b9f047390e1840a5"
  },
  "/learn/glossary/": {
   "date": "2026-11-02",
-  "hash": "36984c0b304ede42"
+  "hash": "ca0f1a6e2e352af0"
  },
  "/learn/how-loud-to-master/": {
   "date": "2026-11-02",
-  "hash": "4049bc58d19e0733"
+  "hash": "3a2bca11441f3f21"
  },
  "/learn/limiter/": {
   "date": "2026-11-02",
-  "hash": "be32c11aaa0a5fb5"
+  "hash": "98c2ba1d7221804a"
  },
  "/learn/loudness/": {
   "date": "2026-11-02",
-  "hash": "453c711e9e6279ce"
+  "hash": "492e52047bc0a6a3"
  },
  "/learn/lowend/": {
   "date": "2026-11-02",
-  "hash": "fdec6c4b323e37ce"
+  "hash": "248e1744a24730aa"
  },
  "/learn/peaks/": {
   "date": "2026-11-02",
-  "hash": "50da5cc756522a38"
+  "hash": "e5b0b343b4a9c228"
  },
  "/learn/reference-loudness/": {
   "date": "2026-11-02",
-  "hash": "a490a545f0f223c2"
+  "hash": "1e44be2149996786"
  },
  "/learn/sounds-worse-on-spotify/": {
   "date": "2026-11-02",
-  "hash": "6b915a7e8263815b"
+  "hash": "d14c2c94d3397572"
  },
  "/learn/stereo/": {
   "date": "2026-11-02",
-  "hash": "53699cdcdf257f81"
+  "hash": "8978ff3be3242631"
  },
  "/learn/streaming/": {
   "date": "2026-11-02",
-  "hash": "c14e20200080325e"
+  "hash": "e0783340a664b60f"
  },
  "/learn/tone/": {
   "date": "2026-11-02",
-  "hash": "8667733e050b8122"
+  "hash": "89329a8a115768a4"
  },
  "/learn/workflow/": {
   "date": "2026-11-02",
-  "hash": "c2b8f84ec371d425"
+  "hash": "c3ac713293b37ea0"
  },
  "/liminal/": {
   "date": "2026-11-02",
-  "hash": "7f6a8582ac2258b3"
+  "hash": "df5d2b00a3b586e3"
  },
  "/liminal/guide/": {
   "date": "2026-11-02",
-  "hash": "30474375d52f26f8"
+  "hash": "858189cab25dd8ae"
  },
  "/meter/": {
   "date": "2026-11-02",
-  "hash": "debfe6a11ceecd20"
+  "hash": "bca622d9e95c52e6"
  },
  "/press/": {
   "date": "2026-11-02",
-  "hash": "d2ce7b26c431bd6e"
+  "hash": "a363ed96ad144e77"
  },
  "/privacy/": {
   "date": "2026-11-02",
-  "hash": "09aa76e681ddcaa6"
+  "hash": "a7b6f2dfc680eed5"
  },
  "/terms/": {
   "date": "2026-11-02",
-  "hash": "024902110a7442c5"
+  "hash": "9c8739f507bba4ef"
  }
 }

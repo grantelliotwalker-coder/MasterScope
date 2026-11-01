@@ -10,7 +10,7 @@
     --text-dim: #9097a8;
     --text-faint: #848c9f;
     --accent: #8ea2ff;
-    --accent-strong: #6f86ff;
+    --accent-strong: #4f63e6;   /* white text on it passes WCAG AA (4.9:1) */
     --accent-soft: rgba(142,162,255,0.14);
     --ok: #3ecf8e;
     --warn: #f2a93b;
@@ -611,7 +611,7 @@
   .dl-btn.soon, .dl-btn.soon + .dl-btn.soon { cursor: default; background: var(--surface-3); color: var(--text); box-shadow: none; border: 1px dashed var(--border, rgba(127,127,127,.35)); } .dl-btn.soon:hover { filter: none; }
   .dl-note { margin: 14px 0 0; font-size: 14.5px; }
   .dl-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
-  .dl-btn b { display: block; font-size: 14.5px; } .dl-btn small { display: block; font-size: 12px; opacity: .8; }
+  .dl-btn b { display: block; font-size: 14.5px; } .dl-btn small { display: block; font-size: 12px; opacity: .94; }
   .lp-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 18px 0 10px; }
   .lp-f { border: 1px solid var(--border); background: var(--surface); border-radius: 12px; padding: 16px 16px 6px; }
   .lp-f h3 { margin: 0 0 6px; font-size: 15px; } .lp-f p { font-size: 14px !important; line-height: 1.6; color: var(--text-dim); }
@@ -1187,3 +1187,6 @@ footer .foot-tag { font-weight: 600; color: var(--text-dim); margin-right: 6px; 
 .topbar .file-chip { flex: 0 1 auto; }
 @media (min-width: 641px) { .topbar .site-nav { flex-shrink: 0; } .topbar .file-chip { flex: 0 1 auto; min-width: 0; overflow: hidden; } .topbar .file-chip .name { max-width: none; min-width: 0; } }
 @media (max-width: 1240px) { .topbar .file-chip .meta { display: none; } }
+/* bigger tap area for the card links on the home page and the changelog headings */
+.lp-loop li > a, .lp-loop > div > a, #landing [class*="loop"] div > a:last-child { display: inline-block; padding: 8px 0; }
+.changelog .release h3 a { display: inline-block; padding: 4px 0; }

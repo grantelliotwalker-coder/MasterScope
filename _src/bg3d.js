@@ -1,5 +1,5 @@
 /* MasterScope: a faint 3D wave terrain behind every page. Drawn on one fixed canvas,
-   about 30 frames a second, paused when the tab is hidden, still for reduced motion. */
+   about 25 frames a second (20 on phones), starting after the page has loaded, paused when the tab is hidden, still for reduced motion. */
 (function () {
   'use strict';
   if (window.__msBg3d) return; window.__msBg3d = 1;
@@ -9,11 +9,12 @@
   const ctx = cv.getContext('2d');
   if (!ctx) return;
   const still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const ROWS = 34, COLS = 73, DEPTH = 34, SPAN = 40;
+  const small = Math.min(innerWidth, innerHeight) < 700;               // phones: a lighter mesh, fewer frames
+  const ROWS = small ? 24 : 34, COLS = small ? 45 : 73, DEPTH = 34, SPAN = 40, FRAME_MS = small ? 50 : 40;
   let W = 0, H = 0, dpr = 1, last = 0, t0 = performance.now(), raf = 0;
 
   function size() {
-    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    dpr = 1;   // it's faint and soft, so full resolution only costs battery
     W = innerWidth; H = innerHeight;
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -27,7 +28,7 @@
   function frame(now) {
     raf = 0;
     if (!still) schedule();
-    if (now - last < 33 && !still) return;
+    if (now - last < FRAME_MS && !still) return;
     last = now;
     const t = (now - t0) / 1000;
     const light = document.documentElement.getAttribute('data-theme') === 'light';
@@ -71,5 +72,8 @@
   document.addEventListener('visibilitychange', schedule);
   new MutationObserver(() => { if (still) frame(performance.now()); })
     .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-  if (still) frame(performance.now()); else schedule();
+  // start once the page has loaded and settled, so it never slows the first view
+  const begin = () => { if (still) frame(performance.now()); else schedule(); };
+  const later = () => setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(begin, { timeout: 1500 }) : begin()), 400);
+  if (document.readyState === 'complete') later(); else addEventListener('load', later, { once: true });
 })();

@@ -142,7 +142,7 @@ BRAND = '''<svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
 def topbar(active):
     a = lambda r, href, label: f'<a href="{href}" data-route="{r}"{" class=\"active\" aria-current=\"page\"" if r == active else ""}>{label}</a>'
     return f'''<header class="topbar">
-  <a class="brand" href="/" style="text-decoration:none;color:inherit">
+  <a class="brand" href="/" aria-label="MasterScope home" style="text-decoration:none;color:inherit">
     {BRAND}
   </a>
   <nav class="site-nav" aria-label="Site">
@@ -351,9 +351,9 @@ write('privacy/index.html', static_page('/privacy/', 'Privacy – MasterScope', 
 pages.append(('/privacy/', '0.3'))
 
 # 404, sitemap, robots
-write('404.html', static_page('/404.html', 'Page not found – MasterScope', 'That page doesn\'t exist.', '',
+write('404.html', re.sub(r'<link rel="canonical"[^>]*>', '<meta name="robots" content="noindex">', static_page('/404.html', 'Page not found – MasterScope', 'That page doesn\'t exist.', '',
                               '''  <section class="page"><div class="doc-page"><div class="eyebrow">404</div><h1>That page doesn't exist.</h1>
-  <p class="lede">It may have moved. Try the <a href="/">analyser</a>, the <a href="/learn/">Learn guide</a> or <a href="/liminal/">Liminal</a>.</p></div></section>'''))
+  <p class="lede">It may have moved. Try the <a href="/">analyser</a>, the <a href="/learn/">Learn guide</a> or <a href="/liminal/">Liminal</a>.</p></div></section>''')))
 # lastmod: each page's date moves only when its built HTML changes (fingerprints kept in _src/lastmod.json),
 # so the build stays reproducible and search engines re-check only what really changed
 import hashlib, json as _json
