@@ -3,7 +3,7 @@
 The pages in this repo are **built output**. Don't edit them directly: the next build overwrites them.
 
 1. Edit the sources in `_src/` (page bodies like `_src/liminal.html`, `_src/press.html`, the analyser in `_src/body.html`, `_src/app.js`, `_src/dsp.js`, styles in `_src/style.css`; titles, descriptions and JSON-LD in `_src/build_site.py`).
-2. Build: `python3 _src/build_site.py` (writes into the repo root; needs esbuild: `npm i -g esbuild` if it's missing).
+2. Build: `python3 _src/build_site.py` (writes into the repo root; needs esbuild: `npm i -g esbuild@0.28.2` if it's missing; other versions minify slightly differently).
 3. Check `git status`: only the files you meant to change should differ.
 4. Commit `_src/` and the built files together, push to main.
 

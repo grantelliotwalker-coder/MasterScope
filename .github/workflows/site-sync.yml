@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
-      - run: npm i -g esbuild@0.24.0
+      - run: npm i -g esbuild@0.28.2
       - run: python3 _src/build_site.py
       - name: Built pages match _src
         run: |
