@@ -87,7 +87,12 @@
           </ol>
           <p>Liminal needs Windows 10 or 11, 64-bit, and a DAW that loads VST3 plug-ins: Ableton Live, FL Studio, Cubase, Reaper, Studio One, Bitwig and most others.</p>
           <h3>macOS</h3>
-          <p>A Mac version (VST3 and AU, for Logic too) is on the way.</p>
+          <ol>
+            <li>Open <code>Liminal-1.0.0-macOS.pkg</code>. Liminal isn't notarised by Apple yet, so the first time macOS may say it can't check the installer: open <b>System Settings → Privacy &amp; Security</b>, scroll down, click <b>Open Anyway</b>, then open the installer again.</li>
+            <li>It installs <code>Liminal.vst3</code> to <code>/Library/Audio/Plug-Ins/VST3</code> and <code>Liminal.component</code> (the Audio Unit) to <code>/Library/Audio/Plug-Ins/Components</code>. Untick either under <b>Customise</b> if you only want one.</li>
+            <li>Open your DAW. Logic and GarageBand check new Audio Units when they start; in other hosts, rescan plug-ins. Find <b>Liminal</b> under <b>MasterScope</b>.</li>
+          </ol>
+          <p>Liminal runs natively on Apple silicon and Intel Macs with macOS 10.13 or later, in any VST3 or AU host: Logic Pro, Ableton Live, FL Studio, Cubase, Reaper, Studio One, Bitwig and others. Measuring "this computer's sound" is Windows-only; on a Mac, measure through the track's input.</p>
           <h3>Uninstall</h3>
           <p>Delete <code>Liminal.vst3</code> from the VST3 folder. Your own presets are kept in <code>Documents\MasterScope\Liminal\Presets</code>, so reinstalling brings them back. Delete that folder too if you want them gone.</p>
 
