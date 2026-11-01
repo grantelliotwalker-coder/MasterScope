@@ -9,3 +9,6 @@ The pages in this repo are **built output**. Don't edit them directly: the next 
 
 Images go in `img/` (kept by the build). Downloads in `downloads/`. New installers: `_src/launch_liminal.sh`.
 A check on every push rebuilds from `_src/` and fails if the built pages don't match.
+
+## Changelog style (`_src/changelog.html`)
+One entry per version (1.0.1, 1.1 …), newest first, with its date. List only what a producer would notice: new features and visible changes, one short line each. Small fixes go in a single "Fixes and improvements." line. No bug details, no testing or validation details, no website housekeeping (share images, contrast, contact address).
