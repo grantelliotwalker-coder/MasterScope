@@ -1123,3 +1123,7 @@ html:has(body.landing-page) { background: #07080f; }
 @media (max-width: 640px) { .site-nav .nav-long { display: none; } .site-nav .nav-short { display: inline; } }
 @media (max-width: 380px) { .topbar { padding: 0 10px; gap: 6px; } .topbar .site-nav a { padding-left: 5px; padding-right: 5px; font-size: 13px; } }
 @media (max-width: 340px) { .topbar .site-nav a { padding-left: 3px; padding-right: 3px; font-size: 12px; } }
+/* Tap the landing wave to choose a track */
+.lp-ridges, .lp-ridge-note { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.lp-ridge-note .note-touch { display: none; }
+@media (pointer: coarse) { .lp-ridge-note .note-desk { display: none; } .lp-ridge-note .note-touch { display: inline; } }
