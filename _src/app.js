@@ -280,6 +280,7 @@
   $('dropzone').addEventListener('click', () => fileInput.click());
   if ($('lpFinalDrop')) $('lpFinalDrop').addEventListener('click', () => fileInput.click());
   $('openAnotherBtn').addEventListener('click', () => fileInput.click());
+  if ($('openAnotherTabBtn')) $('openAnotherTabBtn').addEventListener('click', () => fileInput.click());
   // tapping the landing wave (or its note) opens the file picker too, handy on phones
   ['lpRidges', 'lpRidgeNote'].forEach(id => { if ($(id)) $(id).addEventListener('click', () => fileInput.click()); });
   fileInput.addEventListener('change', () => { if (fileInput.files[0]) openFile(fileInput.files[0]); fileInput.value = ''; });

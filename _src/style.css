@@ -1121,9 +1121,22 @@ html:has(body.landing-page) { background: #07080f; }
 @media (prefers-reduced-motion: reduce) { .soon-card .redact { animation: none; } }
 .site-nav .nav-short { display: none; }
 @media (max-width: 640px) { .site-nav .nav-long { display: none; } .site-nav .nav-short { display: inline; } }
-@media (max-width: 380px) { .topbar { padding: 0 10px; gap: 6px; } .topbar .site-nav a { padding-left: 5px; padding-right: 5px; font-size: 13px; } }
-@media (max-width: 340px) { .topbar .site-nav a { padding-left: 3px; padding-right: 3px; font-size: 12px; } }
 /* Tap the landing wave to choose a track */
 .lp-ridges, .lp-ridge-note { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .lp-ridge-note .note-touch { display: none; }
 @media (pointer: coarse) { .lp-ridge-note .note-desk { display: none; } .lp-ridge-note .note-touch { display: inline; } }
+/* Phones: the open-file button moves from the top bar into the tab row, so the top bar fits */
+#openAnotherTabBtn { display: none; }
+@media (max-width: 640px) {
+  #openAnotherTabBtn { display: inline-flex; }
+  body:has(#tabbar:not(.hidden)) #openAnotherBtn { display: none; }
+}
+@media (max-width: 820px) { #openAnotherBtn .lbl { display: none; } #openAnotherBtn { padding: 8px 10px; } }
+.topbar .site-nav { min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.topbar .site-nav::-webkit-scrollbar { display: none; }
+.topbar .brand, #openAnotherBtn, #themeToggle { flex-shrink: 0; }
+@media (max-width: 820px) { .topbar .file-chip { display: none; } }
+@media (max-width: 520px) { .brand > div { display: none; } }
+@media (max-width: 420px) { .topbar { gap: 6px; padding: 0 10px; } .topbar .site-nav a { padding-left: 5px; padding-right: 5px; } }
+@media (max-width: 380px) { .topbar .site-nav a { padding-left: 4px; padding-right: 4px; font-size: 13px; } }
+@media (max-width: 340px) { .topbar { padding: 0 8px; gap: 4px; } .topbar .site-nav a { padding-left: 2px; padding-right: 2px; font-size: 12px; } }
