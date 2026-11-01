@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com https://plausible.io; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com https://plausible.io http://127.0.0.1:*; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>A mastering workflow – MasterScope Learn</title>
@@ -75,7 +75,7 @@
                 <figure class="shot"><img src="/img/liminal-capturing.webp" alt="Liminal while Learn is listening" loading="lazy" width="1440" height="900"><figcaption>Learn listening, in the Tools panel.</figcaption></figure>
                 <figure class="shot"><img src="/img/liminal-learned.webp" alt="Liminal after Learn with the Report button" loading="lazy" width="1440" height="900"><figcaption>Done: the threshold is set and the Report button appears.</figcaption></figure>
               </div></li>
-            <li><b>Save the report.</b> Press Report and save the .json, then drop it on MasterScope to see the result, the gain reduction over time and your settings. No second play-through needed. (The Session log in Tools does the same for a live play-through after you change settings by hand.)
+            <li><b>Open the report.</b> Press Report and choose <b>Open in MasterScope</b> (or save the .json and drop it on MasterScope) to see the result, the gain reduction over time and your settings. No second play-through needed. (The Session log in Tools does the same for a live play-through after you change settings by hand.)
               <figure class="shot"><img src="/img/ms-session-top.webp" alt="A Liminal Learn report open in MasterScope" loading="lazy" width="1600" height="987"><figcaption>A Learn report in MasterScope: loudness, peaks, codec estimate, PLR and gain reduction, plus a timeline and the settings used.</figcaption></figure></li>
             <li><b>Check the punch, then Optimise.</b> If the Punch reading (Loudness card, More) shows the limiter taking more than 3 or 4 dB off the hits, open Optimise from Tools and try the top setup. Mix Doctor shows which part of the mix makes the peaks, so you know what to fix at the source.
               <figure class="shot"><img src="/img/liminal-doctor.webp" alt="Liminal's Mix Doctor" loading="lazy" width="1440" height="900"><figcaption>Mix Doctor: each range's share of the peaks against its share of the loudness, how much limiting a little peak control there would save, and the fix.</figcaption></figure></li>

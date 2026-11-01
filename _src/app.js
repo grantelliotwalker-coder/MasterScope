@@ -2304,6 +2304,10 @@
   async function openSession(file) {
     let obj = null;
     try { obj = JSON.parse(await file.text()); } catch (e) { /* not JSON */ }
+    openReportObj(obj, file.name);
+  }
+  function openReportObj(obj, fileName) {
+    const file = { name: fileName };
     if (isMeterExport(obj)) return openMeterSong(obj, file.name);
     if (!obj || obj.format !== 'liminal-session') return toast('That .json file isn’t a Liminal session or a MasterScope Meter export.');
     const appVisible = !$('app').classList.contains('hidden');
@@ -3856,6 +3860,35 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
     else { try { S.meterRef = cleanRef(JSON.parse(sessionStorage.getItem(REF_KEY) || 'null')); } catch (e) { S.meterRef = null; } renderRefBanner(); }
     try { localStorage.removeItem(REF_KEY); } catch (e) {}   // references used to be kept across visits
   }
+
+  // ===================================================================
+  // "Open in MasterScope" from Liminal or MasterScope Meter: the app serves the
+  // report once from 127.0.0.1 (this computer only) and opens this page with
+  // #handoff=<port>-<token>. The fragment never leaves the browser. The report is
+  // checked exactly like a dropped file.
+  // ===================================================================
+  (async () => {
+    const m = /^#handoff=(\d{4,5})-([0-9a-f]{64})$/.exec(location.hash);
+    if (!m) return;
+    history.replaceState(null, '', location.pathname + location.search);
+    const port = +m[1];
+    if (port < 1024 || port > 65535) return;
+    toast('Opening the report from Liminal or MasterScope Meter…', 4000);
+    const fail = () => toast('Couldn’t get the report from the app. If your browser asked to let this page reach apps on your computer, allow it and try again. The app also saved a copy in Documents › MasterScope: you can drop that file here.', 10000);
+    try {
+      const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 10000);
+      const res = await fetch(`http://127.0.0.1:${port}/handoff/${m[2]}`, { cache: 'no-store', credentials: 'omit', signal: ctl.signal, targetAddressSpace: 'loopback' });
+      clearTimeout(timer);
+      if (!res.ok) return fail();
+      const text = await res.text();
+      if (text.length > 30e6) return fail();
+      const w = JSON.parse(text);
+      if (!w || w.format !== 'masterscope-handoff' || !w.report) return fail();
+      const name = String(w.name || 'Report').slice(0, 120);
+      openReportObj(w.report, /\.json$/i.test(name) ? name : name + '.json');
+      toast(`Opened ${name}.`, 2500);
+    } catch (e) { fail(); }
+  })();
 
   // ===================================================================
   // Measure a song playing on this computer: Chrome and Edge on Windows can

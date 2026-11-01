@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com https://plausible.io; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com https://plausible.io http://127.0.0.1:*; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Liminal user guide – install, Learn and every control</title>
@@ -75,14 +75,14 @@
       </aside>
       <article class="doc-body">
         <section class="chapter guide" id="g-intro">
-          <div class="eyebrow">Liminal 1.0.1 · user guide</div>
+          <div class="eyebrow">Liminal 1.0.2 · user guide</div>
           <h1 class="ch-title">How to use Liminal</h1>
           <p class="lede">Everything in Liminal, from installing it to the last button. Liminal is built to be used by hand: pick a style, pull the threshold down until it sounds right, and the ceiling keeps the peaks safe. When you want a second opinion, the <b>Tools</b> button has Learn, Optimise, Mix Doctor and the rest. Hover over any control in the plug-in for a short explanation too.</p>
 
         </section>
         <section class="chapter guide">
           <h2 id="install">1. Install</h2>
-          <div class="callout good"><b>Download Liminal 1.0.1</b> free from the <a href="/liminal/">Liminal page</a>. Windows may show <i>Windows protected your PC</i> because Liminal isn't code-signed yet: click <b>More info</b>, then <b>Run anyway</b>. On a Mac, if macOS says it can't check the installer, open <b>System Settings → Privacy &amp; Security</b> and click <b>Open Anyway</b>.</div>
+          <div class="callout good"><b>Download Liminal 1.0.2</b> free from the <a href="/liminal/">Liminal page</a>. Windows may show <i>Windows protected your PC</i> because Liminal isn't code-signed yet: click <b>More info</b>, then <b>Run anyway</b>. On a Mac, if macOS says it can't check the installer, open <b>System Settings → Privacy &amp; Security</b> and click <b>Open Anyway</b>.</div>
           <h3>Windows</h3>
           <ol>
             <li>Run the installer. It copies <code>Liminal.vst3</code> to <code>C:\Program Files\Common Files\VST3</code>, the standard folder every VST3 host looks in. If you have a zip instead, copy <code>Liminal.vst3</code> into that folder yourself.</li>
@@ -92,7 +92,7 @@
           <p>On Windows, Liminal needs Windows 10 or 11, 64-bit, and a DAW that loads VST3 plug-ins: Ableton Live, FL Studio, Cubase, Reaper, Studio One, Bitwig and most others.</p>
           <h3>macOS</h3>
           <ol>
-            <li>Open <code>Liminal-1.0.1-macOS.pkg</code>. Liminal isn't notarised by Apple yet, so the first time macOS may say it can't check the installer: open <b>System Settings → Privacy &amp; Security</b>, scroll down, click <b>Open Anyway</b>, then open the installer again.</li>
+            <li>Open <code>Liminal-1.0.2-macOS.pkg</code>. Liminal isn't notarised by Apple yet, so the first time macOS may say it can't check the installer: open <b>System Settings → Privacy &amp; Security</b>, scroll down, click <b>Open Anyway</b>, then open the installer again.</li>
             <li>It installs <code>Liminal.vst3</code> to <code>/Library/Audio/Plug-Ins/VST3</code> and <code>Liminal.component</code> (the Audio Unit) to <code>/Library/Audio/Plug-Ins/Components</code>. Untick either under <b>Customise</b> if you only want one.</li>
             <li>Open your DAW. Logic and GarageBand check new Audio Units when they start; in other hosts, rescan plug-ins. Find <b>Liminal</b> under <b>MasterScope</b>.</li>
           </ol>
@@ -110,7 +110,7 @@
             <li><b>Watch the Loudness card.</b> It shows the integrated loudness, the true peak and the PLR (density). For streaming, a PLR of 9 to 11 is punchy and competitive.</li>
             <li><b>Listen honestly.</b> Turn on <b>Level match</b> to hear your unlimited mix at the same loudness, and <b>Hear what's removed</b> to hear only what the limiter takes away. If the drums lose their snap, back the threshold off or try Punch Guard.</li>
             <li><b>Want a second opinion?</b> Open <b>Tools</b>, choose a target and press <b>Learn</b>, play the song, then press Stop: Liminal suggests the threshold that lands on it. See <a href="#learn">Learn and targets</a>.</li>
-            <li><b>Bounce your master</b> as usual. Optional: press <b>Report</b> (beside Learn) or use the Session log, and drop the .json file on <a href="/">MasterScope</a> to check it against every platform.</li>
+            <li><b>Bounce your master</b> as usual. Optional: press <b>Report</b> (beside Learn) or use the Session log, and choose <b>Open in MasterScope</b> to check it against every platform in your browser.</li>
           </ol>
           <figure class="shot"><img src="/img/liminal-main.webp" alt="Liminal's main window: the limiter display with tabs, the style and knobs below it, the threshold, gain reduction and ceiling meters, and the loudness card" loading="lazy" width="1440" height="900"><figcaption>Liminal's window. Left: the display, with the style and its knobs below. Right: Threshold, gain reduction (GR) and Ceiling, then the Loudness card. Bottom: Advanced.</figcaption></figure>
 
@@ -286,12 +286,12 @@
             <li><b>Import preset</b> (at the bottom of the preset menu) loads a preset file, such as the one MasterScope suggests from your report. It's copied into your presets and can be undone.</li>
             <li><b>A/B:</b> two sets of settings to compare. Click the other letter to switch; changes stay in the slot you were on.</li>
             <li><b>Undo / Redo</b> cover every change, including Learn and Apply.</li>
-            <li><b>Session log</b> (Tools): press, play the song, press again. Save as .json for MasterScope or .csv for a spreadsheet. Learn's <b>Report</b> button gives you the same file without a second play-through.</li>
+            <li><b>Session log</b> (Tools): press, play the song, press again, then choose <b>Open in MasterScope</b>, or save it as .json (for MasterScope later) or .csv (for a spreadsheet). Learn's <b>Report</b> button gives you the same file without a second play-through.</li>
           </ul>
           <div class="callout key"><b>The round trip with MasterScope</b>
             <ol>
-              <li>Learn, then press Report and save the .json file.</li>
-              <li>Drop it on <a href="/">MasterScope</a>: you get the platform-by-platform verdict, a timeline, and suggested changes to your Liminal settings.</li>
+              <li>Learn, then press Report and choose <b>Open in MasterScope</b>. (Or save the .json file and drop it on <a href="/">MasterScope</a>.)</li>
+              <li>MasterScope opens in your browser with the platform-by-platform verdict, a timeline, and suggested changes to your Liminal settings.</li>
               <li>Download the suggested preset, use Import preset in Liminal, and Learn again.</li>
             </ol>
           </div>
@@ -310,6 +310,8 @@
             <dd>Try a higher PLR target (11 or 12), Punch Guard with 2x oversampling, or Optimise. Then check Mix Doctor: often one part of the mix makes most of the peaks.</dd>
             <dt>The kick makes everything duck.</dt>
             <dd>Turn on Bass first (Lookahead style), or try Multiband.</dd>
+            <dt>Open in MasterScope opens the site but not the report.</dt>
+            <dd>Liminal hands the report to the browser on this computer only. If the browser asks to let MasterScope reach apps on this device, choose Allow. If it still doesn't open (some browsers, such as Safari, block it), Liminal has already saved a copy in <b>Documents › MasterScope</b>: drop that file on <a href="/">MasterScope</a>.</dd>
             <dt>High CPU or latency.</dt>
             <dd>In Advanced, lower Oversampling or turn off Linear phase while working, and turn on 4x on export so the bounce is still clean. Brickwall has no limiting latency at all, for tracking.</dd>
           </dl>

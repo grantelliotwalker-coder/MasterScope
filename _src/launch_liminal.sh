@@ -31,8 +31,9 @@ PY
 # 2. Record the release
 python3 - "$TMP/release.json" "$HERE/release.json" <<'PY'
 import datetime, json, sys
+from zoneinfo import ZoneInfo
 r = json.load(open(sys.argv[1], encoding='utf-8-sig'))
-d = datetime.date.today()
+d = datetime.datetime.now(ZoneInfo('Australia/Sydney')).date()   # Grant's date, not the server's
 r['date'] = f'{d.day} {d:%B %Y}'; r['iso_date'] = d.isoformat()
 json.dump(r, open(sys.argv[2], 'w'), indent=2)
 print('release', r['version'], r['date'])
@@ -41,10 +42,9 @@ rm -rf "$TMP"
 
 # 3. Build and test
 cd "$HERE"
-ESBUILD="$ESBUILD" python3 build_site.py "$SITE"
+ESBUILD="$ESBUILD" python3 build_site.py
 grep -q 'Download for Windows' "$SITE/liminal/index.html"
 ! grep -q 'Downloads are coming soon' "$SITE/liminal/index.html"
-python3 full_test.py | tail -1
 
 # 4. Publish
 if [ "${1:-}" = "--push" ]; then

@@ -107,7 +107,7 @@ def head(title, desc, path, ld=''):
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com https://plausible.io; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com https://plausible.io http://127.0.0.1:*; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{html.escape(title)}</title>
@@ -310,7 +310,7 @@ write('liminal/index.html', static_page('/liminal/', 'Liminal – a free masteri
                                         'liminal', unhide(src('liminal.html')), ' class="wide-page"', jsonld(
     {'@type': 'SoftwareApplication', 'name': 'Liminal', 'alternateName': 'Liminal by MasterScope', 'url': DOMAIN + '/liminal/',
      'applicationCategory': 'MultimediaApplication', 'applicationSubCategory': 'Audio plug-in (VST3), mastering limiter',
-     'operatingSystem': 'Windows 10, Windows 11, macOS 10.13+', 'softwareVersion': '1.0.1', 'image': DOMAIN + '/img/liminal-learned.webp',
+     'operatingSystem': 'Windows 10, Windows 11, macOS 10.13+', 'softwareVersion': RELEASE['version'] if LIVE else '1.0', 'image': DOMAIN + '/img/liminal-learned.webp',
      'screenshot': DOMAIN + '/img/liminal-main.webp',
      'description': 'A free mastering limiter: press Learn, play your song once, and it sets itself for your loudness or density, checks the peaks through real Opus and Vorbis encoders, and hands MasterScope the report.',
      'offers': {'@type': 'Offer', 'price': '0', 'priceCurrency': 'AUD'}, 'publisher': ORG, 'license': DOMAIN + '/terms/#liminal',
@@ -329,7 +329,7 @@ write('meter/index.html', static_page('/meter/', 'MasterScope Meter – measure 
                                       'meter', unhide(src('meter.html')), ' class="wide-page"', jsonld(
     {'@type': 'SoftwareApplication', 'name': 'MasterScope Meter', 'url': DOMAIN + '/meter/',
      'applicationCategory': 'MultimediaApplication', 'applicationSubCategory': 'Loudness meter',
-     'operatingSystem': 'Windows 10, Windows 11', 'softwareVersion': '1.0.1', 'image': DOMAIN + '/img/meter-main.webp',
+     'operatingSystem': 'Windows 10, Windows 11', 'softwareVersion': RELEASE['version'] if LIVE else '1.0', 'image': DOMAIN + '/img/meter-main.webp',
      'description': 'Measures the loudness, true peak, PLR and loudness range of anything your computer plays, and shows what Spotify, YouTube, Apple Music, Tidal, Amazon and Deezer do to it.',
      'offers': {'@type': 'Offer', 'price': '0', 'priceCurrency': 'AUD'}, 'publisher': ORG,
      **({'downloadUrl': DL_BASE + RELEASE['setup'], 'fileSize': f"{RELEASE['bytes'] / 1048576:.1f} MB", 'datePublished': RELEASE['iso_date']} if LIVE else {})},
