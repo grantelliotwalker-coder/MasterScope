@@ -1,0 +1,21 @@
+name: Site in sync with _src
+on:
+  push:
+    branches: [main]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm i -g esbuild@0.24.0
+      - run: python3 _src/build_site.py
+      - name: Built pages match _src
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::These built files differ from what _src builds. Edit _src/ and run python3 _src/build_site.py instead of editing pages directly."
+            git status --porcelain
+            git diff --stat
+            exit 1
+          fi

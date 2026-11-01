@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "commit": "4f40a3f434d52fe3454918a9a6ed0824907a2eb7",
+  "built": "2026-10-30T02:20:32.0689114+00:00",
+  "setup": "MasterScope-Full-Suite-1.0.0-Windows-Setup.exe",
+  "sha256": "3a67ad7337a9ea5fc3afcdf04fb6ea8e19a412184c51d2f57560654a858fc8f4",
+  "bytes": 5002688,
+  "files": {
+    "suite": {
+      "setup": "MasterScope-Full-Suite-1.0.0-Windows-Setup.exe",
+      "sha256": "3a67ad7337a9ea5fc3afcdf04fb6ea8e19a412184c51d2f57560654a858fc8f4",
+      "bytes": 5002688
+    },
+    "liminal": {
+      "setup": "Liminal-1.0.0-Windows-Setup.exe",
+      "sha256": "46c451c03716f94cd2bee54bad686bc9a83decd3d4471a56d6c74d0e83d48a31",
+      "bytes": 4425219
+    },
+    "meter": {
+      "setup": "MasterScope-Meter-1.0.0-Windows-Setup.exe",
+      "sha256": "a72bd0de5b75f09238899517ddc7eab45d2a80f38d1fdb6c49056d9f08ecc88e",
+      "bytes": 3948354
+    }
+  },
+  "date": "30 October 2026",
+  "iso_date": "2026-10-30"
+}

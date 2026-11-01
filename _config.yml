@@ -1,0 +1,2 @@
+# GitHub Pages: never serve the site sources or notes
+exclude: [_src, CLAUDE.md, README.md, LICENSE]

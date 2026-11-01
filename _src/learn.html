@@ -1,0 +1,459 @@
+  <!-- ================= Learn ================= -->
+  <section id="learnPage" class="hidden page">
+    <div class="doc">
+      <aside class="doc-toc" aria-label="Chapters">
+        <div class="toc-title">Learn</div>
+        <ol id="learnToc"><li><a href="/learn/how-loud-to-master/">How loud should you master?</a></li>
+          <li><a href="/learn/sounds-worse-on-spotify/">Why does my master sound worse on Spotify?</a></li>
+          <li><a href="/learn/reference-loudness/">How loud are the songs you're up against?</a></li>
+          <li><a href="/learn/streaming/">How streaming plays your music</a></li>
+          <li><a href="/learn/loudness/">Measuring loudness</a></li>
+          <li><a href="/learn/peaks/">Peaks: sample, true and codec</a></li>
+          <li><a href="/learn/density/">Density and PLR</a></li>
+          <li><a href="/learn/tone/">Tonal balance</a></li>
+          <li><a href="/learn/lowend/">The low end</a></li>
+          <li><a href="/learn/stereo/">Stereo and mono</a></li>
+          <li><a href="/learn/dynamics/">Dynamics in the mix</a></li>
+          <li><a href="/learn/limiter/">How a limiter works</a></li>
+          <li><a href="/learn/workflow/">A mastering workflow</a></li>
+          <li><a href="/learn/delivery/">Exporting and delivery</a></li>
+          <li><a href="/learn/checklist/">Release checklist</a></li>
+          <li><a href="/learn/glossary/">Glossary</a></li>
+        </ol>
+      </aside>
+
+      <article class="doc-body">
+        <header class="doc-head">
+          <div class="eyebrow">Learn</div>
+          <h1>Mixing and mastering for streaming</h1>
+          <p class="lede">Everything you need to finish a track that holds its own next to commercial releases: how loudness is measured, what streaming services do to your music, how to get a fuller mix, and how to master and deliver it. Each chapter shows what to look for in MasterScope and what to do about it in Liminal.</p>
+        </header>
+
+        <!-- 1 -->
+        <section class="chapter" id="ch-how-loud-to-master">
+          <div class="ch-num">01</div>
+          <h2>How loud should you master?</h2>
+          <p>It's the question every producer asks when a track is nearly done, and most answers give you a single number. The honest answer is a range plus one rule: on streaming services the loudness number matters much less than you think, and the <b>density</b> of the master and its <b>peaks after encoding</b> matter much more.</p>
+          <div class="callout key"><b>The short answer</b><ul>
+            <li><b>Streaming</b> (Spotify, Apple Music, YouTube, Tidal, Amazon, SoundCloud): anywhere from about <b>−14 to −9 LUFS</b> integrated is fine. Choose the density you like, around a PLR of 9 to 11 for punchy, competitive music, and keep the peaks at or under <b>−1 dBTP after encoding</b>. With peaks at −1 dBTP, a PLR of 9 to 11 lands at about −10 to −12 LUFS.</li>
+            <li><b>Don't master quieter than about −14</b> unless you want a quiet, open sound on purpose. Several services never turn quiet tracks up.</li>
+            <li><b>Club and DJ sets:</b> nothing normalises there, so louder masters play louder. −9 to −7 LUFS is typical, with peaks around −0.3 to −1 dBTP.</li>
+          </ul></div>
+
+          <h3>What each platform does with your track</h3>
+          <p>Most services measure every track's loudness and turn it up or down so songs play at about the same level. This is <a href="/learn/streaming/">loudness normalisation</a>. Only Spotify and SoundCloud publish their numbers; the rest are measured by engineers from playback and can change without notice.</p>
+          <div class="table-wrap"><table class="data">
+            <thead><tr><th>Platform</th><th>Plays at</th><th>Turns quiet tracks up?</th><th>Peak advice</th></tr></thead>
+            <tbody>
+              <tr><td>Spotify</td><td class="num">−14 LUFS</td><td>Yes, but only as far as the peaks allow, keeping 1 dB of headroom. Premium listeners can choose Loud (−11) or Quiet (−19).</td><td>Under −1 dBTP (Spotify's own advice)</td></tr>
+              <tr><td>Apple Music</td><td class="num">about −16 LUFS</td><td>Reports differ</td><td>Under −1 dBTP; AAC overshoots a little more than most</td></tr>
+              <tr><td>YouTube</td><td class="num">about −14 LUFS</td><td>No: loud tracks are turned down, quiet ones stay quiet</td><td>Under −1 dBTP after Opus</td></tr>
+              <tr><td>Tidal</td><td class="num">about −14 LUFS</td><td>No, and it normalises whole albums together</td><td>Under −1 dBTP</td></tr>
+              <tr><td>Amazon Music</td><td class="num">about −14 LUFS</td><td>Reported as no</td><td>Under −1 dBTP; some engineers leave −2</td></tr>
+              <tr><td>Deezer</td><td class="num">about −15 LUFS</td><td>Not published</td><td>Under −1 dBTP</td></tr>
+              <tr><td>SoundCloud</td><td class="num">about −14 LUFS</td><td>Not published</td><td>Under −1 dBTP, or −2 dBTP for masters louder than −14 (SoundCloud's own advice)</td></tr>
+              <tr><td>Bandcamp, downloads, DJ software</td><td class="num">no change</td><td>No: files play as you made them</td><td>−0.3 to −1 dBTP</td></tr>
+            </tbody>
+          </table></div>
+          <p class="small muted">Checked October 2026. Spotify's figures are from its <a href="https://support.spotify.com/us/artists/article/loudness-normalization/" target="_blank" rel="noopener">loudness normalisation guide</a> and SoundCloud's from its <a href="https://help.soundcloud.com/hc/en-us/articles/360053660014-Will-SoundCloud-play-my-track-at-the-level-it-s-mastered" target="_blank" rel="noopener">help centre</a>; the others are widely reported measurements. Listeners can also switch normalisation off on most services.</p>
+
+          <h3>Why "−14 LUFS" isn't a target</h3>
+          <p>−14 is where Spotify, YouTube and Tidal <i>play</i> your track, not a level you have to master to. Take two masters of the same song:</p>
+          <div class="table-wrap"><table class="data">
+            <thead><tr><th>Master</th><th>File</th><th>On Spotify</th><th>What you hear</th></tr></thead>
+            <tbody>
+              <tr><td>A</td><td class="num">−14 LUFS, PLR 13</td><td class="num">plays as is</td><td>Open, with big drum hits</td></tr>
+              <tr><td>B</td><td class="num">−10 LUFS, PLR 9</td><td class="num">turned down 4 dB</td><td>Fuller and denser, at the same loudness as A</td></tr>
+            </tbody>
+          </table></div>
+          <p>Both play at −14, so neither is "louder" on Spotify. They sound different because of their density: B's peaks sit closer to its average level, so it feels fuller; A keeps more punch and space. Neither is wrong. That's why the better question is <b>how dense should my master be</b>, which you can choose by ear and with a reference track. The <a href="/learn/density/">Density and PLR</a> chapter goes into how to choose.</p>
+          <p>Mastering much louder than about −9 LUFS for streaming usually costs you: the service turns it down to −14 anyway, and what's left is the side effect of the heavy limiting, which is flatter drums and less space.</p>
+
+          <h3>Why does my song sound quieter than others on Spotify?</h3>
+          <p>If a track sounds smaller or quieter than the songs around it on a playlist, it's almost always one of these:</p>
+          <ol>
+            <li><b>It's quieter than −14 and its peaks are already near the top.</b> Spotify only turns a quiet track up until its peaks reach −1 dBTP. A master at −18 LUFS with peaks at −1 dBTP can't be turned up at all, so it plays 4 dB quieter than everything else. On YouTube, Tidal and Amazon, quiet tracks are never turned up. The fix is more density: limit a little harder so the loudness comes up while the peaks stay put.</li>
+            <li><b>It's at −14 but much less dense than the genre.</b> At the same loudness, a very open master (PLR 13 or more) can sound smaller next to dense, competitive releases. If that's not the sound you want, aim for a PLR closer to the references you love.</li>
+            <li><b>Too much low end.</b> A huge sub uses up a lot of the peak level but adds little to the measured loudness, so the limiter has to turn the whole mix down to make room for it. See <a href="/learn/lowend/">The low end</a>.</li>
+            <li><b>It was mastered so loud it got squashed.</b> At −6 LUFS it's turned down 8 dB, and what's left is a flat, distorted version of the song. Dial the limiting back.</li>
+          </ol>
+
+          <h3>A good starting point by style</h3>
+          <div class="table-wrap"><table class="data">
+            <thead><tr><th>Music</th><th>Typical PLR</th><th>Typical loudness</th></tr></thead>
+            <tbody>
+              <tr><td>EDM, club, heavy rock and metal</td><td class="num">5 to 8 dB</td><td class="num">−9 to −6 LUFS</td></tr>
+              <tr><td>Pop, hip-hop, dance, rock</td><td class="num">8 to 11 dB</td><td class="num">−12 to −9 LUFS</td></tr>
+              <tr><td>Singer-songwriter, R&amp;B, indie</td><td class="num">10 to 12 dB</td><td class="num">−13 to −11 LUFS</td></tr>
+              <tr><td>Acoustic, jazz, classical</td><td class="num">12 dB or more</td><td class="num">−18 to −13 LUFS</td></tr>
+            </tbody>
+          </table></div>
+          <p class="small muted">Ranges are typical of released music, not rules. Genres overlap, and the best guide is a reference track you like, compared at matched loudness.</p>
+          <p>Loudness and PLR are linked through the peak level: loudness ≈ true peak − PLR. With peaks at −1 dBTP, a PLR of 10 gives about −11 LUFS. That's why picking the density and the ceiling settles the loudness for you.</p>
+
+          <h3>Don't forget the peaks</h3>
+          <p>Whatever loudness you choose, keep the <b>true peak at or under −1 dBTP</b>. Streaming services convert your file to Opus, Ogg Vorbis, AAC or MP3, and those encoders push peaks up, often by 1 to 2 dB on loud, bright masters. If they go over full scale, the listener hears distortion that isn't in your file. Louder masters need more room, which is why SoundCloud asks for −2 dBTP above −14 LUFS. The <a href="/learn/peaks/">Peaks</a> chapter explains true peak and the <b>codec peak</b>, the peak after encoding, which is the one that really matters.</p>
+
+          <h3>Check yours in a minute</h3>
+          <p>Drop your master on <a href="/">MasterScope</a>: it measures the loudness, PLR, true peak and codec peak in your browser, and the <b>Release ready</b> panel gives a pass or fix for Spotify, Apple Music, YouTube, SoundCloud and the club, with the reason for each. In your DAW, <a href="/liminal/">Liminal</a> can learn straight to a density: choose PLR 10, press Learn, play the song once, and it sets itself so the peaks stay under −1 dB after real streaming encoders.</p>
+        </section>
+        <section class="chapter" id="ch-sounds-worse-on-spotify">
+          <div class="ch-num">02</div>
+          <h2>Why does my master sound worse on Spotify?</h2>
+          <p>Your master sounds great in your DAW, then you hear it on Spotify and it's quieter, duller, harsher or smaller. Nothing is wrong with Spotify, and usually nothing is badly wrong with your master either. Between your bounce and the listener's ears, three things change: the <b>level</b> it plays at, the <b>encoding</b> it goes through, and the <b>gear and settings</b> it's played on. Each has a fix.</p>
+          <div class="callout key"><b>The short answer</b><ul>
+            <li><b>It's turned down.</b> A master louder than −14 LUFS is played quieter, so next to your loud DAW bounce it sounds weaker. Compare at matched loudness before you judge.</li>
+            <li><b>It's encoded.</b> Most listeners hear a lossy version (Ogg Vorbis or AAC), which can smear hi-hats, narrow wide sounds and push peaks into distortion. Keep peaks under −1 dBTP after encoding.</li>
+            <li><b>It's on different gear and settings.</b> Phone speakers, Bluetooth, the app's equaliser and its volume level setting all change what people hear.</li>
+          </ul></div>
+
+          <h3>1. It plays at a different level</h3>
+          <p>Spotify turns every track to about −14 LUFS. If your master is at −8, it's turned down 6 dB, and when you flip from your DAW at full level to Spotify, the drop sounds like a loss of energy. Louder nearly always sounds "better" for a few seconds, which is why this comparison fools everyone. See <a href="/learn/how-loud-to-master/">How loud should you master?</a></p>
+          <p>Three details make it more confusing:</p>
+          <ul>
+            <li><b>Quiet, dynamic masters can be limited by Spotify.</b> In the app's Loud setting (−11 LUFS), Spotify raises quiet tracks regardless of their peaks and runs a limiter to stop them clipping. If you master quietly on purpose, some listeners hear Spotify's limiting rather than yours.</li>
+            <li><b>Quiet masters may not be turned up at all.</b> At the normal setting, Spotify only raises a track until its peaks reach −1 dBTP. A master at −18 LUFS with peaks at −1 dBTP plays 4 dB quieter than its neighbours.</li>
+            <li><b>Some players don't normalise.</b> Spotify's web player and third-party devices such as TVs and smart speakers play files without normalisation, so the same song can sound louder in one place than another.</li>
+          </ul>
+          <div class="callout good"><b>Compare fairly.</b> Turn your bounce down to −14 LUFS before comparing it with a released track on Spotify, or drop both into MasterScope's Compare tab, which plays them at the same loudness. In Liminal, Match plays your unlimited mix at the output's loudness so you hear only what the limiter changed.</div>
+
+          <h3>2. It's encoded</h3>
+          <p>Most listeners don't hear your WAV. Spotify streams a compressed version whose quality depends on the listener's settings:</p>
+          <div class="table-wrap"><table class="data">
+            <thead><tr><th>Spotify setting</th><th>Quality</th></tr></thead>
+            <tbody>
+              <tr><td>Low / Normal / High</td><td class="num">about 24 / 96 / 160 kbit/s</td></tr>
+              <tr><td>Very high (Premium)</td><td class="num">about 320 kbit/s</td></tr>
+              <tr><td>Web player</td><td class="num">AAC 128 (Free) or 256 kbit/s (Premium)</td></tr>
+              <tr><td>Lossless (Premium)</td><td class="num">FLAC up to 24-bit, 44.1 kHz</td></tr>
+            </tbody>
+          </table></div>
+          <p class="small muted">From Spotify's <a href="https://support.spotify.com/us/article/audio-quality/" target="_blank" rel="noopener">audio quality</a> page, checked October 2026. Lossless started rolling out to Premium in September 2025 and has to be switched on by each listener on each device, so most plays are still lossy. "Automatic" lowers the quality on a weak connection.</p>
+          <p>Lossy encoders throw away detail the ear is least likely to miss, and some masters suffer more than others:</p>
+          <ul>
+            <li><b>Peaks go up.</b> Encoders cut the very top of the spectrum and that reshapes the waveform, so peaks often rise 1 to 2 dB on loud, bright masters. Past full scale, that's distortion that isn't in your file. This is the most common cause of a "crunchy" Spotify version. See <a href="/learn/peaks/">Peaks: sample, true and codec</a>.</li>
+            <li><b>Bright, busy top end smears.</b> Dense hi-hats, cymbals, noise risers and bright reverbs are the hardest things to encode, especially at lower bitrates. They can turn swirly or grainy.</li>
+            <li><b>Very wide stereo narrows or turns phasey.</b> Encoders save bits on side information, so extreme widening and out-of-phase tricks in the highs can collapse or warble. See <a href="/learn/stereo/">Stereo and mono</a>.</li>
+            <li><b>Heavy clipping gets worse.</b> Encoders struggle with the extra harmonics of hard clipping, so an already-clipped master degrades more than a cleanly limited one.</li>
+          </ul>
+          <div class="callout good"><b>Hear it before your listeners do.</b> Liminal's Opus button plays your master through a real streaming encoder in real time, and its Streaming ceiling keeps the peaks after Opus and Vorbis under your ceiling. MasterScope shows the <b>codec peak</b> for any file you drop on it.</div>
+
+          <h3>3. It's played on different gear</h3>
+          <ul>
+            <li><b>Phones and laptop speakers</b> have almost no low end. A mix whose energy is all in the sub sounds thin and quiet on them. Check that the bass still reads in the 100 to 300 Hz range. See <a href="/learn/lowend/">The low end</a>.</li>
+            <li><b>Bluetooth</b> re-encodes audio again on the way to the headphones, adding a second layer of lossy compression.</li>
+            <li><b>The listener's settings.</b> Spotify's app has an equaliser and a volume level setting (Loud, Normal, Quiet). If your Spotify sounds odd, check yours first: an equaliser left on can change everything you hear.</li>
+          </ul>
+
+          <h3>4. The upload chain</h3>
+          <p>Upload a 24-bit (or 16-bit) WAV at the sample rate you mixed at, and don't upload an MP3 or AAC: encoding twice makes artefacts much worse. Spotify's lossless tier goes up to 44.1 kHz, so higher-rate files are converted, which is harmless. Don't add a limiter or clipper after your final ceiling, and only dither once. See <a href="/learn/delivery/">Exporting and delivery</a>.</p>
+
+          <div class="callout key"><b>Checklist when it sounds worse on Spotify</b><ul>
+            <li>Compared at the same loudness? Turn your bounce to −14 LUFS first.</li>
+            <li>Codec peak at or under −1 dBTP? If not, lower the ceiling or use a codec-safe ceiling.</li>
+            <li>Top end very bright and busy, or stereo very wide in the highs? Ease it a little.</li>
+            <li>Very loud or heavily clipped? Back the limiting off; it's turned down anyway.</li>
+            <li>Very quiet and dynamic? Expect some listeners to hear Spotify's own limiter.</li>
+            <li>Uploaded a lossless WAV? Never an MP3.</li>
+            <li>Listening settings normal? Equaliser off, volume level on Normal, quality on Very high or Lossless.</li>
+          </ul></div>
+          <p>Drop your master on <a href="/">MasterScope</a> to check the loudness, density, codec peak and stereo in your browser, with a pass or fix for Spotify and the other platforms.</p>
+          <p class="small muted">Spotify's normalisation and limiter details are from its <a href="https://support.spotify.com/us/artists/article/loudness-normalization/" target="_blank" rel="noopener">loudness normalisation guide</a>.</p>
+        </section>
+        <section class="chapter" id="ch-reference-loudness">
+          <div class="ch-num">03</div>
+          <h2>How loud are the songs you're up against?</h2>
+          <p>Before you decide how loud and how dense to make your master, it helps to know where the music you're competing with sits. Not the loudness of the whole charts, but the three or four songs your listeners will hear next to yours. You can measure them yourself in a few minutes, straight from Spotify or YouTube, and use the numbers as your target.</p>
+          <div class="callout key"><b>The short answer</b><ul>
+            <li><b>Measure a few songs in your genre</b> with <a href="/meter/">MasterScope Meter</a> (free) while they play, or load a file of a released track on MasterScope's Compare tab.</li>
+            <li><b>Look at density (PLR), not just loudness.</b> On Spotify everything plays at about −14 LUFS, so what you'll hear is how full and dense each song is at that level.</li>
+            <li><b>Use the result as your target.</b> Send it to MasterScope to compare with your mix, or aim Liminal's Learn at its loudness or density.</li>
+          </ul></div>
+          <h3>What to measure, and what each number tells you</h3>
+          <ul class="list">
+            <li><b>Integrated loudness (LUFS):</b> the average loudness of the whole song. It tells you how hard the master was pushed, and how much Spotify, YouTube and the others turn it down.</li>
+            <li><b>True peak (dBTP):</b> the highest point of the waveform. Measured from a stream it's often a little above the master's own peak, because lossy encoding adds a small overshoot.</li>
+            <li><b>PLR (peak to loudness ratio):</b> true peak minus integrated loudness. The best single number for density: low PLR means dense and loud, high PLR means punchy and open. See <a href="/learn/density/">Density and PLR</a>.</li>
+            <li><b>Loudest moment:</b> the highest short-term (3 second) loudness, usually the biggest chorus or drop. It shows how hard the loudest part is pushed.</li>
+            <li><b>Loudness range (LU):</b> how much the loudness moves between quiet and loud sections. A small number means the song stays at one level; a bigger number means it builds and drops.</li>
+          </ul>
+          <h3>How to measure songs from Spotify or YouTube</h3>
+          <ol class="list">
+            <li><b>Turn off normalisation.</b> In the Spotify app's settings, switch off <i>Normalise volume</i>, otherwise you measure Spotify's turn-down instead of the master. The Spotify web player never normalises, so it's ready as it is.</li>
+            <li><b>Set the player's own volume to 100%</b> (the slider in Spotify, or the YouTube player). Your computer's main volume doesn't matter.</li>
+            <li><b>Measure the app, not the speakers.</b> Many laptops process their sound on the way to the speakers: Waves MaxxAudio, Dolby, DTS, Realtek speaker tuning or "loudness equalisation" can cut the bass, compress the music and change every reading. MasterScope Meter listens to Spotify (or any app you choose) directly, before that processing. In the browser, play the song in a tab and share that tab.</li>
+            <li><b>Measure the whole song.</b> In <a href="/meter/">MasterScope Meter</a>, press Measure at the start and Stop at the end. A single chorus reads louder than the song's integrated loudness.</li>
+          </ol>
+          <div class="callout good"><b>Only numbers, never the audio.</b> MasterScope Meter keeps the measurements and nothing else: no recording, no copies of the music. It's a meter, the same as watching the loudness readout on a mixing desk.</div>
+          <h3>Using the numbers</h3>
+          <p>Compare like with like: measure three or four songs that sound the way you want yours to sound, and look at the range. If they sit between PLR 8 and 10, a master at PLR 9 will sit comfortably among them on Spotify, whatever their exact LUFS. If yours comes out much more dynamic (say PLR 14), it will sound smaller next to them at the same loudness; if it's much denser (PLR 6), it may sound flat and tiring.</p>
+          <p>For the full picture, press <b>Export</b> in the Meter and drop the file on MasterScope: you get the song's own report, the same as for a file, then <b>Compare my track with it</b> sets its loudness, density, stereo width and tone against your mix, with its tonal curve on the Tone tab. (On the Compare tab, <b>Load reference</b> takes an export too.) For just the headline numbers, press <b>Save</b>, then <b>Compare</b>. In Liminal, <i>Tools → Measure a song</i> does the same inside your DAW, with a button to use the result as Learn's target.</p>
+          <div class="doc-cta"><a class="btn primary" href="/meter/">Get MasterScope Meter, free</a><a class="btn" href="/learn/density/">Next: Density and PLR</a></div>
+        </section>
+        <section class="chapter" id="ch-streaming">
+          <div class="ch-num">04</div>
+          <h2>How streaming plays your music</h2>
+          <p>Spotify, Apple Music, YouTube, Tidal and the other big services measure the loudness of every track and turn it up or down so that everything plays at about the same level. This is called <b>loudness normalisation</b>. Spotify, for example, adjusts tracks to −14 LUFS by default.</p>
+          <p>That changes the old rules. A master pushed to −8 LUFS doesn't play louder on Spotify than one at −14: it is turned down 6 dB, and all that is left of the extra loudness is the limiting that was used to get there. What decides how big a track sounds next to others is no longer how loud the file is, but how full and clear it is at the same loudness.</p>
+          <div class="table-wrap"><table class="data">
+            <thead><tr><th>Service</th><th>Default level</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>Spotify</td><td class="num">−14 LUFS</td><td>Premium listeners can choose Loud (−11) or Quiet (−19). Quiet tracks are only turned up as far as their peaks allow, keeping 1 dB of headroom.</td></tr>
+              <tr><td>Apple Music</td><td class="num">about −16 LUFS</td><td>Applied when Sound Check is on.</td></tr>
+              <tr><td>YouTube</td><td class="num">about −14 LUFS</td><td>Turns loud tracks down, but doesn't turn quiet ones up.</td></tr>
+              <tr><td>Tidal, Amazon Music</td><td class="num">about −14 LUFS</td><td></td></tr>
+              <tr><td>Deezer</td><td class="num">about −15 LUFS</td><td></td></tr>
+              <tr><td>SoundCloud</td><td class="num">about −14 LUFS</td><td>Normalises playback. It recommends keeping the true peak under −1 dB, or under −2 dB for masters louder than −14, because its transcoding adds distortion.</td></tr>
+              <tr><td>Bandcamp, DJ software, downloads</td><td class="num">none</td><td>Files play at the level you made them.</td></tr>
+            </tbody>
+          </table></div>
+          <p class="small muted">Services publish and change their policies from time to time, and listeners can switch normalisation off. Spotify's figures are from its <a href="https://support.spotify.com/us/artists/article/loudness-normalization/" target="_blank" rel="noopener">loudness normalisation guide</a>; the others are widely reported defaults.</p>
+          <div class="callout key"><b>What this means for you</b><ul>
+            <li>On streaming, extra loudness is taken away again. Density (how full the track sounds) is what you keep.</li>
+            <li>A track that can't reach −14 without its peaks going over −1 dBTP plays quieter than everything around it on Spotify.</li>
+            <li>Where nothing normalises (Bandcamp, downloads, DJ sets), a louder file does play louder. You can master for both: see <a href="/learn/density/">Density and PLR</a>.</li>
+          </ul></div>
+          <figure class="shot"><img src="/img/ms-platforms.webp" alt="MasterScope's streaming platforms panel showing how much each service turns a track up or down" loading="lazy" width="1600" height="537"><figcaption>MasterScope's Loudness tab shows how much each service will turn your track up or down, and where its peaks land afterwards.</figcaption></figure>
+        </section>
+
+        <!-- 2 -->
+        <section class="chapter" id="ch-loudness">
+          <div class="ch-num">05</div>
+          <h2>Measuring loudness: LUFS</h2>
+          <p><b>LUFS</b> (loudness units relative to full scale) measures loudness the way we hear it, following the ITU-R BS.1770 standard. Before measuring, the signal is filtered to match the ear: very low bass counts for less, and the upper mids and highs count for a little more. That is why a mix heavy in sub bass can read surprisingly quiet, and why a little more presence reads louder.</p>
+          <dl class="terms">
+            <dt>Integrated loudness</dt><dd>The loudness of the whole track: the number streaming services normalise to. Silence and very quiet passages are left out (anything below −70 LUFS, then anything more than 10 LU below the average), so adding silence or a quiet intro doesn't change it.</dd>
+            <dt>Short-term loudness</dt><dd>Loudness over a sliding 3-second window. It shows how loud each section is. The loudest short-term reading is how hard your chorus or drop hits.</dd>
+            <dt>Momentary loudness</dt><dd>The same over 0.4 seconds. It moves with individual hits and words.</dd>
+            <dt>Loudness range (LRA)</dt><dd>How much the short-term loudness varies across the song, in LU, ignoring the quietest 10% and loudest 5%. Roughly, under 5 LU is very consistent and 6 to 10 is typical of songs with breakdowns.</dd>
+          </dl>
+          <figure class="shot"><img src="/img/ms-timeline.webp" alt="MasterScope loudness timeline with momentary and short-term loudness, peak markers and energy dips" loading="lazy" width="1600" height="522"><figcaption>The loudness timeline. Blue is short-term, green is momentary and the dashed line is the integrated loudness. Ticks along the top mark the loudest peaks; shaded spans are stretches where the energy drops well below the average.</figcaption></figure>
+          <div class="callout good"><b>Energy dips</b> are worth a look. A breakdown is meant to drop; a verse that sags 5 LU below the rest will feel small next to other releases at −14. More energy in the arrangement or a little level automation fixes it.</div>
+        </section>
+
+        <!-- 3 -->
+        <section class="chapter" id="ch-peaks">
+          <div class="ch-num">06</div>
+          <h2>Peaks: sample, true and codec</h2>
+          <p>Loudness is about the body of the sound; peaks are its highest points. Three readings matter, each stricter than the last.</p>
+          <dl class="terms">
+            <dt>Sample peak (dBFS)</dt><dd>The highest sample value in the file. 0 dBFS is the top of the scale.</dd>
+            <dt>True peak (dBTP)</dt><dd>The highest point of the reconstructed waveform, including peaks that fall between samples. These "inter-sample peaks" can be well over the sample peak on dense, bright masters. Measured by oversampling.</dd>
+            <dt>Codec peak</dt><dd>The true peak after lossy encoding (Opus on YouTube, Ogg Vorbis on Spotify, AAC on Apple Music, MP3 on SoundCloud and downloads). Encoders remove the very top of the spectrum and add their own noise, and that reshapes the waveform so its peaks rise, often by 1 to 2 dB on loud, bright or clipped masters. MasterScope estimates it by filtering at 16 kHz and measuring the true peak; Liminal goes further and runs your song through the real Opus and Vorbis encoders.</dd>
+          </dl>
+          <p>The usual ceiling is <b>−1 dBTP</b>. Spotify recommends keeping true peak below −2 dBTP when your master is louder than −14 LUFS, because louder masters overshoot more when encoded. The codec estimate tells you directly: if it reads above −1 dBTP, the encoded version may distort wherever it plays at full level.</p>
+          <h3>Liminal's ceiling modes</h3>
+          <p>Under its Ceiling fader Liminal has three ceiling modes. <b>True peak</b> is the classic ceiling. <b>Streaming</b> also keeps the peaks a listener gets after Opus and Vorbis encoding under the ceiling: when you press Learn, Liminal encodes and decodes your song with the real encoders, measures how far its peaks rise, and calibrates its limiter to that song. <b>All codecs</b> adds a 1 dB margin for MP3 and AAC, which overshoot a little more (across 26 test masters, 128 kbps MP3 peaked at most 1.5 dB above Opus and Vorbis, and under 1 dB nine times out of ten).</p>
+          <figure class="shot"><img src="/img/liminal-learned.webp" alt="Liminal after Learn, showing true peak and the decoded codec peak" loading="lazy" width="1440" height="900"><figcaption>After Learn in Streaming mode the codec peak sits at the ceiling (−1.1 dB) while the true peak is lower (−2.5 dBTP): this bright, heavily limited mix overshoots almost 2 dB when encoded.</figcaption></figure>
+          <p>To hear it, open <b>Tools</b> in Liminal and press <b>Codec check</b>: the output plays through a real Opus encoder at 128 kbps, and the codec peak readout shows the decoded peak.</p>
+          <div class="callout warn"><b>A real example.</b> A master at −12.7 LUFS with true peak at −1.1 dBTP looked safe, but its codec peak was +1.3 dBTP: the clipper used on it left sharp, bright edges that the encoder reshaped. Lowering the ceiling by 2.4 dB brought the encoded peak to −1.1. Always check the codec reading on louder masters.</div>
+        </section>
+
+        <!-- 4 -->
+        <section class="chapter" id="ch-density">
+          <div class="ch-num">07</div>
+          <h2>Density and PLR</h2>
+          <p>The <b>peak-to-loudness ratio (PLR)</b> is true peak minus integrated loudness. It measures how far the peaks stand above the body of the track, so it is the clearest single number for density.</p>
+          <div class="table-wrap"><table class="data">
+            <thead><tr><th>PLR</th><th>Sound</th><th>Typical of</th></tr></thead>
+            <tbody>
+              <tr><td class="num">under 8 dB</td><td>Squashed: drums lose their snap, the track can sound smaller</td><td>Very loud club and EDM masters</td></tr>
+              <tr><td class="num">8 to 12 dB</td><td>Full and even, with punch intact</td><td>Most pop, hip-hop, dance and rock releases</td></tr>
+              <tr><td class="num">12 to 13 dB</td><td>Open and punchy, less dense</td><td>Acoustic, jazz, older-style masters</td></tr>
+              <tr><td class="num">over 13 dB</td><td>Can't reach −14 LUFS with peaks at −1 dBTP</td><td>Unmastered mixes</td></tr>
+            </tbody>
+          </table></div>
+          <p>Because PLR is peak minus loudness, choosing a PLR and a ceiling fixes the loudness: <b>target loudness = ceiling − PLR</b>. A PLR of 10 with a ceiling of −2 dBTP lands at −12 LUFS. A PLR of 13 with a ceiling of −1 lands at −14.</p>
+          <figure class="shot"><img src="/img/ms-readiness.webp" alt="MasterScope's −14 readiness panel with the PLR bar" loading="lazy" width="1600" height="639"><figcaption>MasterScope's −14 readiness panel places your PLR on a bar from squashed to too dynamic, with the steps to get where you want.</figcaption></figure>
+          <div class="callout good"><b>Learn by density.</b> In Liminal, open Tools, click Learn's target and choose a density instead of a loudness (PLR 8 to 14). Learn then finds the threshold that gives your song that PLR at your ceiling, whatever loudness that turns out to be. Load a reference in Optimise (Tools) and press <i>Use its density</i> to match a track you like.</div>
+          <h3>Does denser sound louder?</h3>
+          <p>A little, and only up to a point. LUFS already measures loudness the way we hear it, so at −14 two tracks are about equally loud. A denser master sounds fuller and more constant, which reads as "bigger" at low volume. Below a PLR of about 8, the drum hits lose impact and the track starts to sound smaller, even though the meter says it is just as loud. Judge density by ear at matched loudness, and compare against a reference in your genre.</p>
+          <h3>Louder masters by choice</h3>
+          <p>You don't have to master to exactly −14. A master at −12 with a PLR of 10 is turned down 2 dB on Spotify and sounds the same there as a −14 master with the same density, but it plays louder in DJ sets, on Bandcamp and as a download. So pick your PLR by ear, set the ceiling (−1 dBTP, or lower for louder masters and anything clipped), and let the loudness follow. Don't turn the master down after the limiter just to read −14: streaming services will do that for you, and the file will be quieter everywhere else.</p>
+        </section>
+
+        <!-- 5 -->
+        <section class="chapter" id="ch-tone">
+          <div class="ch-num">08</div>
+          <h2>Tonal balance</h2>
+          <p>Tonal balance is how the energy is spread from sub to air. MasterScope compares each octave with <b>pink noise</b>, which has equal energy per octave and sounds balanced to the ear, so a flat line means balanced and the bars show where your mix leans.</p>
+          <figure class="shot"><img src="/img/ms-tonal.webp" alt="MasterScope tonal balance chart, octave bars relative to pink noise" loading="lazy" width="1600" height="629"><figcaption>Octave bars relative to pink noise. Most releases fall gently from bass to treble, a tilt of about 0 to −3 dB per octave.</figcaption></figure>
+          <dl class="terms">
+            <dt>Tilt</dt><dd>The overall slope from 63 Hz to 8 kHz. Steeper than about −3 dB per octave sounds dark and woolly; above 0 sounds bright and thin.</dd>
+            <dt>Low-mid build-up (250 to 500 Hz)</dt><dd>Where mud and boxiness live. Many parts overlap here; small cuts on the busiest ones clear space.</dd>
+            <dt>Presence (2 to 5 kHz)</dt><dd>Where the ear is most sensitive. A mix with too little presence sounds smaller at the same loudness. Most releases sit around 3 to 6 dB below the low mids here.</dd>
+            <dt>Sub (20 to 60 Hz)</dt><dd>Felt more than heard. Phones and small speakers can't play it, but it still takes up peak room.</dd>
+          </dl>
+          <figure class="shot"><img src="/img/ms-spectrogram.webp" alt="MasterScope spectrogram of a full song" loading="lazy" width="1600" height="588"><figcaption>The spectrogram shows frequency over time. Horizontal lines are sustained notes or resonances, vertical stripes are hits. Click to play from any point.</figcaption></figure>
+          <div class="callout good"><b>Use a reference.</b> Genre matters more than any rule of thumb. Load a released track you like on MasterScope's Compare tab: both play at −14 so loudness can't fool you, and MasterScope lists where your track differs most and whether the gap is tone, density or arrangement.</div>
+        </section>
+
+        <!-- 6 -->
+        <section class="chapter" id="ch-lowend">
+          <div class="ch-num">09</div>
+          <h2>The low end</h2>
+          <p>The kick and bass carry most of a track's energy, so they decide a lot about how clean and loud it can be.</p>
+          <ul class="list">
+            <li><b>Give the kick its own moment.</b> If the bass or 808 is still sounding when the kick hits, the two add up into bigger peaks and the low end blurs. Shorter bass notes or sidechain ducking from the kick fixes it.</li>
+            <li><b>Keep the low end in the centre.</b> Below about 150 Hz, stereo content loses weight on mono systems (phones, many club rigs) and sounds loose. Make it mono, or narrow the parts that sit there.</li>
+            <li><b>Measure before you cut.</b> Sub bass counts for little in LUFS but can take up peak room, so cutting it can help. It doesn't always: if your loudest peaks come from somewhere else, cutting the low end only makes the track thinner. MasterScope's <a href="/learn/dynamics/">Louder at −14</a> panel shows which is true for your track.</li>
+          </ul>
+          <figure class="shot"><img src="/img/ms-transients.webp" alt="MasterScope hits and transients panel showing kick rise and settle times" loading="lazy" width="1600" height="387"><figcaption>MasterScope's Dynamics tab measures how far each kick rises above what was already playing in the 50 to 90 Hz range, and how quickly the low end settles afterwards.</figcaption></figure>
+        </section>
+
+        <!-- 7 -->
+        <section class="chapter" id="ch-stereo">
+          <div class="ch-num">10</div>
+          <h2>Stereo and mono</h2>
+          <p>A wide mix sounds big on headphones, but much of the world listens in mono or near-mono: phone speakers, Bluetooth speakers, clubs. Anything that cancels in mono disappears there.</p>
+          <dl class="terms">
+            <dt>Phase correlation</dt><dd>+1 means the channels are identical (mono), 0 means unrelated, below 0 means parts cancel when summed. Most mixes sit between about +0.5 and +0.9.</dd>
+            <dt>Stereo width</dt><dd>The share of energy in the side (left minus right) signal. Bass should be close to 0%; pads, reverbs and doubles can be wide.</dd>
+          </dl>
+          <div class="fig-row">
+            <figure class="shot"><img src="/img/ms-vectorscope.webp" alt="MasterScope vectorscope" loading="lazy" width="1600" height="512"><figcaption>The vectorscope: a tall, narrow shape is close to mono; sideways spread warns of phase problems.</figcaption></figure>
+            <figure class="shot"><img src="/img/ms-stereofield.webp" alt="MasterScope stereo width by frequency" loading="lazy" width="1600" height="492"><figcaption>Width by frequency. Anything wide between 50 and 200 Hz is highlighted.</figcaption></figure>
+          </div>
+        </section>
+
+        <!-- 8 -->
+        <section class="chapter" id="ch-dynamics">
+          <div class="ch-num">11</div>
+          <h2>Dynamics in the mix</h2>
+          <p>A master can only be as dense as the mix allows cleanly. If a few parts poke out far above the rest, the master limiter has to pull the whole track down every time they hit, and that is what you hear as pumping and lost punch. Controlling those parts in the mix lets the limiter do less for the same loudness.</p>
+          <h3>The tools</h3>
+          <dl class="terms">
+            <dt>Compressor</dt><dd>Turns a part down when it goes over a threshold, by a ratio. Attack sets how quickly it reacts (slower lets the transient through), release how quickly it lets go. Use it to even out vocals, bass and buses.</dd>
+            <dt>Clipper</dt><dd>Shaves off the very tops of waveforms instantly. On a drum bus, a dB or two of clipping takes the sharpest transients off with little audible change. It adds bright harmonics, so watch the codec peak on the master.</dd>
+            <dt>De-esser</dt><dd>A compressor that only reacts to harsh "s" and "t" sounds, or any bright, spiky part: hats, a bright synth.</dd>
+            <dt>Saturation</dt><dd>Gentle distortion that adds harmonics and density to sustained parts without the pumping of heavy compression.</dd>
+          </dl>
+          <h3>Find what the limiter is fighting</h3>
+          <p>MasterScope's <b>Louder at −14</b> panel splits your track into six ranges and shows two things for each: its share of the height of the loudest peaks, and its share of the loudness. A range with a long amber bar and a short blue one spends peak room without adding much loudness. It then tests the fix on your actual audio: taking 4 dB off the loudest moments in one range at a time and measuring how much less limiting the track then needs.</p>
+          <figure class="shot"><img src="/img/ms-louder_mix.webp" alt="MasterScope's Louder at −14 panel for a mix before mastering" loading="lazy" width="1600" height="1432"><figcaption>A mix before mastering. Presence and highs make 45% of the peak height but only 18% of the loudness; controlling the highs cuts the limiting by 30%, while controlling the bass would make it worse.</figcaption></figure>
+          <p>It also tells you whether those peaks are drum hits or sustained parts, and suggests the matching tool: a drum-bus clipper for hits, a de-esser or compression for a bright vocal or synth. For the clearest answer, analyse your mix with the master limiter switched off.</p>
+          <div class="callout good"><b>Does the level going into the limiter matter?</b> Not for the sound. In a 32-bit floating-point DAW, turning up the input and lowering the threshold by the same amount gives an identical result. What matters is where the loudness comes from: tame peaks in the mix and the limiter has less to do. The exception is analogue-style plugins (tape, consoles, saturators), which do react to how hard they are driven.</div>
+        </section>
+
+        <!-- 9 -->
+        <section class="chapter" id="ch-limiter">
+          <div class="ch-num">12</div>
+          <h2>How a limiter works</h2>
+          <p>A mastering limiter does two jobs: it stops peaks going over a ceiling, and it lets you raise the overall level until the track is as dense as you want. Every limiter has the same core controls.</p>
+          <dl class="terms">
+            <dt>Threshold and makeup</dt><dd>Lowering the threshold makes the limiter work harder and, with makeup gain, raises the level. Liminal's Learn sets the threshold for you to land on a loudness target.</dd>
+            <dt>Ceiling</dt><dd>The highest level the output can reach, in dBTP. −1 is the usual choice; −2 or lower for louder masters, and lower still if the codec peak reads high.</dd>
+            <dt>Attack and lookahead</dt><dd>Lookahead lets the limiter see a peak coming and turn down smoothly before it arrives, instead of clipping it. Attack is how gradually it does so. Very short attack (under 1 ms) grabs the front of every drum hit and flattens the punch; around 5 to 10 ms keeps it.</dd>
+            <dt>Release</dt><dd>How quickly the gain recovers after a peak. Short release is denser but can distort or pump; long release is smoother but can duck the track after each hit. Adaptive release stretches it automatically on dense passages.</dd>
+            <dt>Stereo link</dt><dd>How much the two channels share gain reduction. 100% keeps the stereo image steady; lower lets each side be limited on its own.</dd>
+            <dt>Oversampling</dt><dd>Runs the limiter at a higher internal rate so it catches inter-sample peaks and reduces distortion, at the cost of CPU.</dd>
+          </dl>
+          <figure class="shot"><img src="/img/liminal-bassfirst.webp" alt="Liminal in Lookahead mode with Bass first enabled" loading="lazy" width="1440" height="900"><figcaption>Liminal in Lookahead mode. The display shows the waveform after limiting, what was removed (red) and the gain reduction over time.</figcaption></figure>
+          <h3>Liminal's modes</h3>
+          <dl class="terms">
+            <dt>Lookahead</dt><dd>The default for mastering: smooth, transparent gain reduction with adjustable attack, release and lookahead.</dd>
+            <dt>Brickwall</dt><dd>Zero added latency and an absolute ceiling. Useful while tracking or for a final safety stage.</dd>
+            <dt>Soft Clip</dt><dd>Rounds the peaks off instead of turning the track down. It keeps the gain reduction low and the dynamics lively, but the clipped edges raise the codec peak, so it suits masters with headroom under the ceiling.</dd>
+            <dt>Multiband</dt><dd>Limits the lows and highs separately, so a big kick doesn't pull the vocal down with it.</dd>
+            <dt>Punch Guard</dt><dd>Liminal's Punch Guard mode: the lookahead limiter does the work but leaves the very tips of the peaks to an oversampled clipper. A clipper shaves a millisecond off a drum hit where a limiter turns the whole mix down around it for 50 ms or more, so at the same loudness the drums keep more snap. On test mixes, 2 to 3 dB of clip gave 1 to 1.5 dB more punch than Lookahead alone.</dd>
+            <dt>Bass first</dt><dd>Takes up to a set amount off the low band before the main limiter, so the kick and bass don't trigger limiting across the whole mix. Use only as much as you need: on most mixes 2 to 3 dB is plenty.</dd>
+          </dl>
+          <div class="fig-row">
+            <figure class="shot"><img src="/img/liminal-softclip.webp" alt="Liminal in Soft Clip mode" loading="lazy" width="1440" height="900"><figcaption>Soft Clip mode.</figcaption></figure>
+            <figure class="shot"><img src="/img/liminal-multiband.webp" alt="Liminal in Multiband mode" loading="lazy" width="1440" height="900"><figcaption>Multiband mode.</figcaption></figure>
+          </div>
+          <h3>Punch, and finding the best setup</h3>
+          <p>Liminal's Loudness panel shows <b>Punch</b>: how far the hits stand out from the music around them (the loudest 10 ms of each second against its average), with how much the limiter takes off compared with your mix. Losing under 2 dB is clean; over 4 dB and the drums lose their snap.</p>
+          <p>Rather than guess attack and release, press <b>Optimise</b>. It tries about 30 setups on the loudest 30 seconds Learn heard, learns every one to the same target and ceiling so they are equally loud, and ranks them by punch. Apply the one you like and Liminal re-learns it on the whole song.</p>
+          <figure class="shot"><img src="/img/liminal-optimise.webp" alt="Liminal's Optimise tool ranking limiter setups by punch" loading="lazy" width="1440" height="900"><figcaption>Optimise: every setup at the same loudness and density, ranked by punch, with decoded peaks checked through real encoders.</figcaption></figure>
+          <div class="callout good"><b>Listen at matched loudness.</b> Liminal's Match button plays your unlimited mix at the same loudness as the output, so you hear only what the limiter changes, not just "louder". Delta plays only what is being removed: if you can hear drums or vocals in it, the limiter is doing too much.</div>
+        </section>
+
+        <!-- 10 -->
+        <section class="chapter" id="ch-workflow">
+          <div class="ch-num">13</div>
+          <h2>A mastering workflow</h2>
+          <p>This is the loop that works with MasterScope and Liminal. It starts in the mix, because that is where the biggest gains are.</p>
+          <ol class="wf-steps">
+            <li><b>Analyse the mix.</b> Bounce it with no limiter on the master and open it in MasterScope. Fix anything in "What to work on" first: mud, harshness, wide bass, energy dips, and whatever the Louder at −14 panel says the limiter would be fighting.
+              <figure class="shot"><img src="/img/ms-readiness_mix.webp" alt="MasterScope readiness for an unmastered mix" loading="lazy" width="1600" height="782"><figcaption>An unmastered mix: PLR 18.5 dB, so it needs about 5.5 dB of peak control to reach −14. The steps say what to control first.</figcaption></figure></li>
+            <li><b>Put Liminal last on the master.</b> Start from the factory preset <i>Streaming: punchy (PLR 10)</i>, or Lookahead mode with attack around 10 ms and release around 60 ms. Add Bass first only if the low end is triggering the limiter.</li>
+            <li><b>Set the ceiling.</b> −1 dB with the ceiling mode on Streaming (or All codecs if the track goes to SoundCloud, DJ pools or Apple Music). Liminal keeps the decoded peaks under it, so you no longer need to guess how much lower to go for loud masters.</li>
+            <li><b>Choose your density.</b> Open Tools, click Learn's target and pick a PLR. For a full, competitive sound, aim for 9 to 11.</li>
+            <li><b>Press Learn and play the song once.</b> Liminal listens, then renders what it heard at different thresholds and sets the one that lands on your target.
+              <div class="fig-row">
+                <figure class="shot"><img src="/img/liminal-capturing.webp" alt="Liminal while Learn is listening" loading="lazy" width="1440" height="900"><figcaption>Learn listening, in the Tools panel.</figcaption></figure>
+                <figure class="shot"><img src="/img/liminal-learned.webp" alt="Liminal after Learn with the Report button" loading="lazy" width="1440" height="900"><figcaption>Done: the threshold is set and the Report button appears.</figcaption></figure>
+              </div></li>
+            <li><b>Save the report.</b> Press Report and save the .json, then drop it on MasterScope to see the result, the gain reduction over time and your settings. No second play-through needed. (The Session log in Tools does the same for a live play-through after you change settings by hand.)
+              <figure class="shot"><img src="/img/ms-session-top.webp" alt="A Liminal Learn report open in MasterScope" loading="lazy" width="1600" height="987"><figcaption>A Learn report in MasterScope: loudness, peaks, codec estimate, PLR and gain reduction, plus a timeline and the settings used.</figcaption></figure></li>
+            <li><b>Check the punch, then Optimise.</b> If the Punch reading (Loudness card, More) shows the limiter taking more than 3 or 4 dB off the hits, open Optimise from Tools and try the top setup. Mix Doctor shows which part of the mix makes the peaks, so you know what to fix at the source.
+              <figure class="shot"><img src="/img/liminal-doctor.webp" alt="Liminal's Mix Doctor" loading="lazy" width="1440" height="900"><figcaption>Mix Doctor: each range's share of the peaks against its share of the loudness, how much limiting a little peak control there would save, and the fix.</figcaption></figure></li>
+            <li><b>Listen with Level match, Hear what's removed and Codec check.</b> Level match hears your mix at the same loudness, Hear what's removed only what the limiter takes, Codec check what a streaming listener gets. The Spectrogram's Delta view shows which frequencies are being squashed.</li>
+            <li><b>Export and check the final file.</b> Open the bounced master in MasterScope: true peak, codec peak, density and tone. Then load a reference on the Compare tab.
+              <figure class="shot"><img src="/img/ms-compare.webp" alt="MasterScope comparing a mix with a reference" loading="lazy" width="1600" height="1528"><figcaption>Compare explains why a reference may sound bigger at −14, then lists every difference.</figcaption></figure></li>
+          </ol>
+        </section>
+
+        <!-- 11 -->
+        <section class="chapter" id="ch-delivery">
+          <div class="ch-num">14</div>
+          <h2>Exporting and delivery</h2>
+          <ul class="list">
+            <li><b>Format.</b> WAV or AIFF at the sample rate you mixed at. 24-bit is best; 16-bit is fine for most distributors.</li>
+            <li><b>Dither once, at the end.</b> When reducing to 16-bit, add dither (Liminal's Dither switch) on the final export only. Never dither twice.</li>
+            <li><b>No changes after the limiter.</b> Don't normalise on export, and don't turn the master down afterwards unless you mean to. Every change after the limiter changes the peaks it worked to control.</li>
+            <li><b>Check the encoded peaks.</b> Keep the codec peak at or below −1 dB. With Liminal's Streaming or All codecs ceiling mode, Learn takes care of it; otherwise lower the ceiling and Learn again at the same PLR, or tame the brightest peaks in the mix.</li>
+            <li><b>One master or two?</b> One master at your chosen density works everywhere. If you want more, Liminal's <b>Release pack</b> (in Optimise) learns and writes four masters from one listen: Streaming −14 (safe on every codec), Club −9, Apple Music −16 and YouTube −14, each a 24-bit WAV with its report.</li>
+            <li><b>Leave a little silence</b> at the start and end so nothing is cut off, and let reverb tails finish naturally.</li>
+          </ul>
+        </section>
+
+        <!-- 12 -->
+        <section class="chapter" id="ch-checklist">
+          <div class="ch-num">15</div>
+          <h2>Release checklist</h2>
+          <ul class="checklist">
+            <li>Integrated loudness where you chose it (−14, or louder by choice)</li>
+            <li>True peak at or below −1 dBTP (−2 for louder masters)</li>
+            <li>Codec peak estimate at or below −1 dBTP</li>
+            <li>PLR in the range you want, chosen by ear at matched loudness</li>
+            <li>No clipped samples, no DC offset</li>
+            <li>Tonal balance close to a good reference in your genre</li>
+            <li>Bass centred; phase correlation positive; nothing disappears in mono</li>
+            <li>Drums still punch after limiting (listen with Match and Delta)</li>
+            <li>Sections sit where you intend: no unintended energy dips</li>
+            <li>Correct format, sample rate and bit depth, dithered once</li>
+            <li>Listened on headphones, a phone speaker and a car or club system</li>
+          </ul>
+          <p>MasterScope's PDF report collects all of these in one place, so it is also a good document to keep with each release.</p>
+        </section>
+
+        <!-- 13 -->
+        <section class="chapter" id="ch-glossary">
+          <div class="ch-num">16</div>
+          <h2>Glossary</h2>
+          <dl class="terms compact">
+            <dt>dBFS</dt><dd>Decibels relative to full scale, the top of the digital range (0 dBFS).</dd>
+            <dt>dBTP</dt><dd>Decibels true peak: the waveform's real peak including inter-sample peaks.</dd>
+            <dt>LUFS / LU</dt><dd>Loudness units relative to full scale, and the difference between two loudness readings (1 LU = 1 dB).</dd>
+            <dt>PLR</dt><dd>Peak-to-loudness ratio: true peak minus integrated loudness.</dd>
+            <dt>Crest factor</dt><dd>Peak minus RMS level; a rougher cousin of PLR.</dd>
+            <dt>Gain reduction (GR)</dt><dd>How much a compressor or limiter is turning the signal down, in dB.</dd>
+            <dt>Headroom</dt><dd>The space between the highest peak and the ceiling or 0 dBFS.</dd>
+            <dt>Inter-sample peak</dt><dd>A peak between two samples, higher than either, that appears when the signal is converted back to analogue or resampled.</dd>
+            <dt>K-weighting</dt><dd>The filter LUFS uses to match the ear before measuring loudness.</dd>
+            <dt>Lookahead</dt><dd>A short delay that lets a limiter react before a peak arrives.</dd>
+            <dt>Mid/side</dt><dd>Splitting stereo into what is shared (mid) and what differs (side) between the channels.</dd>
+            <dt>Normalisation</dt><dd>A service turning tracks up or down to a common loudness.</dd>
+            <dt>Pink noise</dt><dd>Noise with equal energy per octave; sounds balanced, and is the reference for tonal balance.</dd>
+            <dt>Sidechain</dt><dd>Using one signal (often the kick) to control a processor on another (often the bass).</dd>
+          </dl>
+          <div class="doc-cta">
+            <div><b>Put it into practice</b><span>Open a mix in MasterScope, or get Liminal for your DAW.</span></div>
+            <div class="cta-btns"><a class="btn primary" href="/">Analyse a track</a><a class="btn" href="/liminal/">Get Liminal</a></div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </section>

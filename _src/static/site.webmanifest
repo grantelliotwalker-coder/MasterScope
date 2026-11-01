@@ -1,0 +1,14 @@
+{
+  "name": "MasterScope",
+  "short_name": "MasterScope",
+  "description": "Drop your track and know if it's ready to release. Free, and your audio never leaves your computer.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07080f",
+  "theme_color": "#07080f",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
