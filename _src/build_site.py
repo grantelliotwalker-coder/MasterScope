@@ -159,7 +159,7 @@ def topbar(active):
 </header>'''
 
 
-FOOTER = f'''<footer><span><b class="foot-tag">{TAGLINE}</b> © {YEAR} MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/meter/">Meter</a><a href="/about/">About</a><a href="/changelog/">What’s new</a><a href="/coming-soon/">Coming soon</a><a href="/advertise/">Advertise</a><a href="/press/">Press</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a>{f'<a href="mailto:{EMAIL}">Contact</a>' if EMAIL else ''}</span></footer>'''
+FOOTER = f'''<footer><span><b class="foot-tag">{TAGLINE}</b> © {YEAR} MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/meter/">Meter</a><a href="/about/">About</a><a href="/changelog/">What’s new</a><a href="/coming-soon/">Coming soon</a><a href="/feedback/">Feedback</a><a href="/advertise/">Advertise</a><a href="/press/">Press</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a>{f'<a href="mailto:{EMAIL}">Contact</a>' if EMAIL else ''}</span></footer>'''
 
 
 def static_page(path, title, desc, active, main, body_attrs='', ld=''):
@@ -341,6 +341,24 @@ write('changelog/index.html', static_page('/changelog/', "What’s new – Maste
 pages.append(('/changelog/', '0.4'))
 write('coming-soon/index.html', static_page('/coming-soon/', 'Coming soon – new free plug-ins from MasterScope', 'New free plug-ins in development from the makers of MasterScope, Liminal and Meter. See what is coming and check back for news.', 'soon', src('coming-soon.html')))
 pages.append(('/coming-soon/', '0.5'))
+# Feedback: each button opens an email with a template, so reports arrive with what's needed to act on them
+from urllib.parse import quote as _q
+_ver = RELEASE['version'] if LIVE else '1.0'
+_fb = {
+    'FB_BUG': ('Bug report: ', 'What were you doing?\n\n\nWhat happened?\n\n\nWhat did you expect to happen?\n\n\n'
+               'Tool and version (MasterScope, Liminal ' + _ver + ' or Meter ' + _ver + '):\n'
+               'Windows or Mac, and which version:\nDAW and version (for Liminal):\nBrowser (for MasterScope):\n\n'
+               'A screenshot, or the report Liminal saved in Documents > MasterScope, helps a lot. Your audio is never needed.\n'),
+    'FB_IDEA': ('Idea: ', 'Which tool is it for (MasterScope, Liminal, Meter, or a new tool)?\n\n\n'
+                'What would you like it to do?\n\n\nWhat would it help you with when finishing a track?\n'),
+    'FB_QUESTION': ('Question: ', 'Your question:\n\n\nWhich tool and version (if it\'s about Liminal or Meter):\n'),
+}
+_fbpage = src('feedback.html')
+for _k, (_subj, _body) in _fb.items():
+    _fbpage = _fbpage.replace('{{' + _k + '}}', f"mailto:{EMAIL}?subject={_q(_subj)}&amp;body={_q(_body)}")
+write('feedback/index.html', static_page('/feedback/', 'Feedback – report a bug or suggest a feature – MasterScope',
+      'Report a bug, suggest a feature or ask a question about MasterScope, Liminal or Meter. Ideas from producers decide what goes into the next release.', '', _fbpage))
+pages.append(('/feedback/', '0.4'))
 write('press/index.html', static_page('/press/', 'Press kit – Liminal and MasterScope', 'Descriptions, facts, screenshots and logos for writing about the free Liminal limiter and MasterScope.', '', src('press.html')))
 pages.append(('/press/', '0.3'))
 write('terms/index.html', static_page('/terms/', 'Terms of use and Liminal licence – MasterScope', 'The terms for using MasterScope and the free licence for the Liminal plug-in.', '', src('terms.html')))

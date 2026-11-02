@@ -1190,3 +1190,9 @@ footer .foot-tag { font-weight: 600; color: var(--text-dim); margin-right: 6px; 
 /* bigger tap area for the card links on the home page and the changelog headings */
 .lp-loop li > a, .lp-loop > div > a, #landing [class*="loop"] div > a:last-child { display: inline-block; padding: 8px 0; }
 .changelog .release h3 a { display: inline-block; padding: 4px 0; }
+.fb-card { display: flex; flex-direction: column; }
+.fb-card h3 { margin-top: 2px; }
+.fb-card .btn { margin-top: auto; padding-top: 0; align-self: flex-start; }
+.fb-card p { margin-bottom: 16px; }
+.fb-plain { margin-top: 12px; }
+.doc-page .fb-card a.btn { text-decoration: none; color: #fff; }
