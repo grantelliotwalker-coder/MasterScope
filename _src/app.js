@@ -3868,16 +3868,18 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
   // checked exactly like a dropped file.
   // ===================================================================
   (async () => {
-    const m = /^#handoff=(\d{4,5})-([0-9a-f]{64})$/.exec(location.hash);
+    // the apps' URL helper escapes the '=' (#handoff%3D…), so decode before matching
+    let h = location.hash; try { h = decodeURIComponent(h); } catch (e) {}
+    const m = /^#handoff=(\d{4,5})-([0-9a-f]{64})$/i.exec(h);
     if (!m) return;
     history.replaceState(null, '', location.pathname + location.search);
     const port = +m[1];
     if (port < 1024 || port > 65535) return;
     toast('Opening the report from Liminal or MasterScope Meter…', 4000);
-    const fail = () => toast('Couldn’t get the report from the app. If your browser asked to let this page reach apps on your computer, allow it and try again. The app also saved a copy in Documents › MasterScope: you can drop that file here.', 10000);
+    const fail = () => toast('Couldn’t get the report from the app. If your browser asked to let this page reach apps on your computer, allow it and try again. The app also saved a copy (usually in Documents › MasterScope): you can drop that file here.', 10000);
     try {
       const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 10000);
-      const res = await fetch(`http://127.0.0.1:${port}/handoff/${m[2]}`, { cache: 'no-store', credentials: 'omit', signal: ctl.signal, targetAddressSpace: 'loopback' });
+      const res = await fetch(`http://127.0.0.1:${port}/handoff/${m[2].toLowerCase()}`, { cache: 'no-store', credentials: 'omit', signal: ctl.signal, targetAddressSpace: 'loopback' });
       clearTimeout(timer);
       if (!res.ok) return fail();
       const text = await res.text();
