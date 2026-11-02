@@ -3878,7 +3878,7 @@ dl.gloss dd { margin: 0.5mm 0 0; color: #3e4554; font-size: 8.5pt; }
     toast('Opening the report from Liminal or MasterScope Meter…', 4000);
     const fail = () => toast('Couldn’t get the report from the app. If your browser asked to let this page reach apps on your computer, allow it and try again. The app also saved a copy (usually in Documents › MasterScope): you can drop that file here.', 10000);
     try {
-      const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 10000);
+      const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 90000);   // long enough to answer Chrome's "access other apps" question
       const res = await fetch(`http://127.0.0.1:${port}/handoff/${m[2].toLowerCase()}`, { cache: 'no-store', credentials: 'omit', signal: ctl.signal, targetAddressSpace: 'loopback' });
       clearTimeout(timer);
       if (!res.ok) return fail();
