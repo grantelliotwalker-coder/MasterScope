@@ -32,6 +32,10 @@ jobs:
           set -euo pipefail
           VER=$(python3 -c "import json;print(json.load(open('.github/release.json'))['version'])")
           TAG="v$VER"
+          # During a release the new installers land here a minute before release.json
+          # catches up; wait for that push instead of failing (and emailing a failure)
+          MISSING=$(python3 -c "import json,os;r=json.load(open('.github/release.json'));print(' '.join(f['setup'] for f in r['files'].values() if not os.path.exists('downloads/'+f['setup'])))")
+          if [ -n "$MISSING" ]; then echo "::notice::release.json ($VER) lists installers not in downloads/ yet ($MISSING); the next publish will run this again"; exit 0; fi
           # check the Windows installers against release.json before publishing
           python3 - <<'EOF'
           import json, hashlib, sys
