@@ -29,7 +29,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/site.css?v=47fcdbe30e">
+<link rel="stylesheet" href="/assets/site.css?v=4fb79ac9f3">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Liminal","alternateName":"Liminal by MasterScope","url":"https://masterscope.gwstudio.com.au/liminal/","applicationCategory":"MultimediaApplication","applicationSubCategory":"Audio plug-in (VST3), mastering limiter","operatingSystem":"Windows 10, Windows 11, macOS 10.13+","softwareVersion":"1.0.3","image":"https://masterscope.gwstudio.com.au/img/liminal-learned.webp","screenshot":"https://masterscope.gwstudio.com.au/img/liminal-main.webp","description":"A free mastering limiter: press Learn, play your song once, and it sets itself for your loudness or density, checks the peaks through real Opus and Vorbis encoders, and hands MasterScope the report.","offers":{"@type":"Offer","price":"0","priceCurrency":"AUD"},"publisher":{"@type":"Organization","@id":"https://masterscope.gwstudio.com.au/#org","name":"MasterScope","url":"https://masterscope.gwstudio.com.au/","logo":"https://masterscope.gwstudio.com.au/icon-512.png","slogan":"Free tools for release-ready masters.","parentOrganization":{"@type":"Organization","name":"GW Studio"}},"license":"https://masterscope.gwstudio.com.au/terms/#liminal","downloadUrl":"https://github.com/grantelliotwalker-coder/MasterScope/releases/download/v1.0.3/MasterScope-Full-Suite-1.0.3-Windows-Setup.exe","fileSize":"4.8 MB","datePublished":"2026-11-03"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Liminal","item":"https://masterscope.gwstudio.com.au/liminal/"}]}]}</script>
 </head>
 <body class="wide-page">
@@ -81,7 +81,11 @@
       </div>
 
 
-      <div class="lp-section glance">
+      <nav class="lp-jump" aria-label="On this page">
+        <a href="#overview">Overview</a><a href="#features">Features</a><a href="#with-masterscope">With MasterScope</a><a href="#gallery">Gallery</a><a href="#install">Install</a><a href="#whats-new">What's new</a>
+      </nav>
+
+      <div class="lp-section glance" id="overview">
         <h2>At a glance</h2>
         <dl class="glance-grid">
           <div><dt>Formats</dt><dd>VST3 on Windows · VST3 and AU on Mac</dd></div>
@@ -94,7 +98,10 @@
         </dl>
       </div>
 
-      <h2 class="sr-only">What Liminal does</h2>
+      <div class="lp-section" id="features">
+        <h2>Features</h2>
+        <p>Everything Liminal does, from setting the level by hand to the helpers under Tools.</p>
+      </div>
       <div class="lp-features">
         <div class="lp-f"><h3>Simple by hand</h3><p>Choose a style, pull the threshold down until it sounds right, and the ceiling keeps the peaks safe. The settings you set once and leave live under Advanced; the helpers live under Tools.</p></div>
         <div class="lp-f"><h3>Learn, in one listen</h3><p>A second opinion: pick a loudness or a density (PLR), press Learn and play the song. Liminal renders what it heard through hidden copies of itself and suggests the threshold that lands on the target. Undo puts it back.</p></div>
@@ -105,16 +112,18 @@
         <div class="lp-f"><h3>See everything</h3><p>A rebuilt 8192-point spectrum (flat for pink noise, average, peak hold, input and reference overlays, note readout) and a 2D and 3D spectrogram with a Delta view of what limiting removes.</p></div>
         <div class="lp-f"><h3>Hear what matters</h3><p>Level match plays your mix at the output's loudness. Hear what's removed plays only what the limiter takes. Codec check plays the output through a real Opus encoder. Reference track plays a song you like at your loudness.</p></div>
         <div class="lp-f"><h3>Release pack</h3><p>Streaming, Club, Apple Music and YouTube masters written straight to disk from one listen, each a 24-bit WAV with its MasterScope report.</p></div>
+        <div class="lp-f"><h3>Live meters</h3><p>Loudness (momentary, short-term, integrated), true peak, the peak a listener gets after encoding, PLR, punch, gain reduction, correlation and stereo width, all as you play.</p></div>
+        <div class="lp-f"><h3>Snapshot</h3><p>One click copies every setting and the current meter readings as text, ready to paste into a message or a forum post when you want to show exactly how Liminal is set.</p></div>
         <div class="lp-f"><h3>Any window size</h3><p>Stretch the window to any shape (extra room goes to the graphs) or press full screen. New instances open at the size you last used.</p></div>
       </div>
 
-      <div class="lp-section">
+      <div class="lp-section" id="with-masterscope">
         <h2>Works with MasterScope</h2>
         <p>Liminal and MasterScope speak the same language. Learn's report opens in MasterScope with the result, a timeline of loudness and gain reduction, and your settings, and MasterScope's analysis tells you what to fix in the mix before Liminal ever has to work hard. The <a href="/learn/workflow/">mastering workflow</a> on the Learn page walks through it step by step.</p>
         <figure class="shot"><img src="/img/ms-session-top.webp" alt="A Liminal Learn report open in MasterScope" loading="lazy" width="1600" height="987"><figcaption>A Liminal Learn report in MasterScope.</figcaption></figure>
       </div>
 
-      <div class="lp-section">
+      <div class="lp-section" id="gallery">
         <h2>Gallery</h2>
         <div class="lp-gallery">
           <figure class="shot"><img src="/img/liminal-bassfirst.webp" alt="Liminal in Lookahead mode with Bass first" loading="lazy" width="1440" height="900"><figcaption>Lookahead with Bass first.</figcaption></figure>
@@ -128,7 +137,7 @@
         </div>
       </div>
 
-      <div class="lp-section lp-cols">
+      <div class="lp-section lp-cols" id="install">
         <div>
           <h2>Install on Windows</h2>
           <ol class="wf-steps compact">
@@ -147,8 +156,15 @@
         </div>
       </div>
 
-      <div class="lp-section">
-        <h2>What's in 1.0.3</h2>
+      <div class="lp-section" id="whats-new">
+        <h2>What's new in 1.0.3</h2>
+        <ul class="list">
+          <li><b>Snapshot:</b> a camera button next to Reset meters copies every setting and meter reading, ready to paste anywhere.</li>
+          <li><b>A live stereo width meter</b> next to Correlation, the same measure MasterScope reports.</li>
+          <li>Fixes and improvements. <a href="/changelog/">Every release →</a></li>
+        </ul>
+        <details class="lp-more">
+          <summary>What came in Liminal 1.0</summary>
         <ul class="list">
           <li><b>Codec-safe ceiling, measured with real encoders.</b> True peak, Streaming (Opus and Vorbis) or All codecs. Learn encodes your song, measures the decoded peaks and calibrates the limiter, so a loud master doesn't overshoot after upload.</li>
           <li><b>A cleaner window:</b> styles, a Tools panel for the helpers and an Advanced strip for set-and-forget settings.</li>
@@ -162,6 +178,7 @@
           <li><b>Factory presets</b> built around streaming-safe ceilings and density targets, and an About box with the licences.</li>
           <li><b>A report with every Learn,</b> and the Session log for any play-through. Open either straight in MasterScope (or save it and drop it on), which suggests what to change and gives you a preset to load back in.</li>
         </ul>
+        </details>
       </div>
 
       <div class="doc-cta">
