@@ -1,27 +1,27 @@
 {
-  "version": "1.0.3",
-  "commit": "f43a82d7e34ae926a0a4f094057470acd7eb92bf",
-  "built": "2026-11-03T03:59:23.3100186+00:00",
-  "setup": "MasterScope-Full-Suite-1.0.3-Windows-Setup.exe",
-  "sha256": "3707d9497a7ad25bfcfb6c47418d6353ef81d221a560429e10c3df06f9b34538",
-  "bytes": 5017951,
+  "version": "1.1.0",
+  "commit": "bd49cd7b7ea3054f0b12221f5180d1155bdb3edc",
+  "built": "2026-11-03T22:07:59.3777114+00:00",
+  "setup": "MasterScope-Full-Suite-1.1.0-Windows-Setup.exe",
+  "sha256": "87e4b35f0046678dff0dc1d83a5d9006d097bac93032da8ce245259ef87e0869",
+  "bytes": 5031771,
   "files": {
     "suite": {
-      "setup": "MasterScope-Full-Suite-1.0.3-Windows-Setup.exe",
-      "sha256": "3707d9497a7ad25bfcfb6c47418d6353ef81d221a560429e10c3df06f9b34538",
-      "bytes": 5017951
+      "setup": "MasterScope-Full-Suite-1.1.0-Windows-Setup.exe",
+      "sha256": "87e4b35f0046678dff0dc1d83a5d9006d097bac93032da8ce245259ef87e0869",
+      "bytes": 5031771
     },
     "liminal": {
-      "setup": "Liminal-1.0.3-Windows-Setup.exe",
-      "sha256": "a1b8c4d18cef0d3a6dc446bb738915595610d1ed9a250ff37d22a7354f6566f7",
-      "bytes": 4435729
+      "setup": "Liminal-1.1.0-Windows-Setup.exe",
+      "sha256": "b722ba9a1e5fc1fbea64a1de97b5c8879c50ae10ba455bee68d48b7fc8831645",
+      "bytes": 4443979
     },
     "meter": {
-      "setup": "MasterScope-Meter-1.0.3-Windows-Setup.exe",
-      "sha256": "d95a42ec6b4a85adb48dfcc17c45f39ff8f789eb19c8b20b95d204772401c062",
-      "bytes": 3955648
+      "setup": "MasterScope-Meter-1.1.0-Windows-Setup.exe",
+      "sha256": "13c3d00f8aeff200d67ec39ceb61dde133c5af09ef03fcce487d1e80d2272250",
+      "bytes": 3956848
     }
   },
-  "date": "3 November 2026",
-  "iso_date": "2026-11-03"
+  "date": "4 November 2026",
+  "iso_date": "2026-11-04"
 }
