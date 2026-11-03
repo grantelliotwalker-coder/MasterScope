@@ -1,15 +1,15 @@
 name: Publish installers as a GitHub Release
 
 # The site's download buttons point at this release, so GitHub counts every
-# download. Runs when the installers or _src/release.json change, or by hand
+# download. Runs when the installers or .github/release.json change, or by hand
 # (Actions -> this workflow -> Run workflow). It creates release v<version>
 # and uploads every installer in downloads/ for that version, after checking
-# each Windows installer against the SHA-256 in _src/release.json.
+# each Windows installer against the SHA-256 in .github/release.json.
 # Files already on the release are left alone, so download counts are kept.
 on:
   push:
     branches: [main]
-    paths: ['_src/release.json', 'downloads/**', '.github/workflows/release.yml']
+    paths: ['.github/release.json', 'downloads/**', '.github/workflows/release.yml']
   workflow_dispatch:
 
 permissions:
@@ -30,12 +30,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          VER=$(python3 -c "import json;print(json.load(open('_src/release.json'))['version'])")
+          VER=$(python3 -c "import json;print(json.load(open('.github/release.json'))['version'])")
           TAG="v$VER"
           # check the Windows installers against release.json before publishing
           python3 - <<'EOF'
           import json, hashlib, sys
-          r = json.load(open('_src/release.json'))
+          r = json.load(open('.github/release.json'))
           for f in r['files'].values():
               h = hashlib.sha256(open('downloads/' + f['setup'], 'rb').read()).hexdigest()
               if h != f['sha256']:
