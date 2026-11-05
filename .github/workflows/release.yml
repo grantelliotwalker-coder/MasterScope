@@ -5,7 +5,8 @@ name: Publish installers as a GitHub Release
 # (Actions -> this workflow -> Run workflow). It creates release v<version>
 # and uploads every installer in downloads/ for that version, after checking
 # each Windows installer against the SHA-256 in .github/release.json.
-# Files already on the release are left alone, so download counts are kept.
+# Files already on the release are left alone, so download counts are kept, unless the
+# file in downloads/ itself changed (a rebuilt installer under the same version).
 on:
   push:
     branches: [main]
@@ -56,6 +57,15 @@ jobs:
           HAVE=$(gh release view "$TAG" --json assets -q '.assets[].name')
           for f in "${FILES[@]}"; do
             n=$(basename "$f")
-            if grep -qxF "$n" <<<"$HAVE"; then echo "already there: $n"; else gh release upload "$TAG" "$f"; echo "uploaded: $n"; fi
+            if grep -qxF "$n" <<<"$HAVE"; then
+              # A file that changed in downloads/ on purpose (a rebuilt installer under the same
+              # version) replaces the release copy; that resets its download count, so only then.
+              info=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" -q ".assets[] | select(.name == \"$n\") | \"\(.digest // \"\") \(.size)\"")
+              dig=${info% *}; size=${info##* }
+              local_sha="sha256:$(sha256sum "$f" | cut -d' ' -f1)"; local_size=$(stat -c %s "$f")
+              if { [ -n "$dig" ] && [ "$dig" != "$local_sha" ]; } || { [ -z "$dig" ] && [ "$size" != "$local_size" ]; }; then
+                gh release upload "$TAG" "$f" --clobber; echo "::notice::replaced $n (the file in downloads/ changed; its download count restarts)"
+              else echo "already there: $n"; fi
+            else gh release upload "$TAG" "$f"; echo "uploaded: $n"; fi
           done
           gh release view "$TAG" --json assets -q '.assets[] | "\(.name)  \(.size) bytes  \(.download_count) downloads"'
