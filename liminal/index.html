@@ -29,7 +29,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=optional" rel="stylesheet">
-<link rel="stylesheet" href="/assets/site.css?v=b13c59c57f">
+<link rel="stylesheet" href="/assets/site.css?v=21832b5e4a">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","name":"Liminal","alternateName":"Liminal by MasterScope","url":"https://masterscope.gwstudio.com.au/liminal/","sameAs":["https://www.kvraudio.com/product/liminal-by-masterscope"],"applicationCategory":"MultimediaApplication","applicationSubCategory":"Audio plug-in (VST3), mastering limiter","operatingSystem":"Windows 10, Windows 11, macOS 10.13+","softwareVersion":"1.1.0","image":"https://masterscope.gwstudio.com.au/img/liminal-learned.webp","screenshot":"https://masterscope.gwstudio.com.au/img/liminal-main.webp","description":"A free mastering limiter: press Learn, play your song once, and it sets itself for your loudness or density, checks the peaks through real Opus and Vorbis encoders, and hands MasterScope the report.","offers":{"@type":"Offer","price":"0","priceCurrency":"AUD"},"publisher":{"@type":"Organization","@id":"https://masterscope.gwstudio.com.au/#org","name":"MasterScope","url":"https://masterscope.gwstudio.com.au/","logo":"https://masterscope.gwstudio.com.au/icon-512.png","slogan":"Free tools for release-ready masters.","parentOrganization":{"@type":"Organization","name":"GW Studio"}},"license":"https://masterscope.gwstudio.com.au/terms/#liminal","downloadUrl":"https://github.com/grantelliotwalker-coder/MasterScope/releases/download/v1.1.0/MasterScope-Full-Suite-1.1.0-Windows-Setup.exe","fileSize":"4.8 MB","datePublished":"2026-11-04"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Liminal","item":"https://masterscope.gwstudio.com.au/liminal/"}]}]}</script>
 </head>
 <body class="wide-page">
@@ -82,7 +82,7 @@
 
 
       <nav class="lp-jump" aria-label="On this page">
-        <a href="#overview">Overview</a><a href="#features">Features</a><a href="#themes">Themes</a><a href="#with-masterscope">With MasterScope</a><a href="#gallery">Gallery</a><a href="#install">Install</a><a href="#whats-new">What's new</a>
+        <a href="#overview">Overview</a><a href="#features">Features</a><a href="#listen">Listen</a><a href="#themes">Themes</a><a href="#with-masterscope">With MasterScope</a><a href="#gallery">Gallery</a><a href="#install">Install</a><a href="#whats-new">What's new</a>
       </nav>
 
       <div class="lp-section glance" id="overview">
@@ -116,6 +116,31 @@
         <div class="lp-f"><h3>Live meters</h3><p>Loudness (momentary, short-term, integrated), true peak, the peak a listener gets after encoding, PLR, punch, gain reduction, correlation and stereo width, all as you play.</p></div>
         <div class="lp-f"><h3>Snapshot</h3><p>One click copies every setting and the current meter readings as text, ready to paste into a message or a forum post when you want to show exactly how Liminal is set.</p></div>
         <div class="lp-f"><h3>Any size, any look</h3><p>Stretch the window to any shape (extra room goes to the graphs) or press full screen, and pick Dark, Light or a hardware look: Console, Rack or Vintage.</p></div>
+      </div>
+
+      <div class="lp-section" id="listen">
+        <h2>Listen</h2>
+        <p>Eight bars of <i>Jai</i>, one of Grant Walker's own tracks: the mixdown as it left the mix, then the same mix through Liminal. Switch between them as it plays. Level match is on, so the master plays at the mixdown's loudness and you hear the difference in punch and tone, not just volume. Headphones or good speakers help.</p>
+        <div class="ab-player" id="abPlayer" data-before="/audio/liminal-jai-before.mp3" data-after="/audio/liminal-jai-after.mp3" data-match-db="-6.04">
+          <div class="ab-top">
+            <button class="ab-play" id="abPlay" type="button" aria-label="Play"><svg viewBox="0 0 24 24" aria-hidden="true"><path id="abPlayIcon" d="M8 5v14l11-7z"/></svg></button>
+            <div class="ab-switch" role="group" aria-label="Which version">
+              <button type="button" class="ab-opt" id="abBefore" aria-pressed="false">Before<small>Mixdown</small></button>
+              <button type="button" class="ab-opt on" id="abAfter" aria-pressed="true">After<small>Liminal</small></button>
+            </div>
+            <label class="ab-match"><input type="checkbox" id="abMatch" checked> Level match</label>
+          </div>
+          <div class="ab-bar" id="abBar" role="slider" aria-label="Position" aria-valuemin="0" aria-valuemax="25" aria-valuenow="0" tabindex="0"><div class="ab-fill" id="abFill"></div></div>
+          <div class="ab-meta"><span id="abTime">0:00 / 0:25</span><span id="abNote">Level matched: the master is turned down 6.0 dB to the mixdown's loudness.</span></div>
+          <table class="ab-stats">
+            <thead><tr><th></th><th>Loudness</th><th>True peak</th><th>PLR (density)</th></tr></thead>
+            <tbody>
+              <tr><th>Before</th><td>−17.5 LUFS</td><td>+0.2 dBTP <span class="ab-bad">clips</span></td><td>17.8 dB</td></tr>
+              <tr><th>After</th><td>−11.5 LUFS</td><td>−2.1 dBTP</td><td>9.4 dB</td></tr>
+            </tbody>
+          </table>
+          <p class="small muted">Measured on this section. Played in your browser from 256 kbps MP3 copies of the WAV files.</p>
+        </div>
       </div>
 
       <div class="lp-section" id="themes">
@@ -205,7 +230,7 @@
 </main>
 <footer><span><b class="foot-tag">Free tools for release-ready masters.</b> © 2026 MasterScope. All rights reserved.</span><span>Runs entirely in your browser · Loudness per ITU-R BS.1770-4 and EBU R128</span><span class="foot-links"><a href="/learn/">Learn</a><a href="/liminal/">Liminal</a><a href="/meter/">Meter</a><a href="/about/">About</a><a href="/changelog/">What’s new</a><a href="/coming-soon/">Coming soon</a><a href="/feedback/">Feedback</a><a href="/advertise/">Advertise</a><a href="/press/">Press</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="mailto:masterscope@gwstudio.com.au">Contact</a></span></footer>
 <script src="/assets/config.js?v=0761814d71"></script>
-<script src="/assets/site.js?v=ec758a1201" defer></script>
+<script src="/assets/site.js?v=4bf27ef8cf" defer></script>
 <script src="/assets/bg3d.js?v=e0f994e98a" defer></script>
 </body>
 </html>
